@@ -1,0 +1,358 @@
+[
+  {
+    "id": "a11-manual-check",
+    "kind": "paraphrase",
+    "question": "Is a second check required when critical data is entered by hand?",
+    "document": "eu-gmp-annex11",
+    "any_of": [
+      "additional check on the accuracy"
+    ]
+  },
+  {
+    "id": "a11-batch-release",
+    "kind": "paraphrase",
+    "question": "Who is allowed to certify batch release in a computerised system?",
+    "document": "eu-gmp-annex11",
+    "any_of": [
+      "allow only Qualified Persons to certify the release"
+    ]
+  },
+  {
+    "id": "a11-migration",
+    "kind": "paraphrase",
+    "question": "What must be verified when data is moved to another system or format?",
+    "document": "eu-gmp-annex11",
+    "any_of": [
+      "validation should include checks"
+    ]
+  },
+  {
+    "id": "a11-backups",
+    "kind": "paraphrase",
+    "question": "What are the requirements for backing up data?",
+    "document": "eu-gmp-annex11",
+    "any_of": [
+      "Regular back-ups of all relevant data should be done"
+    ]
+  },
+  {
+    "id": "a11-continuity",
+    "kind": "paraphrase",
+    "question": "What should be in place if a system supporting critical processes breaks down?",
+    "document": "eu-gmp-annex11",
+    "any_of": [
+      "manual or alternative system"
+    ]
+  },
+  {
+    "id": "a11-access",
+    "kind": "paraphrase",
+    "question": "How should access to a computerised system be restricted?",
+    "document": "eu-gmp-annex11",
+    "any_of": [
+      "restrict access to computerised"
+    ]
+  },
+  {
+    "id": "a11-esig",
+    "kind": "paraphrase",
+    "question": "What must an electronic signature include?",
+    "document": "eu-gmp-annex11",
+    "any_of": [
+      "include the time and date that they were applied"
+    ]
+  },
+  {
+    "id": "a11-periodic",
+    "kind": "paraphrase",
+    "question": "How should a system be checked to confirm it remains in a valid state?",
+    "document": "eu-gmp-annex11",
+    "any_of": [
+      "periodically evaluated to confirm"
+    ]
+  },
+  {
+    "id": "a11-supplier-audit",
+    "kind": "paraphrase",
+    "question": "Is an audit of a supplier always required?",
+    "document": "eu-gmp-annex11",
+    "any_of": [
+      "The need for an audit should be based on a risk assessment"
+    ]
+  },
+  {
+    "id": "a11-system-owner",
+    "kind": "paraphrase",
+    "question": "Who is the system owner?",
+    "document": "eu-gmp-annex11",
+    "any_of": [
+      "responsible for the availability"
+    ]
+  },
+  {
+    "id": "p11-legacy",
+    "kind": "paraphrase",
+    "question": "Which conditions must a system meet to benefit from enforcement discretion as a legacy system?",
+    "document": "fda-part11-scope",
+    "any_of": [
+      "The system was operational before the effective date"
+    ]
+  },
+  {
+    "id": "p11-printouts",
+    "kind": "paraphrase",
+    "question": "Does printing paper records from a computer bring a system under Part 11?",
+    "document": "fda-part11-scope",
+    "any_of": [
+      "would not trigger part 11"
+    ]
+  },
+  {
+    "id": "p11-inspector",
+    "kind": "paraphrase",
+    "question": "How should access to records be provided to an inspector?",
+    "document": "fda-part11-scope",
+    "any_of": [
+      "reasonable and useful access to records"
+    ]
+  },
+  {
+    "id": "p11-word-processor",
+    "kind": "paraphrase",
+    "question": "Does every system need extensive validation, for example a word processor?",
+    "document": "fda-part11-scope",
+    "any_of": [
+      "validation would not be important for a word processor"
+    ]
+  },
+  {
+    "id": "p11-delete-electronic",
+    "kind": "paraphrase",
+    "question": "Can the electronic version be deleted after archiving to paper or microfilm?",
+    "document": "fda-part11-scope",
+    "any_of": [
+      "you can delete the electronic version of the records"
+    ]
+  },
+  {
+    "id": "p11-hybrid",
+    "kind": "paraphrase",
+    "question": "Can paper and electronic records exist side by side?",
+    "document": "fda-part11-scope",
+    "any_of": [
+      "components can co-exist"
+    ]
+  },
+  {
+    "id": "p11-audit-trail-not-required",
+    "kind": "paraphrase",
+    "question": "Should I keep audit trails even if no rule explicitly requires them?",
+    "document": "fda-part11-scope",
+    "any_of": [
+      "it may nonetheless be important to have audit trails"
+    ]
+  },
+  {
+    "id": "di-shared-login",
+    "kind": "paraphrase",
+    "question": "Why are shared login accounts a problem?",
+    "document": "fda-data-integrity-qa",
+    "any_of": [
+      "a unique individual cannot be identified through the login"
+    ]
+  },
+  {
+    "id": "di-audit-reviewer",
+    "kind": "paraphrase",
+    "question": "Who should review audit trails?",
+    "document": "fda-data-integrity-qa",
+    "any_of": [
+      "Audit trail review is similar to assessing cross-outs on paper"
+    ]
+  },
+  {
+    "id": "di-esig",
+    "kind": "paraphrase",
+    "question": "Can electronic signatures replace handwritten signatures on master production records?",
+    "document": "fda-data-integrity-qa",
+    "any_of": [
+      "electronic signature with the appropriate controls"
+    ]
+  },
+  {
+    "id": "di-reprocessing",
+    "kind": "paraphrase",
+    "question": "Is it acceptable to keep only the final result of reprocessed chromatography?",
+    "document": "fda-data-integrity-qa",
+    "any_of": [
+      "each result retained for review"
+    ]
+  },
+  {
+    "id": "di-falsification",
+    "kind": "paraphrase",
+    "question": "Can a tip about possible data falsification be handled informally?",
+    "document": "fda-data-integrity-qa",
+    "any_of": [
+      "known falsification or alteration of records required under parts 210"
+    ]
+  },
+  {
+    "id": "ich-principles",
+    "kind": "paraphrase",
+    "question": "What are the two primary principles of quality risk management?",
+    "document": "ich-q9-r1",
+    "any_of": [
+      "Two primary principles of quality risk management are"
+    ]
+  },
+  {
+    "id": "ich-review-frequency",
+    "kind": "paraphrase",
+    "question": "How often should a risk review be carried out?",
+    "document": "ich-q9-r1",
+    "any_of": [
+      "The frequency of any review should be based upon the level of risk"
+    ]
+  },
+  {
+    "id": "ich-formality",
+    "kind": "paraphrase",
+    "question": "Is the level of formality in risk management a yes or no matter?",
+    "document": "ich-q9-r1",
+    "any_of": [
+      "Formality in quality risk management is not a binary concept"
+    ]
+  },
+  {
+    "id": "id-alcoa",
+    "kind": "identifier",
+    "question": "ALCOA",
+    "document": "fda-data-integrity-qa",
+    "any_of": [
+      "original or a true copy, and accurate (ALCOA)"
+    ]
+  },
+  {
+    "id": "id-11-10e",
+    "kind": "identifier",
+    "question": "21 CFR 11.10(e) audit trail enforcement discretion",
+    "document": "fda-part11-scope",
+    "any_of": [
+      "11.10 (e), (k)(2)"
+    ]
+  },
+  {
+    "id": "id-testing-into-compliance",
+    "kind": "identifier",
+    "question": "testing into compliance",
+    "document": "fda-data-integrity-qa",
+    "any_of": [
+      "testing into compliance"
+    ]
+  },
+  {
+    "id": "id-fmea",
+    "kind": "identifier",
+    "question": "FMEA Failure Mode Effects Analysis",
+    "document": "ich-q9-r1",
+    "any_of": [
+      "Failure Mode Effects Analysis (FMEA)"
+    ]
+  },
+  {
+    "id": "id-1997",
+    "kind": "identifier",
+    "question": "August 20, 1997",
+    "document": "fda-part11-scope",
+    "any_of": [
+      "August 20, 1997"
+    ]
+  },
+  {
+    "id": "pl-a11-manual-check",
+    "kind": "polish",
+    "question": "Czy dla krytycznych danych wprowadzanych ręcznie wymagana jest dodatkowa kontrola?",
+    "document": "eu-gmp-annex11",
+    "any_of": [
+      "additional check on the accuracy"
+    ]
+  },
+  {
+    "id": "pl-a11-batch-release",
+    "kind": "polish",
+    "question": "Kto może zatwierdzać zwolnienie serii w systemie komputerowym?",
+    "document": "eu-gmp-annex11",
+    "any_of": [
+      "allow only Qualified Persons to certify the release"
+    ]
+  },
+  {
+    "id": "pl-di-shared-login",
+    "kind": "polish",
+    "question": "Dlaczego wspólne konta logowania są problemem?",
+    "document": "fda-data-integrity-qa",
+    "any_of": [
+      "a unique individual cannot be identified through the login"
+    ]
+  },
+  {
+    "id": "pl-ich-principles",
+    "kind": "polish",
+    "question": "Jakie są dwie główne zasady zarządzania ryzykiem jakości?",
+    "document": "ich-q9-r1",
+    "any_of": [
+      "Two primary principles of quality risk management are"
+    ]
+  },
+  {
+    "id": "neg-boiling",
+    "kind": "unanswerable",
+    "question": "What is the boiling point of water at high altitude?"
+  },
+  {
+    "id": "neg-sourdough",
+    "kind": "unanswerable",
+    "question": "How do I bake sourdough bread?"
+  },
+  {
+    "id": "neg-mona-lisa",
+    "kind": "unanswerable",
+    "question": "Who painted the Mona Lisa?"
+  },
+  {
+    "id": "neg-light",
+    "kind": "unanswerable",
+    "question": "What is the speed of light in a vacuum?"
+  },
+  {
+    "id": "neg-router",
+    "kind": "unanswerable",
+    "question": "How do I reset my home router password?"
+  },
+  {
+    "id": "neg-barszcz",
+    "kind": "unanswerable",
+    "question": "Jak ugotować barszcz czerwony?"
+  },
+  {
+    "id": "neg-hiking",
+    "kind": "unanswerable",
+    "question": "What are the best hiking trails in the Alps?"
+  },
+  {
+    "id": "neg-engine",
+    "kind": "unanswerable",
+    "question": "How does a car engine work?"
+  },
+  {
+    "id": "neg-japan",
+    "kind": "unanswerable",
+    "question": "What is the population of Japan?"
+  },
+  {
+    "id": "neg-language",
+    "kind": "unanswerable",
+    "question": "Which programming language is best for beginners?"
+  }
+]

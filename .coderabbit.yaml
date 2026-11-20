@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+language: en-US
+reviews:
+  profile: assertive
+  request_changes_workflow: false
+  high_level_summary: true
+  poem: false
+  auto_review:
+    enabled: true
+    drafts: false
+    base_branches:
+      - main
+  path_instructions:
+    - path: "api/**"
+      instructions: >
+        Check data integrity and traceability (audit trail, no silent overwrites),
+        SQL injection safety, and that answers are grounded in retrieved context.
+    - path: "web/**"
+      instructions: >
+        Check WCAG 2.1 AA (keyboard access, contrast, semantics, live regions)
+        and responsive layout from 320 px.
+    - path: ".github/**"
+      instructions: Check that actions are pinned and permissions are least-privilege.
+chat:
+  auto_reply: true

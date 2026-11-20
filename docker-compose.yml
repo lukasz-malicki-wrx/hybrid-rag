@@ -1,0 +1,110 @@
+# Runs the stack. For development (hot reload, live code) add the dev overlay:
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+# Published ports are bound to 127.0.0.1 so the database and Ollama are not exposed to the network.
+
+services:
+  db:
+    image: pgvector/pgvector:0.8.7-pg17
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-rag}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-rag}
+      POSTGRES_DB: ${POSTGRES_DB:-rag}
+    ports:
+      - "127.0.0.1:${DB_PORT:-5433}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-rag} -d ${POSTGRES_DB:-rag}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  ollama:
+    image: ollama/ollama:0.40.16
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:11434:11434"
+    volumes:
+      - ollama:/root/.ollama
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  # One-shot: pulls the models on first start (the chat model only when LLM_PROVIDER=ollama).
+  # The API waits for it, so the first request does not hit a missing model.
+  ollama-init:
+    image: ollama/ollama:0.40.16
+    depends_on:
+      ollama:
+        condition: service_healthy
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+      EMBED_MODEL: ${EMBED_MODEL:-bge-m3}
+      LLM_PROVIDER: ${LLM_PROVIDER:-ollama}
+      LLM_MODEL: ${LLM_MODEL:-qwen2.5:3b}
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - 'ollama pull "$$EMBED_MODEL" && { [ "$$LLM_PROVIDER" != ollama ] || ollama pull "$$LLM_MODEL"; }'
+    restart: "no"
+
+  api:
+    build: ./api
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-rag}:${POSTGRES_PASSWORD:-rag}@db:5432/${POSTGRES_DB:-rag}
+      OLLAMA_URL: ${OLLAMA_URL:-http://ollama:11434}
+      EMBED_MODEL: ${EMBED_MODEL:-bge-m3}
+      MAX_UPLOAD_MB: ${MAX_UPLOAD_MB:-50}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
+      LLM_PROVIDER: ${LLM_PROVIDER:-ollama}
+      LLM_MODEL: ${LLM_MODEL:-}
+      LLM_NUM_CTX: ${LLM_NUM_CTX:-8192}
+      LLM_MAX_TOKENS: ${LLM_MAX_TOKENS:-768}
+      MAX_VECTOR_DISTANCE: ${MAX_VECTOR_DISTANCE:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      UPLOAD_DIR: /data/uploads
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - uploads:/data/uploads  # original PDFs, content-addressed by SHA-256
+      - ./eval:/app/eval:ro  # evaluation questions for `python -m app.evaluation`
+    depends_on:
+      db:
+        condition: service_healthy
+      ollama-init:
+        condition: service_completed_successfully
+
+  # Ingestion worker: takes jobs from the Postgres queue (table ingestion_jobs) and turns the
+  # stored originals into embedded chunks. Same image as the API, different command.
+  worker:
+    build: ./api
+    command: ["python", "-m", "app.worker"]
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-rag}:${POSTGRES_PASSWORD:-rag}@db:5432/${POSTGRES_DB:-rag}
+      OLLAMA_URL: ${OLLAMA_URL:-http://ollama:11434}
+      EMBED_MODEL: ${EMBED_MODEL:-bge-m3}
+      UPLOAD_DIR: /data/uploads
+      INGEST_MAX_ATTEMPTS: ${INGEST_MAX_ATTEMPTS:-3}
+      INGEST_STALE_SECONDS: ${INGEST_STALE_SECONDS:-600}
+    volumes:
+      - uploads:/data/uploads:ro
+    healthcheck:
+      # The worker touches this file every loop and after every embedded batch.
+      test: ["CMD", "python", "-c", "import os, sys, time; sys.exit(time.time() - os.path.getmtime('/tmp/worker-heartbeat') > 300)"]
+      interval: 30s
+      timeout: 5s
+      start_period: 60s
+    depends_on:
+      db:
+        condition: service_healthy
+      ollama-init:
+        condition: service_completed_successfully
+
+volumes:
+  pgdata:
+  ollama:
+  uploads:
