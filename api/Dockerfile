@@ -1,7 +1,7 @@
 # Build stage: resolve dependencies from the lockfile into a virtualenv.
 FROM ghcr.io/astral-sh/uv:0.9.30 AS uv
 
-FROM python:3.12.16-slim-bookworm AS builder
+FROM python:3.15.2-slim-bookworm AS builder
 COPY --from=uv /uv /usr/local/bin/uv
 ENV UV_COMPILE_BYTECODE=1 \
     UV_LINK_MODE=copy \
@@ -11,7 +11,7 @@ COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-dev --no-install-project
 
 # Runtime stage: no build tools, non-root user, only the venv and the code.
-FROM python:3.12.16-slim-bookworm
+FROM python:3.15.2-slim-bookworm
 ENV PATH="/app/.venv/bin:$PATH" \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
