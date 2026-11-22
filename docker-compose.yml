@@ -51,7 +51,7 @@ services:
     restart: "no"
 
   api:
-    build: ./api
+    build: ./apps/api
     restart: unless-stopped
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER:-rag}:${POSTGRES_PASSWORD:-rag}@db:5432/${POSTGRES_DB:-rag}
@@ -80,7 +80,7 @@ services:
   # Ingestion worker: takes jobs from the Postgres queue (table ingestion_jobs) and turns the
   # stored originals into embedded chunks. Same image as the API, different command.
   worker:
-    build: ./api
+    build: ./apps/api
     command: ["python", "-m", "app.worker"]
     restart: unless-stopped
     environment:
@@ -107,7 +107,8 @@ services:
   # Web UI (Next.js). PUBLIC_API_URL is the API address as seen by the browser.
   web:
     build:
-      context: ./fe
+      context: .
+      dockerfile: apps/web/Dockerfile
       args:
         NEXT_PUBLIC_API_URL: ${PUBLIC_API_URL:-http://localhost:8000}
     restart: unless-stopped

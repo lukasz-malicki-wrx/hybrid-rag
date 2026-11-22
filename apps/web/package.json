@@ -1,0 +1,39 @@
+{
+  "name": "@hybrid-rag/web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "typecheck": "next typegen && tsc --noEmit",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "api:types": "openapi-typescript ${API_URL:-http://localhost:8000}/openapi.json -o src/api/schema.d.ts"
+  },
+  "dependencies": {
+    "@hybrid-rag/design-tokens": "*",
+    "@hybrid-rag/ui": "*",
+    "@tanstack/react-query": "5.108.2",
+    "next": "16.4.6",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "zustand": "5.1.0"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.14.0",
+    "@hybrid-rag/eslint-config": "*",
+    "@hybrid-rag/typescript-config": "*",
+    "@playwright/test": "1.65.1",
+    "@tailwindcss/turbopack": "4.3.3",
+    "@types/node": "22.20.5",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "openapi-typescript": "7.13.0",
+    "tailwindcss": "4.3.3",
+    "typescript": "^5",
+    "vitest": "5.1.1"
+  }
+}

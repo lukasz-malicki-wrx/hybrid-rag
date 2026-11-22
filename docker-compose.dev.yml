@@ -4,12 +4,12 @@ services:
   api:
     command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
     volumes:
-      - ./api/app:/app/app:ro
-      - ./api/migrations:/app/migrations:ro
+      - ./apps/api/app:/app/app:ro
+      - ./apps/api/migrations:/app/migrations:ro
 
   worker:
     # Restart the worker when its code changes (watchfiles ships with uvicorn[standard]).
     command: ["watchfiles", "--filter", "python", "python -m app.worker", "/app/app"]
     volumes:
-      - ./api/app:/app/app:ro
-      - ./api/migrations:/app/migrations:ro
+      - ./apps/api/app:/app/app:ro
+      - ./apps/api/migrations:/app/migrations:ro
