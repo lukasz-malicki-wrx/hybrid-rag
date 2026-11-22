@@ -121,7 +121,7 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
-      - run: npx turbo run lint typecheck test build
+      - run: npx --no turbo run lint typecheck test build
 
   web-e2e:
     # End-to-end tests with axe accessibility checks (WCAG 2.1 A/AA) against a mocked API.
@@ -135,7 +135,7 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
-      - run: npx --workspace @hybrid-rag/web playwright install --with-deps chromium
+      - run: npx --no --workspace @hybrid-rag/web playwright install --with-deps chromium
       - run: npm run test:e2e
       - uses: actions/upload-artifact@v4
         if: failure()
