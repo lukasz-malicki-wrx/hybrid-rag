@@ -150,7 +150,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: hadolint/hadolint-action@v3.1.0
+      - uses: hadolint/hadolint-action@v3.5.0
         with:
           dockerfile: apps/api/Dockerfile
       - name: Validate compose files
@@ -158,7 +158,7 @@ jobs:
           docker compose config -q
           docker compose -f docker-compose.yml -f docker-compose.dev.yml config -q
           docker compose -f docker-compose.yml -f docker-compose.native-ollama.yml config -q
-      - uses: hadolint/hadolint-action@v3.1.0
+      - uses: hadolint/hadolint-action@v3.5.0
         with:
           dockerfile: apps/web/Dockerfile
       - name: Build api image
