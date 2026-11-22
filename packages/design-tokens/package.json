@@ -17,7 +17,7 @@
     "@hybrid-rag/eslint-config": "*",
     "@hybrid-rag/typescript-config": "*",
     "@types/node": "22.20.5",
-    "eslint": "^9",
+    "eslint": "^10",
     "typescript": "^5",
     "vitest": "5.1.1"
   }

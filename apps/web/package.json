@@ -30,7 +30,7 @@
     "@types/node": "22.20.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "eslint": "^9",
+    "eslint": "^10",
     "openapi-typescript": "7.13.0",
     "tailwindcss": "4.3.3",
     "typescript": "^5",
