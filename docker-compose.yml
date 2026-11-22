@@ -104,6 +104,19 @@ services:
       ollama-init:
         condition: service_completed_successfully
 
+  # Web UI (Next.js). PUBLIC_API_URL is the API address as seen by the browser.
+  web:
+    build:
+      context: ./fe
+      args:
+        NEXT_PUBLIC_API_URL: ${PUBLIC_API_URL:-http://localhost:8000}
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      api:
+        condition: service_healthy
+
 volumes:
   pgdata:
   ollama:

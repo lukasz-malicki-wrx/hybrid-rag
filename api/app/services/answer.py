@@ -1,12 +1,15 @@
-import hashlib
 import logging
+import queue
+import threading
 from collections.abc import Callable, Iterator
+from contextlib import closing
 from dataclasses import dataclass
 from typing import Any
 from uuid import UUID
 
 from psycopg import Connection
 
+from ..rag.conversation import Turn, format_history
 from ..rag.llm import LLMProvider
 from ..rag.prompt import (
     PROMPT_VERSION,
@@ -17,7 +20,7 @@ from ..rag.prompt import (
     is_refusal,
 )
 from ..repositories.answer import AnswerRepository, QueryRepository
-from ..repositories.audit import AuditRepository
+from ..repositories.conversation import ConversationRepository
 from ..schemas.answer import (
     AnswerEvent,
     DoneEvent,
@@ -38,13 +41,33 @@ class Completion:
     refused: bool
     citations: list[int]
     uncited: bool
+    stopped: bool = False
+
+
+class AnswerRun:
+    """A generation running in its own thread, decoupled from the HTTP connection.
+
+    The response relays next_event() until it returns None. If the client goes away, the
+    response calls cancel(): the thread stops the model at the next token, closing the
+    connection to it, and still stores what was generated (marked stopped).
+    """
+
+    def __init__(self) -> None:
+        self._events: queue.Queue[AnswerEvent | None] = queue.Queue()
+        self.cancelled = threading.Event()
+
+    def next_event(self) -> AnswerEvent | None:
+        return self._events.get()
+
+    def cancel(self) -> None:
+        self.cancelled.set()
+
+    def put(self, event: AnswerEvent | None) -> None:
+        self._events.put(event)
 
 
 class AnswerService:
-    """Generates grounded, cited answers and records them for traceability.
-
-    Streaming runs after the request handler returned, so persistence uses its own connection.
-    """
+    """Generates grounded, cited answers and stores them with what they were based on."""
 
     def __init__(
         self,
@@ -61,7 +84,12 @@ class AnswerService:
         self._answer_tokens = answer_tokens
 
     def generate(
-        self, question: str, hits: list[dict[str, Any]]
+        self,
+        question: str,
+        hits: list[dict[str, Any]],
+        history: str = "",
+        cancel: threading.Event | None = None,
+        personal: str = "",
     ) -> Iterator[SourcesEvent | TokenEvent | Completion]:
         """Pure generation: sources, then tokens, then a Completion. No persistence."""
         yield SourcesEvent(
@@ -83,52 +111,115 @@ class AnswerService:
             yield Completion(REFUSAL, refused=True, citations=[], uncited=False)
             return
 
-        system, user = build_prompt(question, hits)
+        system, user = build_prompt(question, hits, history, personal)
         parts: list[str] = []
-        for token in self._llm.stream(system, user):
-            parts.append(token)
-            yield TokenEvent(text=token)
+        stopped = False
+        # closing(): leaving the loop early closes the provider's HTTP stream right away,
+        # which makes the model server stop generating.
+        with closing(self._llm.stream(system, user)) as tokens:
+            for token in tokens:
+                if cancel is not None and cancel.is_set():
+                    stopped = True
+                    break
+                parts.append(token)
+                yield TokenEvent(text=token)
         text = "".join(parts)
         refused = is_refusal(text)
         citations = [] if refused else extract_citations(text, len(hits))
-        yield Completion(text, refused, citations, uncited=not refused and not citations)
+        yield Completion(
+            text, refused, citations, uncited=not refused and not citations, stopped=stopped
+        )
 
-    def stream(
+    def start(
         self,
         question: str,
+        conversation_id: UUID | None,
+        history: list[Turn],
         docs: list[UUID] | None,
         params: dict[str, Any],
         hits: list[dict[str, Any]],
-    ) -> Iterator[AnswerEvent]:
-        """Generate, then persist; the final DoneEvent carries the stored answer's id."""
-        fitted = fit_to_budget(question, hits, self._context_tokens, self._answer_tokens)
-        if len(fitted) < len(hits):
-            params = {**params, "dropped_for_context": len(hits) - len(fitted)}
-        hits = fitted
+        attached: list[UUID] | None = None,
+        personal: str = "",
+    ) -> AnswerRun:
+        run = AnswerRun()
+        threading.Thread(
+            target=self._run,
+            args=(
+                run,
+                question,
+                conversation_id,
+                history,
+                docs,
+                params,
+                hits,
+                attached or [],
+                personal,
+            ),
+            name="answer",
+            daemon=True,
+        ).start()
+        return run
+
+    def _run(
+        self,
+        run: AnswerRun,
+        question: str,
+        conversation_id: UUID | None,
+        history: list[Turn],
+        docs: list[UUID] | None,
+        params: dict[str, Any],
+        hits: list[dict[str, Any]],
+        attached: list[UUID],
+        personal: str,
+    ) -> None:
         try:
-            for item in self.generate(question, hits):
+            history_text = format_history(history)
+            fitted = fit_to_budget(
+                question,
+                hits,
+                self._context_tokens,
+                self._answer_tokens,
+                history_text,
+                personal,
+            )
+            if personal:
+                # Stored with the question, so the style of an answer can be explained later.
+                params = {**params, "personal_context": personal}
+            if len(fitted) < len(hits):
+                params = {**params, "dropped_for_context": len(hits) - len(fitted)}
+            if history:
+                params = {**params, "history_turns": len(history)}
+            for item in self.generate(question, fitted, history_text, run.cancelled, personal):
                 if isinstance(item, Completion):
-                    answer_id = self._save(question, docs, params, hits, item)
-                    yield DoneEvent(
-                        answer_id=answer_id,
-                        refused=item.refused,
-                        citations=item.citations,
-                        uncited=item.uncited,
+                    answer_id = self._save(
+                        question, conversation_id, docs, params, fitted, item, attached
+                    )
+                    run.put(
+                        DoneEvent(
+                            answer_id=answer_id,
+                            refused=item.refused,
+                            citations=item.citations,
+                            uncited=item.uncited,
+                            stopped=item.stopped,
+                        )
                     )
                 else:
-                    yield item
+                    run.put(item)
         except Exception:
             logger.exception("answer generation failed")
-            self._audit_failure(question, params)
-            yield ErrorEvent(message="answer generation failed")
+            run.put(ErrorEvent(message="answer generation failed"))
+        finally:
+            run.put(None)
 
     def _save(
         self,
         question: str,
+        conversation_id: UUID | None,
         docs: list[UUID] | None,
         params: dict[str, Any],
         hits: list[dict[str, Any]],
         done: Completion,
+        attached: list[UUID] | None = None,
     ) -> UUID:
         corpus = {
             str(h["document_id"]): {
@@ -141,7 +232,9 @@ class AnswerService:
         chunk_ids = [h["id"] for h in hits]
         with self._connect() as conn:
             # An empty list means "all active documents"; the API rejects an explicit [].
-            query_id = QueryRepository(conn).create(question, docs or [], params)
+            query_id = QueryRepository(conn).create(
+                question, docs or [], params, conversation_id, attached
+            )
             answer_id = AnswerRepository(conn).create(
                 query_id,
                 done.text,
@@ -151,32 +244,11 @@ class AnswerService:
                 self._llm.name,
                 self._llm.model,
                 PROMPT_VERSION,
+                refused=done.refused,
+                uncited=done.uncited,
+                citations=done.citations,
+                stopped=done.stopped,
             )
-            AuditRepository(conn).append(
-                "answer.generated",
-                {
-                    "query_id": str(query_id),
-                    "answer_id": str(answer_id),
-                    "llm_provider": self._llm.name,
-                    "llm_model": self._llm.model,
-                    "prompt_version": PROMPT_VERSION,
-                    # The hash ties the audit entry to the stored answer text: any later
-                    # change to the answer row no longer matches the tamper-evident log.
-                    "answer_sha256": hashlib.sha256(done.text.encode()).hexdigest(),
-                    "chunk_ids": chunk_ids,
-                    "cited": done.citations,
-                    "refused": done.refused,
-                    "uncited": done.uncited,
-                },
-            )
+            if conversation_id is not None:
+                ConversationRepository(conn).touch(conversation_id)
         return answer_id
-
-    def _audit_failure(self, question: str, params: dict[str, Any]) -> None:
-        try:
-            with self._connect() as conn:
-                AuditRepository(conn).append(
-                    "answer.failed",
-                    {"question": question[:200], "params": params, "llm_model": self._llm.model},
-                )
-        except Exception:
-            logger.exception("could not audit answer failure")

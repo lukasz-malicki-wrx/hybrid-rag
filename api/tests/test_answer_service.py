@@ -14,10 +14,14 @@ class FakeLLM:
     def __init__(self, tokens):
         self.tokens = tokens
         self.calls = 0
+        self.closed = False
 
     def stream(self, system, user):
         self.calls += 1
-        yield from self.tokens
+        try:
+            yield from self.tokens
+        finally:
+            self.closed = True  # the provider's HTTP stream would be closed here
 
 
 HIT = {
@@ -75,3 +79,19 @@ def test_event_union_round_trips_by_type_field():
     parsed = adapter.validate_json(event.model_dump_json())
     assert isinstance(parsed, DoneEvent)
     assert adapter.validate_python({"type": "token", "text": "hi"}) == TokenEvent(text="hi")
+
+
+def test_cancel_stops_the_model_and_marks_the_answer_stopped():
+    import threading
+
+    cancel = threading.Event()
+    llm = FakeLLM(["one ", "two ", "three"])
+    service = AnswerService(llm, connect=None, embed_model="bge-m3")
+    events = []
+    for event in service.generate("q", [HIT], cancel=cancel):
+        events.append(event)
+        if isinstance(event, TokenEvent):
+            cancel.set()  # e.g. the client pressed Stop after the first token
+    done = events[-1]
+    assert done.stopped and done.text == "one "
+    assert llm.closed

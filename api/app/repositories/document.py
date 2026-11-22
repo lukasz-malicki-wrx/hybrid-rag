@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Any
 from uuid import UUID
 
@@ -26,13 +28,37 @@ class DocumentRepository:
     def get(self, doc_id: UUID) -> Row | None:
         return self._conn.execute("SELECT * FROM documents WHERE id = %s", (doc_id,)).fetchone()
 
+    def refs(self, doc_ids: list[UUID]) -> dict[UUID, Row]:
+        """Short descriptions of documents by id, inactive ones included."""
+        rows = self._conn.execute(
+            "SELECT id, filename, version, status, active FROM documents "
+            "WHERE id = ANY(%s::uuid[])",
+            (doc_ids,),
+        ).fetchall()
+        return {r["id"]: r for r in rows}
+
+    def missing_or_inactive(self, doc_ids: list[UUID]) -> list[UUID]:
+        """The ids in doc_ids that are not active documents."""
+        found = {
+            r["id"]
+            for r in self._conn.execute(
+                "SELECT id FROM documents WHERE id = ANY(%s::uuid[]) AND active", (doc_ids,)
+            ).fetchall()
+        }
+        return [d for d in doc_ids if d not in found]
+
     def get_by_sha256(self, sha256: str) -> Row | None:
         return self._conn.execute("SELECT * FROM documents WHERE sha256 = %s", (sha256,)).fetchone()
 
-    def list(self, include_inactive: bool) -> list[Row]:
+    def list(self, include_inactive: bool, group_id: UUID | None = None) -> list[Row]:
         return self._conn.execute(
-            "SELECT * FROM documents WHERE active OR %s ORDER BY filename, version DESC",
-            (include_inactive,),
+            "SELECT d.* FROM documents d WHERE (d.active OR %(all)s) "
+            "AND (%(group)s::uuid IS NULL OR EXISTS ("
+            "  SELECT 1 FROM group_documents gd "
+            "  WHERE gd.document_id = d.id AND gd.group_id = %(group)s::uuid "
+            "  AND gd.removed_at IS NULL)) "
+            "ORDER BY d.filename, d.version DESC",
+            {"all": include_inactive, "group": group_id},
         ).fetchall()
 
     def latest_by_filename(self, filename: str) -> Row | None:

@@ -1,11 +1,7 @@
-import threading
-import uuid
-
 import psycopg
 import pytest
 
 from app.core import migrate
-from app.repositories.audit import AuditRepository
 
 
 def test_migrations_are_recorded_with_checksums_and_rerun_safely(db_url, conn):
@@ -33,24 +29,5 @@ def test_answers_and_queries_are_append_only(conn):
     conn.rollback()
 
 
-def test_audit_chain_stays_valid_under_concurrent_writers(connect, conn):
-    def write(n: int) -> None:
-        with connect() as c:
-            for i in range(10):
-                AuditRepository(c).append("test.concurrent", {"writer": n, "i": i})
-                c.commit()
-
-    threads = [threading.Thread(target=write, args=(n,)) for n in range(8)]
-    for t in threads:
-        t.start()
-    for t in threads:
-        t.join()
-    assert conn.execute("SELECT audit_verify() AS id").fetchone()["id"] is None
-
-
-def test_audit_log_rejects_changes(conn):
-    AuditRepository(conn).append("test.event", {"x": str(uuid.uuid4())})
-    conn.commit()
-    with pytest.raises(psycopg.errors.RaiseException, match="append-only"):
-        conn.execute("UPDATE audit_log SET event = 'x'")
-    conn.rollback()
+def test_audit_log_is_gone(conn):
+    assert conn.execute("SELECT to_regclass('audit_log') AS t").fetchone()["t"] is None

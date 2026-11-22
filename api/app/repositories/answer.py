@@ -9,10 +9,18 @@ class QueryRepository:
     def __init__(self, conn: Connection) -> None:
         self._conn = conn
 
-    def create(self, question: str, document_ids: list[UUID], params: dict[str, Any]) -> UUID:
+    def create(
+        self,
+        question: str,
+        document_ids: list[UUID],
+        params: dict[str, Any],
+        conversation_id: UUID | None = None,
+        attached_document_ids: list[UUID] | None = None,
+    ) -> UUID:
         return self._conn.execute(
-            "INSERT INTO queries (question, document_ids, params) VALUES (%s, %s, %s) RETURNING id",
-            (question, document_ids, Jsonb(params)),
+            "INSERT INTO queries (question, document_ids, params, conversation_id, "
+            "attached_document_ids) VALUES (%s, %s, %s, %s, %s) RETURNING id",
+            (question, document_ids, Jsonb(params), conversation_id, attached_document_ids or []),
         ).fetchone()["id"]
 
 
@@ -30,11 +38,15 @@ class AnswerRepository:
         llm_provider: str,
         llm_model: str,
         prompt_version: str,
+        refused: bool = False,
+        uncited: bool = False,
+        citations: list[int] | None = None,
+        stopped: bool = False,
     ) -> UUID:
         return self._conn.execute(
             "INSERT INTO answers (query_id, answer, chunk_ids, corpus, embed_model, "
-            "llm_provider, llm_model, prompt_version) VALUES (%s, %s, %s, %s, %s, %s, %s, %s) "
-            "RETURNING id",
+            "llm_provider, llm_model, prompt_version, refused, uncited, citations, stopped) "
+            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id",
             (
                 query_id,
                 answer,
@@ -44,5 +56,9 @@ class AnswerRepository:
                 llm_provider,
                 llm_model,
                 prompt_version,
+                refused,
+                uncited,
+                citations or [],
+                stopped,
             ),
         ).fetchone()["id"]

@@ -9,7 +9,6 @@ from ..core.config import Settings
 from ..rag.chunking import split_text
 from ..rag.embedding import Embedder
 from ..rag.pdf import extract_pages
-from ..repositories.audit import AuditRepository
 from ..repositories.chunk import ChunkRepository
 from ..repositories.document import DocumentRepository
 from ..repositories.job import JobRepository
@@ -89,17 +88,6 @@ class IngestionService:
             ChunkRepository(conn).add_many(doc_id, rows, vectors)
             DocumentRepository(conn).mark_ready(doc_id, pages, len(rows))
             JobRepository(conn).complete(job["id"])
-            AuditRepository(conn).append(
-                "document.ingested",
-                {
-                    "id": str(doc_id),
-                    "job_id": job["id"],
-                    "attempt": job["attempts"],
-                    "pages": pages,
-                    "chunks": len(rows),
-                    "embed_model": self._embedder.model,
-                },
-            )
 
     def _record_failure(self, job: Row, error: str, final: bool = False) -> None:
         doc_id = job["document_id"]
@@ -107,38 +95,15 @@ class IngestionService:
         final = final or attempt >= job["max_attempts"]
         try:
             with self._connect() as conn:
-                docs, jobs, audit = (
-                    DocumentRepository(conn),
-                    JobRepository(conn),
-                    AuditRepository(conn),
-                )
+                docs, jobs = DocumentRepository(conn), JobRepository(conn)
                 if final:
                     jobs.fail(job["id"], error)
                     docs.mark_failed(doc_id, error)
-                    audit.append(
-                        "document.failed",
-                        {
-                            "id": str(doc_id),
-                            "job_id": job["id"],
-                            "attempt": attempt,
-                            "error": error,
-                        },
-                    )
                 else:
                     delay = retry_delay_seconds(attempt)
                     jobs.retry_later(job["id"], error, delay)
                     docs.note_error(
                         doc_id, f"attempt {attempt} failed, retrying in {delay} s: {error}"
-                    )
-                    audit.append(
-                        "ingestion.retry_scheduled",
-                        {
-                            "id": str(doc_id),
-                            "job_id": job["id"],
-                            "attempt": attempt,
-                            "delay_seconds": delay,
-                            "error": error,
-                        },
                     )
         except Exception:
             # The job stays 'running'; once its heartbeat is stale another claim retries it.

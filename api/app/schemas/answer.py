@@ -6,6 +6,27 @@ from pydantic import BaseModel, Field
 
 class AnswerRequest(BaseModel):
     question: str = Field(min_length=1, max_length=2000)
+    conversation_id: UUID | None = Field(
+        default=None, description="Continue this conversation; omit to start a new one"
+    )
+    group_id: UUID | None = Field(
+        default=None,
+        description="Group of a new conversation; its documents become the search scope",
+    )
+    pin_document_ids: list[UUID] | None = Field(
+        default=None,
+        min_length=1,
+        max_length=50,
+        description="Documents to pin to the conversation before answering; a conversation "
+        "with pinned documents searches only those",
+    )
+    attached_document_ids: list[UUID] | None = Field(
+        default=None,
+        min_length=1,
+        max_length=20,
+        description="Files attached to this question: shown with it in the conversation and "
+        "pinned to the conversation like pin_document_ids",
+    )
     document_ids: list[UUID] | None = Field(
         default=None,
         min_length=1,
@@ -23,6 +44,15 @@ class SourceOut(BaseModel):
     version: int
     page: int
     text: str
+
+
+class ConversationEvent(BaseModel):
+    """First event: the conversation this answer belongs to (created if it was new)."""
+
+    type: Literal["conversation"] = "conversation"
+    conversation_id: UUID
+    title: str
+    created: bool
 
 
 class SourcesEvent(BaseModel):
@@ -47,6 +77,7 @@ class DoneEvent(BaseModel):
     refused: bool
     citations: list[int]
     uncited: bool = Field(description="True when the answer is not a refusal but cites nothing")
+    stopped: bool = Field(default=False, description="Generation was stopped by the client")
 
 
 class ErrorEvent(BaseModel):
@@ -55,5 +86,6 @@ class ErrorEvent(BaseModel):
 
 
 AnswerEvent = Annotated[
-    SourcesEvent | TokenEvent | DoneEvent | ErrorEvent, Field(discriminator="type")
+    ConversationEvent | SourcesEvent | TokenEvent | DoneEvent | ErrorEvent,
+    Field(discriminator="type"),
 ]

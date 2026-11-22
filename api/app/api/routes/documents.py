@@ -1,11 +1,12 @@
 from collections.abc import Iterator
 from pathlib import Path
+from urllib.parse import quote
 from uuid import UUID
 
 from fastapi import APIRouter, Response, UploadFile
 from fastapi.responses import StreamingResponse
 
-from ...schemas.document import DocumentOut, DocumentStatusEvent, UploadOut
+from ...schemas.document import ChunkOut, DocumentOut, DocumentStatusEvent, UploadOut
 from ..deps import DocumentServiceDep, SettingsDep, StatusStreamDep
 
 router = APIRouter(prefix="/documents", tags=["documents"])
@@ -13,25 +14,56 @@ router = APIRouter(prefix="/documents", tags=["documents"])
 
 @router.post("", status_code=202, response_model=UploadOut)
 def upload_document(
-    file: UploadFile, response: Response, documents: DocumentServiceDep, settings: SettingsDep
+    file: UploadFile,
+    response: Response,
+    documents: DocumentServiceDep,
+    settings: SettingsDep,
+    group_id: UUID | None = None,
 ):
     """Store the original and queue it for ingestion (202), or return the existing duplicate
-    (200). Follow progress with GET /documents/{id}/events."""
+    (200). With group_id the document is also added to that group. Follow progress with
+    GET /documents/{id}/events."""
     data = file.file.read(settings.max_upload_bytes + 1)
-    result = documents.register_upload(Path(file.filename or "document.pdf").name, data)
+    result = documents.register_upload(Path(file.filename or "document.pdf").name, data, group_id)
     if not result.queued:
         response.status_code = 200
     return {**result.document, "duplicate": not result.queued}
 
 
 @router.get("", response_model=list[DocumentOut])
-def list_documents(documents: DocumentServiceDep, include_inactive: bool = False):
-    return documents.list(include_inactive)
+def list_documents(
+    documents: DocumentServiceDep, include_inactive: bool = False, group_id: UUID | None = None
+):
+    return documents.list(include_inactive, group_id)
 
 
 @router.get("/{doc_id}", response_model=DocumentOut)
 def get_document(doc_id: UUID, documents: DocumentServiceDep):
     return documents.get(doc_id)
+
+
+@router.get("/{doc_id}/chunks", response_model=list[ChunkOut])
+def document_chunks(doc_id: UUID, documents: DocumentServiceDep):
+    """How the document was cut for search: its chunks in reading order, with page and length."""
+    return documents.chunks(doc_id)
+
+
+@router.get(
+    "/{doc_id}/file",
+    response_class=Response,
+    responses={200: {"content": {"application/pdf": {}}}, 404: {}},
+)
+def document_file(doc_id: UUID, documents: DocumentServiceDep):
+    """The original PDF, unchanged. Append #page=N to open it at a cited page."""
+    doc, data = documents.original(doc_id)
+    return Response(
+        data,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f"inline; filename*=UTF-8''{quote(doc['filename'])}",
+            "Cache-Control": "private, max-age=3600",
+        },
+    )
 
 
 def _sse(events: Iterator[DocumentStatusEvent | None]) -> Iterator[str]:

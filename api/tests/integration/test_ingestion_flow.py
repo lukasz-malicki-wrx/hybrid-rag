@@ -2,7 +2,7 @@ import threading
 
 from app.core.config import Settings
 from app.rag.embedding import Embedder
-from app.repositories.audit import AuditRepository
+from app.repositories.chunk import ChunkRepository
 from app.repositories.document import DocumentRepository
 from app.repositories.job import JobRepository
 from app.services.document import DocumentService
@@ -39,7 +39,6 @@ def upload(connect, store, data=PDF, name="annex.pdf", **overrides):
             conn,
             DocumentRepository(conn),
             JobRepository(conn),
-            AuditRepository(conn),
             store,
             settings(**overrides),
         )
@@ -81,6 +80,13 @@ def test_upload_then_worker_makes_the_document_searchable(connect, connect_liste
         ).fetchone()
     assert chunks == doc["progress_total"]
     assert job["status"] == "done"
+
+    with connect() as conn:
+        listed = ChunkRepository(conn).by_document(doc["id"])
+    assert len(listed) == chunks
+    order = [(c["page"], c["position"]) for c in listed]
+    assert order == sorted(order)
+    assert all(c["chars"] == len(c["text"]) > 0 for c in listed)
 
 
 def test_failed_attempt_is_retried_later_then_fails_for_good(connect, connect_listener, tmp_path):

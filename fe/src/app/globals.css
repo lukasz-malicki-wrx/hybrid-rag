@@ -1,0 +1,99 @@
+@import "tailwindcss";
+
+/* Colour palette: import exactly one. "classic" is the original grey and blue; "vintage" and
+   "bees" are Adobe Color themes. Each file defines the same variables. */
+@import "./palettes/vintage.css";
+/* @import "./palettes/classic.css"; */
+
+:root {
+  color-scheme: light dark;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-fg: var(--accent-fg);
+  --color-danger: var(--danger);
+  --color-danger-fg: var(--danger-fg);
+  --color-warn-bg: var(--warn-bg);
+  --color-warn-fg: var(--warn-fg);
+  --color-ok: var(--ok);
+  --color-focus: var(--focus);
+  --color-ai: var(--ai-2);
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
+}
+
+/* In a layer, so Tailwind utilities (e.g. focus:outline-none) can still override these. */
+@layer base {
+  html,
+  body {
+    height: 100%;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-sans);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  dialog::backdrop {
+    background: rgb(0 0 0 / 0.45);
+  }
+
+  @keyframes ai-shimmer {
+    from {
+      background-position: 0% 50%;
+    }
+    to {
+      background-position: 200% 50%;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* A conversation the assistant is answering right now: a soft, moving gradient. With reduced
+   motion it stays as a static highlight. Text keeps its normal colour for contrast. */
+@utility ai-active {
+  background-image: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--ai-1) 16%, transparent),
+    color-mix(in srgb, var(--ai-2) 22%, transparent),
+    color-mix(in srgb, var(--ai-3) 16%, transparent),
+    color-mix(in srgb, var(--ai-1) 16%, transparent)
+  );
+  background-size: 200% 100%;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ai-2) 45%, transparent);
+  animation: ai-shimmer 2.4s linear infinite;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}

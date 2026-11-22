@@ -32,5 +32,10 @@ def test_unknown_origin_is_rejected():
     assert "access-control-allow-origin" not in resp.headers
 
 
+def test_methods_used_by_the_web_ui_are_allowed():
+    for method in ("GET", "POST", "PUT", "PATCH", "DELETE"):
+        assert preflight("http://localhost:3000", method=method).status_code == 200, method
+
+
 def test_unlisted_method_is_rejected():
-    assert preflight("http://localhost:3000", method="PUT").status_code == 400
+    assert preflight("http://localhost:3000", method="TRACE").status_code == 400
