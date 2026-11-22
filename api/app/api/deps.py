@@ -8,16 +8,20 @@ from ..core.config import Settings, get_settings
 from ..core.db import connect, connect_listener, get_conn
 from ..rag.embedding import Embedder, OllamaEmbedder
 from ..rag.llm import LLMProvider, build_llm
-from ..repositories.audit import AuditRepository
 from ..repositories.chunk import ChunkRepository
+from ..repositories.conversation import ConversationRepository
 from ..repositories.document import DocumentRepository
+from ..repositories.group import GroupRepository
 from ..repositories.job import JobRepository
+from ..repositories.settings import SettingsRepository
 from ..services.answer import AnswerService
-from ..services.audit import AuditService
+from ..services.conversation import ConversationService
 from ..services.document import DocumentService
 from ..services.document_events import DocumentStatusStream
+from ..services.group import GroupService
 from ..services.health import HealthService
 from ..services.search import SearchService
+from ..services.settings import SettingsService
 from ..storage import FileStore, LocalFileStore
 
 SettingsDep = Annotated[Settings, Depends(get_settings)]
@@ -45,10 +49,34 @@ def get_document_service(conn: ConnDep, settings: SettingsDep) -> DocumentServic
         conn,
         DocumentRepository(conn),
         JobRepository(conn),
-        AuditRepository(conn),
         _store(),
         settings,
+        GroupRepository(conn),
+        ChunkRepository(conn),
     )
+
+
+def get_group_service(conn: ConnDep) -> GroupService:
+    return GroupService(
+        conn,
+        GroupRepository(conn),
+        ConversationRepository(conn),
+        DocumentRepository(conn),
+    )
+
+
+def get_conversation_service(conn: ConnDep) -> ConversationService:
+    return ConversationService(
+        conn,
+        ConversationRepository(conn),
+        GroupRepository(conn),
+        ChunkRepository(conn),
+        DocumentRepository(conn),
+    )
+
+
+def get_settings_service(conn: ConnDep) -> SettingsService:
+    return SettingsService(conn, SettingsRepository(conn))
 
 
 def get_status_stream() -> DocumentStatusStream:
@@ -65,17 +93,15 @@ def get_answer_service(settings: SettingsDep) -> AnswerService:
     )
 
 
-def get_audit_service(conn: ConnDep) -> AuditService:
-    return AuditService(AuditRepository(conn))
-
-
 def get_health_service(settings: SettingsDep) -> HealthService:
     return HealthService(settings)
 
 
 DocumentServiceDep = Annotated[DocumentService, Depends(get_document_service)]
+GroupServiceDep = Annotated[GroupService, Depends(get_group_service)]
+ConversationServiceDep = Annotated[ConversationService, Depends(get_conversation_service)]
+SettingsServiceDep = Annotated[SettingsService, Depends(get_settings_service)]
 StatusStreamDep = Annotated[DocumentStatusStream, Depends(get_status_stream)]
 SearchServiceDep = Annotated[SearchService, Depends(get_search_service)]
 AnswerServiceDep = Annotated[AnswerService, Depends(get_answer_service)]
-AuditServiceDep = Annotated[AuditService, Depends(get_audit_service)]
 HealthServiceDep = Annotated[HealthService, Depends(get_health_service)]

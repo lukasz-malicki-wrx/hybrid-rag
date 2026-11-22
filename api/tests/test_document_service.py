@@ -26,14 +26,6 @@ class FakeConn:
         self.rollbacks += 1
 
 
-class FakeAudit:
-    def __init__(self):
-        self.events: list[str] = []
-
-    def append(self, event, payload=None):
-        self.events.append(event)
-
-
 class FakeDocuments:
     def __init__(self):
         self.rows: dict[UUID, dict] = {}
@@ -101,10 +93,10 @@ SETTINGS = Settings(database_url="x", ollama_url="y", max_upload_bytes=1000)
 
 @pytest.fixture
 def parts():
-    conn, docs, audit = FakeConn(), FakeDocuments(), FakeAudit()
+    conn, docs = FakeConn(), FakeDocuments()
     jobs, store = FakeJobs(), FakeStore()
-    service = DocumentService(conn, docs, jobs, audit, store, SETTINGS)
-    return service, conn, docs, audit, jobs, store
+    service = DocumentService(conn, docs, jobs, store, SETTINGS)
+    return service, conn, docs, jobs, store
 
 
 PDF = b"%PDF-1.7 first"
@@ -123,24 +115,22 @@ def test_rejects_oversized(parts):
 
 
 def test_first_upload_creates_version_one(parts):
-    service, conn, _, audit, jobs, store = parts
+    service, conn, _, jobs, store = parts
     result = service.register_upload("a.pdf", PDF)
     assert result.queued
     assert result.document["version"] == 1
-    assert audit.events == ["document.uploaded", "ingestion.queued"]
     assert jobs.queued == [result.document["id"]]
     assert list(store.saved.values()) == [PDF]
     assert conn.commits == 1
 
 
 def test_identical_upload_is_deduplicated(parts):
-    service, _, docs, audit, jobs, _ = parts
+    service, _, docs, jobs, _ = parts
     service.register_upload("a.pdf", PDF)
     again = service.register_upload("copy.pdf", PDF)
     assert not again.queued
     assert len(docs.rows) == 1
     assert len(jobs.queued) == 1
-    assert audit.events == ["document.uploaded", "ingestion.queued", "document.duplicate_upload"]
 
 
 def test_changed_content_becomes_next_version(parts):
@@ -159,7 +149,7 @@ def test_deactivate_unknown_raises(parts):
 
 def make_service(docs, store=None):
     conn = FakeConn()
-    service = DocumentService(conn, docs, FakeJobs(), FakeAudit(), store or FakeStore(), SETTINGS)
+    service = DocumentService(conn, docs, FakeJobs(), store or FakeStore(), SETTINGS)
     return service, conn
 
 
@@ -172,13 +162,12 @@ def test_original_is_stored_before_locking_and_reading():
 
 
 def test_failed_document_is_requeued_on_reupload(parts):
-    service, _, docs, audit, jobs, _ = parts
+    service, _, docs, jobs, _ = parts
     doc = service.register_upload("a.pdf", PDF).document
     docs.rows[doc["id"]]["status"] = "failed"
     again = service.register_upload("a.pdf", PDF)
     assert again.queued
     assert jobs.queued == [doc["id"], doc["id"]]
-    assert "document.retry" in audit.events
 
 
 def test_unexpected_unique_violation_becomes_409():
@@ -190,3 +179,23 @@ def test_unexpected_unique_violation_becomes_409():
     with pytest.raises(ConflictError):
         service.register_upload("a.pdf", PDF)
     assert conn.rollbacks == 1 and conn.commits == 0
+
+
+class FakeChunks:
+    def by_document(self, document_id):
+        return [{"id": 1, "page": 1, "position": 0, "text": "hello", "chars": 5}]
+
+
+def test_chunks_of_a_known_document(parts):
+    service, _, docs, jobs, store = parts
+    doc = service.register_upload("a.pdf", PDF).document
+    docs.get = lambda doc_id: docs.rows.get(doc_id)
+    with_chunks = DocumentService(FakeConn(), docs, jobs, store, SETTINGS, chunks=FakeChunks())
+    assert with_chunks.chunks(doc["id"])[0]["text"] == "hello"
+
+
+def test_chunks_of_an_unknown_document_is_not_found(parts):
+    service, _, docs, *_ = parts
+    docs.get = lambda doc_id: None
+    with pytest.raises(NotFoundError):
+        service.chunks(uuid4())

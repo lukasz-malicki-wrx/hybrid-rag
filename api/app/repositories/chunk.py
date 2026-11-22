@@ -35,6 +35,24 @@ class ChunkRepository:
                 ],
             )
 
+    def by_document(self, document_id: UUID) -> list[Row]:
+        """All chunks of a document in reading order (no embeddings: they are 1024 numbers each)."""
+        return self._conn.execute(
+            "SELECT id, page, position, text, length(text) AS chars FROM chunks "
+            "WHERE document_id = %s ORDER BY page, position",
+            (document_id,),
+        ).fetchall()
+
+    def by_ids(self, chunk_ids: list[int]) -> list[Row]:
+        """Chunks with their document, in the order given (inactive documents included:
+        history must still show what an old answer was based on)."""
+        rows = self._conn.execute(
+            f"SELECT {_COLUMNS} {_FROM} WHERE c.id = ANY(%s)",  # noqa: S608
+            (chunk_ids,),
+        ).fetchall()
+        by_id = {r["id"]: r for r in rows}
+        return [by_id[i] for i in chunk_ids if i in by_id]
+
     def by_filename(self, name_part: str) -> list[Row]:
         """Active, ready chunks of documents whose filename contains name_part."""
         return self._conn.execute(

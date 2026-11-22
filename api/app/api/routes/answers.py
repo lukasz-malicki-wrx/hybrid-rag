@@ -1,17 +1,26 @@
-from collections.abc import Iterator
+from collections.abc import AsyncIterator
 
 from fastapi import APIRouter
+from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import StreamingResponse
 
-from ...schemas.answer import AnswerEvent, AnswerRequest
-from ..deps import AnswerServiceDep, SearchServiceDep
+from ...rag.conversation import retrieval_query
+from ...schemas.answer import AnswerRequest, ConversationEvent
+from ...services.answer import AnswerRun
+from ..deps import AnswerServiceDep, ConversationServiceDep, SearchServiceDep, SettingsServiceDep
 
 router = APIRouter(prefix="/answers", tags=["answers"])
 
 
-def _sse(events: Iterator[AnswerEvent]) -> Iterator[str]:
-    for event in events:
-        yield f"data: {event.model_dump_json()}\n\n"
+async def _relay(first: ConversationEvent, run: AnswerRun) -> AsyncIterator[str]:
+    try:
+        yield f"data: {first.model_dump_json()}\n\n"
+        while (event := await run_in_threadpool(run.next_event)) is not None:
+            yield f"data: {event.model_dump_json()}\n\n"
+    finally:
+        # Runs when the stream ends and when the client disconnects (e.g. a Stop button
+        # aborting the request): the generation thread then stops the model.
+        run.cancel()
 
 
 @router.post(
@@ -19,19 +28,52 @@ def _sse(events: Iterator[AnswerEvent]) -> Iterator[str]:
     response_class=StreamingResponse,
     responses={
         200: {
-            "description": "Server-sent events; each `data:` line is one AnswerEvent as JSON.",
+            "description": "Server-sent events; each `data:` line is one AnswerEvent as JSON: "
+            "`conversation`, `sources`, `token`s, then `done` (or `error`). Closing the "
+            "connection stops generation; the partial answer is stored as stopped.",
             "content": {
                 "text/event-stream": {"schema": {"$ref": "#/components/schemas/AnswerEvent"}}
             },
         }
     },
 )
-def answer(req: AnswerRequest, search: SearchServiceDep, answers: AnswerServiceDep):
-    """Server-sent events: `sources`, then `token`s, then `done` (or `error`)."""
-    hits = search.search(req.question, req.document_ids, req.k, req.mode)
-    events = answers.stream(req.question, req.document_ids, {"k": req.k, "mode": req.mode}, hits)
+async def answer(
+    req: AnswerRequest,
+    conversations: ConversationServiceDep,
+    search: SearchServiceDep,
+    answers: AnswerServiceDep,
+    settings: SettingsServiceDep,
+):
+    turn = await run_in_threadpool(
+        conversations.start_turn,
+        req.question,
+        req.conversation_id,
+        req.group_id,
+        req.pin_document_ids,
+        req.attached_document_ids,
+    )
+    docs = req.document_ids if req.document_ids is not None else turn.scope
+    personal = await run_in_threadpool(settings.personal_context)
+    hits = await run_in_threadpool(
+        search.search, retrieval_query(req.question, turn.history), docs, req.k, req.mode
+    )
+    run = answers.start(
+        req.question,
+        turn.conversation["id"],
+        turn.history,
+        docs,
+        {"k": req.k, "mode": req.mode},
+        hits,
+        req.attached_document_ids or [],
+        personal,
+    )
+    first = ConversationEvent(
+        conversation_id=turn.conversation["id"],
+        title=turn.conversation["title"],
+        created=turn.created,
+    )
     return StreamingResponse(
-        _sse(events),
+        _relay(first, run),
         media_type="text/event-stream",
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )

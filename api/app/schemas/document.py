@@ -46,3 +46,13 @@ class DocumentStatusEvent(BaseModel):
             progress_total=row["progress_total"],
             error=row["error"],
         )
+
+
+class ChunkOut(BaseModel):
+    """One searchable piece of a document, as it was cut at ingestion."""
+
+    id: int
+    page: int
+    position: int = Field(description="Order of the chunk within its page")
+    text: str
+    chars: int

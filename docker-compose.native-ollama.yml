@@ -1,0 +1,33 @@
+# Ollama running natively on the host (e.g. Metal on a Mac, CUDA on Linux) instead of in a
+# container, so the models can use the GPU. Docker Desktop on macOS cannot pass the GPU through.
+#
+#   ollama pull bge-m3 && ollama pull qwen2.5:3b     # models live on the host now
+#   docker compose -f docker-compose.yml -f docker-compose.native-ollama.yml up -d
+#
+# The Ollama container and the one-shot model puller are left out, and the API and worker no
+# longer wait for them. Combine with the dev overlay by adding `-f docker-compose.dev.yml`.
+# Needs Docker Compose 2.24 or newer (`!override`).
+services:
+  ollama:
+    profiles: ["container-ollama"]
+
+  ollama-init:
+    profiles: ["container-ollama"]
+
+  api:
+    depends_on: !override
+      db:
+        condition: service_healthy
+    environment:
+      OLLAMA_URL: ${OLLAMA_URL:-http://host.docker.internal:11434}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"  # already defined on Docker Desktop; needed on Linux
+
+  worker:
+    depends_on: !override
+      db:
+        condition: service_healthy
+    environment:
+      OLLAMA_URL: ${OLLAMA_URL:-http://host.docker.internal:11434}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

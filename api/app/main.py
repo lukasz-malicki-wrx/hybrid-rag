@@ -5,7 +5,15 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .api.errors import register_error_handlers
 from .api.openapi import install_openapi
-from .api.routes import answers, audit, documents, health, search
+from .api.routes import (
+    answers,
+    conversations,
+    documents,
+    groups,
+    health,
+    search,
+)
+from .api.routes import settings as settings_routes
 from .core import migrate
 from .core.config import get_settings
 
@@ -21,10 +29,18 @@ def create_app() -> FastAPI:
     app.add_middleware(
         CORSMiddleware,
         allow_origins=list(get_settings().cors_origins),
-        allow_methods=["GET", "POST", "DELETE"],
+        allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE"],
         allow_headers=["content-type"],
     )
-    for module in (health, documents, search, answers, audit):
+    for module in (
+        health,
+        documents,
+        groups,
+        conversations,
+        search,
+        answers,
+        settings_routes,
+    ):
         app.include_router(module.router)
     register_error_handlers(app)
     install_openapi(app)

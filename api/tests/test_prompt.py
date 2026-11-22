@@ -17,7 +17,8 @@ def test_prompt_wraps_excerpts_with_number_and_source():
     _, user = build_prompt("why?", HITS)
     assert '<excerpt n="1" source="a.pdf" page="3">\nalpha\n</excerpt>' in user
     assert '<excerpt n="2" source="b.pdf" page="1">\nbeta\n</excerpt>' in user
-    assert user.endswith("Question: why?")
+    assert "Question: why?" in user
+    assert user.rstrip().endswith("is required [1].")  # citation reminder comes last
 
 
 def test_document_text_cannot_close_its_excerpt():
@@ -67,3 +68,21 @@ def test_refusal_detection():
     assert is_refusal(REFUSAL)
     assert is_refusal("  " + REFUSAL + " ")
     assert not is_refusal("The answer is 42 [1].")
+
+
+def test_personal_context_comes_right_before_the_question():
+    _, user = build_prompt("why?", HITS, personal="Answer in Polish, as bullet points.")
+    assert user.index("</excerpt>") < user.index("Answer preferences from the user")
+    assert user.index("as bullet points.") < user.index("Question: why?")
+
+
+def test_no_preferences_block_without_personal_context():
+    _, user = build_prompt("why?", HITS)
+    assert "Answer preferences" not in user
+
+
+def test_personal_context_takes_room_from_the_excerpt_budget():
+    big = [{"filename": "a.pdf", "page": i, "text": "x" * 3000} for i in range(10)]
+    assert len(fit_to_budget("q", big, 8192, 768, personal="p" * 6000)) < len(
+        fit_to_budget("q", big, 8192, 768)
+    )
