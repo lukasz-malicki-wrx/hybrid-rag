@@ -1,0 +1,21 @@
+# Allowlist for the web image (docker build -f apps/web/Dockerfile .): everything else, such as
+# .env, .git, docs, samples and the API, never enters the build context.
+*
+!package.json
+!package-lock.json
+!turbo.json
+!apps/web
+!packages
+
+**/node_modules
+**/.next
+**/.turbo
+**/.env*
+**/tests
+**/test-results
+**/playwright-report
+**/*.tsbuildinfo
+**/next-env.d.ts
+**/*.test.ts
+**/*.test.tsx
+**/*.log

@@ -1,0 +1,40 @@
+/* Base styles of the UI components. Tailwind and the colour tokens are not imported here, so that
+   the app chooses the palette. An app (or a landing page) starts its stylesheet with these lines,
+   in this order, then adds its own @source and rules:
+
+     @import "tailwindcss" source(none);
+     @import "@hybrid-rag/design-tokens";
+     @import "@hybrid-rag/ui/styles.css";
+*/
+
+/* The components' own classes, so that they end up in the app's CSS. */
+@source ".";
+@source not "./**/*.test.{ts,tsx}";
+
+/* In a layer, so Tailwind utilities (e.g. focus:outline-none) can still override these. */
+@layer base {
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-sans);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  dialog::backdrop {
+    background: rgb(0 0 0 / 0.45);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}

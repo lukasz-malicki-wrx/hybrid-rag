@@ -290,7 +290,7 @@ Copy `.env.example` to `.env` to change defaults.
 ## Project layout
 
 ```
-api/app/
+apps/api/app/
   api/routes/     HTTP controllers
   schemas/        Pydantic request/response and event models
   services/       business logic and transactions
@@ -299,24 +299,53 @@ api/app/
   core/           config, database, domain errors, migrations
   storage/        original file storage (content-addressed, verified on read)
   worker/         ingestion worker (`python -m app.worker`)
-api/migrations/   SQL migrations applied at startup
-fe/               web UI (Next.js, React, Tailwind CSS, TanStack Query, Zustand)
+apps/api/migrations/         SQL migrations applied at startup
+apps/web/                    web UI (Next.js, React, Tailwind CSS, TanStack Query, Zustand)
   src/app/          routes only: / (new conversation), /c/[id] (conversation), /g/[id] (group)
   src/api/          HTTP client, types generated from OpenAPI, React Query hooks per domain
   src/features/     views by area (chat, composer, scope, groups, sidebar, settings, layout)
-  src/components/   UI primitives (ui/) and icons (icons/), one component per file
   src/stores/       Zustand: streaming answer, UI, notifications, language, theme
   src/i18n/         English (source of truth) and Polish texts, translator, language detection
-  src/hooks/        shared hooks (asking a question, modal dialogs, scrolling)
+  src/hooks/        shared hooks (asking a question, scrolling)
   tests/e2e/        Playwright + axe tests against a mocked API
-eval/             evaluation questions
-samples/          public PDFs used as sample data and evaluation corpus
-scripts/          sample seeding and re-download
-docs/             requirements, plan, explanation, evaluation
+packages/design-tokens/      colour palettes and theme variables, plain CSS
+packages/ui/                 React components and icons, one component per file, and base styles
+packages/eslint-config/      shared ESLint configs
+packages/typescript-config/  shared tsconfig bases
+eval/                        evaluation questions
+samples/                     public PDFs used as sample data and evaluation corpus
+scripts/                     sample seeding and re-download
+docs/                        requirements, plan, explanation, evaluation
 ```
 
 Requirements, including WCAG 2.1 and responsive design, are in
 [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md); the roadmap is in [docs/PLAN.md](docs/PLAN.md).
+
+## Monorepo
+
+The JavaScript side is an npm workspace (`apps/*` and `packages/*`), and
+[Turborepo](https://turborepo.dev) runs lint, type check, tests and build in dependency order.
+`apps/api` is Python with its own `pyproject.toml` and has no `package.json`, so npm ignores it.
+
+Dependencies point one way: apps use `@hybrid-rag/ui`, and `@hybrid-rag/ui` uses
+`@hybrid-rag/design-tokens`. Nothing in `packages/` imports from `apps/`. The tokens are a
+separate package because they are plain CSS: another site can use the same colours and theme
+without React or the components. Packages ship source (`.ts`, `.tsx`, `.css`) and have no build
+step; the app compiles them.
+
+A new Next.js app in `apps/` lists both packages as dependencies and adds
+`transpilePackages: ["@hybrid-rag/ui"]` to its `next.config.ts`. Its global CSS starts with:
+
+```css
+@import "tailwindcss" source(none);
+@import "@hybrid-rag/design-tokens";
+@import "@hybrid-rag/ui/styles.css";
+@source "../";
+```
+
+`source(none)` turns off Tailwind's automatic file scanning, so `@source` names the folder to
+scan (relative to the CSS file). The UI package registers its own sources in `styles.css`.
+Components are imported one by one, for example `@hybrid-rag/ui/button`.
 
 ## Limitations
 
@@ -351,11 +380,11 @@ Run with live code and auto-reload by adding the dev overlay:
 docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
 ```
 
-Dependencies are locked in `api/uv.lock` (managed with [uv](https://docs.astral.sh/uv/)). Lint
+Dependencies are locked in `apps/api/uv.lock` (managed with [uv](https://docs.astral.sh/uv/)). Lint
 and tests with exactly the locked versions, without installing anything locally:
 
 ```bash
-docker run --rm -v "$PWD:/repo" -w /repo/api -e UV_PROJECT_ENVIRONMENT=/tmp/venv \
+docker run --rm -v "$PWD:/repo" -w /repo/apps/api -e UV_PROJECT_ENVIRONMENT=/tmp/venv \
   ghcr.io/astral-sh/uv:0.9.30-python3.12-bookworm-slim \
   sh -c "uv run --frozen ruff check . && uv run --frozen pytest -q"
 ```
@@ -365,31 +394,36 @@ Integration tests run against a real Postgres. They need a database whose name e
 
 ```bash
 docker compose exec db createdb -U rag rag_test
-docker run --rm --network hybrid-rag_default -v "$PWD:/repo" -w /repo/api \
+docker run --rm --network hybrid-rag_default -v "$PWD:/repo" -w /repo/apps/api \
   -e UV_PROJECT_ENVIRONMENT=/tmp/venv -e TEST_DATABASE_URL=postgresql://rag:rag@db:5432/rag_test \
   ghcr.io/astral-sh/uv:0.9.30-python3.12-bookworm-slim uv run --frozen pytest -q
 ```
 
-Schema changes go in a new file under `api/migrations/`. Applied migrations are checksummed and
+Schema changes go in a new file under `apps/api/migrations/`. Applied migrations are checksummed and
 the API refuses to start if one of them was edited.
 
 The API image is multi-stage, runs as a non-root user and has a liveness healthcheck
 (`/health/live`). Base images and tools are pinned to exact versions.
 
-Web UI (Node 22). `npm run dev` serves it on <http://localhost:3000> against the API on port
-8000. After changing the API, regenerate the client types with `npm run api:types`.
+Web UI (Node 22, version in `.nvmrc`). `npm run dev` serves it on <http://localhost:3000>
+against the API on port 8000. After changing the API, regenerate the client types with
+`npm run api:types -w @hybrid-rag/web`. Run all commands from the repository root:
 
 ```bash
-cd fe
-npm ci
+npm ci                              # once, installs every workspace
 npm run dev                         # development server
 npm run lint && npm run typecheck && npm test
-npx playwright install chromium     # once
+npx --workspace @hybrid-rag/web playwright install chromium     # once
 npm run test:e2e                    # end-to-end + accessibility tests, mocked API
 ```
 
+The web image is built from the repository root
+(`docker build -f apps/web/Dockerfile .`), which is what `docker compose` does. It uses
+`turbo prune` to build only the web app and the packages it needs.
+
 CI runs lint, unit, integration and end-to-end tests (with axe accessibility checks), Docker
-and compose checks, CodeQL, dependency review and secret scanning.
+and compose checks, CodeQL, dependency review and secret scanning. A pull request runs only the
+jobs for the parts it changes (API, web, Docker); pushes to `main` run all of them.
 
 ## License
 

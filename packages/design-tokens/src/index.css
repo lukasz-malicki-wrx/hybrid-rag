@@ -1,0 +1,6 @@
+/* Colour palette: import exactly one. "vintage" is the default; "classic" is the original grey and
+   blue. To use another, import theme.css and that palette instead of this file. Each palette
+   defines the same variables. */
+@import "./palettes/vintage.css";
+
+@import "./theme.css";

@@ -8,20 +8,66 @@ on:
 permissions:
   contents: read
 
+# A newer push to a pull request replaces the run in progress. Runs on main each get their own
+# group, so none is cancelled or dropped from the queue.
+concurrency:
+  group: ci-${{ github.event_name == 'pull_request' && github.ref || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
+  changes:
+    # Decides which of the jobs below have to run. Pushes to main run all of them.
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      api: ${{ github.event_name != 'pull_request' || steps.filter.outputs.api == 'true' }}
+      web: ${{ github.event_name != 'pull_request' || steps.filter.outputs.web == 'true' }}
+      docker: ${{ github.event_name != 'pull_request' || steps.filter.outputs.api == 'true' || steps.filter.outputs.web == 'true' || steps.filter.outputs.docker == 'true' }}
+    steps:
+      - uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
+        id: filter
+        if: github.event_name == 'pull_request'
+        with:
+          filters: |
+            api:
+              - 'apps/api/**'
+              - 'eval/**'
+              - 'samples/**'
+              - '.github/workflows/ci.yml'
+            web:
+              - 'apps/web/**'
+              - 'packages/**'
+              - 'package.json'
+              - 'package-lock.json'
+              - 'turbo.json'
+              - '.nvmrc'
+              - '.github/workflows/ci.yml'
+            docker:
+              - 'docker-compose*.yml'
+              - '.dockerignore'
+              - '.github/workflows/ci.yml'
+
+  # The jobs below also run when `changes` fails: a broken filter must not skip the checks.
+
   lint:
+    needs: changes
+    if: ${{ !cancelled() && (needs.changes.result != 'success' || needs.changes.outputs.api == 'true') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/ruff-action@v3
         with:
-          src: api
+          src: apps/api
       - uses: astral-sh/ruff-action@v3
         with:
-          src: api
+          src: apps/api
           args: format --check
 
   test:
+    needs: changes
+    if: ${{ !cancelled() && (needs.changes.result != 'success' || needs.changes.outputs.api == 'true') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -29,11 +75,13 @@ jobs:
         with:
           version: "0.9.30"
       - run: uv sync --frozen
-        working-directory: api
+        working-directory: apps/api
       - run: uv run --frozen pytest
-        working-directory: api
+        working-directory: apps/api
 
   integration:
+    needs: changes
+    if: ${{ !cancelled() && (needs.changes.result != 'success' || needs.changes.outputs.api == 'true') }}
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -55,60 +103,56 @@ jobs:
         with:
           version: "0.9.30"
       - run: uv sync --frozen
-        working-directory: api
+        working-directory: apps/api
       - run: uv run --frozen pytest tests/integration -rs
-        working-directory: api
+        working-directory: apps/api
         env:
           TEST_DATABASE_URL: postgresql://rag:rag@localhost:5432/rag_test
 
   web:
+    # Lint, type check, unit tests and build of every JavaScript workspace, ordered by Turborepo.
+    needs: changes
+    if: ${{ !cancelled() && (needs.changes.result != 'success' || needs.changes.outputs.web == 'true') }}
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: fe
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: "22.23.5"
+          node-version-file: .nvmrc
           cache: npm
-          cache-dependency-path: fe/package-lock.json
       - run: npm ci
-      - run: npm run lint
-      - run: npm run typecheck
-      - run: npm test
-      - run: npm run build
+      - run: npx turbo run lint typecheck test build
 
   web-e2e:
     # End-to-end tests with axe accessibility checks (WCAG 2.1 A/AA) against a mocked API.
+    needs: changes
+    if: ${{ !cancelled() && (needs.changes.result != 'success' || needs.changes.outputs.web == 'true') }}
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: fe
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: "22.23.5"
+          node-version-file: .nvmrc
           cache: npm
-          cache-dependency-path: fe/package-lock.json
       - run: npm ci
-      - run: npx playwright install --with-deps chromium
+      - run: npx --workspace @hybrid-rag/web playwright install --with-deps chromium
       - run: npm run test:e2e
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: playwright-report
-          path: fe/playwright-report
+          path: apps/web/playwright-report
           retention-days: 7
 
   docker:
+    needs: changes
+    if: ${{ !cancelled() && (needs.changes.result != 'success' || needs.changes.outputs.docker == 'true') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: hadolint/hadolint-action@v3.1.0
         with:
-          dockerfile: api/Dockerfile
+          dockerfile: apps/api/Dockerfile
       - name: Validate compose files
         run: |
           docker compose config -q
@@ -116,11 +160,11 @@ jobs:
           docker compose -f docker-compose.yml -f docker-compose.native-ollama.yml config -q
       - uses: hadolint/hadolint-action@v3.1.0
         with:
-          dockerfile: fe/Dockerfile
+          dockerfile: apps/web/Dockerfile
       - name: Build api image
-        run: docker build ./api
+        run: docker build ./apps/api
       - name: Build web image
-        run: docker build ./fe
+        run: docker build -f apps/web/Dockerfile .
 
   secrets:
     runs-on: ubuntu-latest

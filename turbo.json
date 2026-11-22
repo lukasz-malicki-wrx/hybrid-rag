@@ -1,0 +1,32 @@
+{
+  "$schema": "https://turborepo.dev/schema.json",
+  "tasks": {
+    "transit": {
+      "dependsOn": ["^transit"]
+    },
+    "lint": {
+      "dependsOn": ["transit"]
+    },
+    "typecheck": {
+      "dependsOn": ["transit"]
+    },
+    "test": {
+      "dependsOn": ["transit"]
+    },
+    "build": {
+      "dependsOn": ["transit", "typecheck"],
+      "env": ["NEXT_PUBLIC_API_URL", "NEXT_OUTPUT"],
+      "passThroughEnv": ["NEXT_TELEMETRY_DISABLED"],
+      "outputs": [".next/**", "!.next/cache/**"]
+    },
+    "test:e2e": {
+      "dependsOn": ["transit"],
+      "cache": false,
+      "passThroughEnv": ["CI", "NEXT_TELEMETRY_DISABLED", "PLAYWRIGHT_*"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    }
+  }
+}

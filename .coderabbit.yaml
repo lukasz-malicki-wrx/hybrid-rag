@@ -11,14 +11,18 @@ reviews:
     base_branches:
       - main
   path_instructions:
-    - path: "api/**"
+    - path: "apps/api/**"
       instructions: >
         Check SQL injection safety, that rows are only soft-deleted (never removed),
         and that answers are grounded in retrieved context.
-    - path: "web/**"
+    - path: "apps/web/**"
       instructions: >
         Check WCAG 2.1 AA (keyboard access, contrast, semantics, live regions)
         and responsive layout from 320 px.
+    - path: "packages/**"
+      instructions: >
+        Check that nothing here imports from apps/, that tokens stay plain CSS without React,
+        and WCAG 2.1 AA for the components (keyboard access, contrast, semantics).
     - path: ".github/**"
       instructions: Check that actions are pinned and permissions are least-privilege.
 chat:
