@@ -1,7 +1,7 @@
 # The build context is the repository root: docker build -f apps/web/Dockerfile .
 # Prune: cut the monorepo down to the web app and the workspaces it uses. Turbo is installed
 # at the version pinned in the root package.json.
-FROM node:22.23.5-alpine AS prune
+FROM node:26.13.1-alpine AS prune
 WORKDIR /repo
 ENV TURBO_TELEMETRY_DISABLED=1
 COPY package.json ./
@@ -12,13 +12,13 @@ RUN turbo prune @hybrid-rag/web --docker
 
 # Dependencies from the pruned lockfile. Only the manifests are copied, so this layer stays
 # cached until a package.json or the lockfile changes.
-FROM node:22.23.5-alpine AS deps
+FROM node:26.13.1-alpine AS deps
 WORKDIR /app
 COPY --from=prune /repo/out/json/ ./
 RUN npm ci --no-audit --no-fund
 
 # Build. NEXT_PUBLIC_API_URL is the API address as the *browser* sees it; it is baked in here.
-FROM node:22.23.5-alpine AS build
+FROM node:26.13.1-alpine AS build
 WORKDIR /app
 ARG NEXT_PUBLIC_API_URL=http://localhost:8000
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
@@ -30,7 +30,7 @@ RUN npm run build --workspace @hybrid-rag/web
 
 # Runtime: only the standalone server and static assets, as the unprivileged node user.
 # The standalone output keeps the monorepo layout, so the server lives under apps/web.
-FROM node:22.23.5-alpine
+FROM node:26.13.1-alpine
 WORKDIR /app
 ENV NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1 \
