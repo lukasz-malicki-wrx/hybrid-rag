@@ -3,13 +3,14 @@
 import { memo } from "react";
 import type { Chunk } from "@/api/types";
 import { Badge } from "@/components/ui/badge";
+import { Highlighted } from "@/components/ui/highlighted";
 import { useTranslation } from "@/i18n/use-translation";
 
 /** Chunks shorter than this rarely carry enough context to be found or understood alone. */
 export const SHORT_CHUNK_CHARS = 200;
 
 /** One chunk exactly as it is stored and searched; its anchor lets search results link here. */
-export const ChunkCard = memo(function ChunkCard({ chunk }: { chunk: Chunk }) {
+export const ChunkCard = memo(function ChunkCard({ chunk, highlight = "" }: { chunk: Chunk; highlight?: string }) {
   const { t, tp } = useTranslation();
   return (
     <li
@@ -22,7 +23,9 @@ export const ChunkCard = memo(function ChunkCard({ chunk }: { chunk: Chunk }) {
         <span>{tp("counts.characters", chunk.chars)}</span>
         {chunk.chars < SHORT_CHUNK_CHARS && <Badge tone="warn">{t("documentView.short")}</Badge>}
       </div>
-      <p className="font-sans text-sm break-words whitespace-pre-wrap">{chunk.text}</p>
+      <p className="font-sans text-sm break-words whitespace-pre-wrap">
+        <Highlighted text={chunk.text} needle={highlight} />
+      </p>
     </li>
   );
 });

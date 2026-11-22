@@ -116,7 +116,7 @@ function ChunkList({
       </Text>
       <ul className="space-y-3">
         {shown.map((c) => (
-          <ChunkCard key={c.id} chunk={c} />
+          <ChunkCard key={c.id} chunk={c} highlight={filter} />
         ))}
       </ul>
     </section>

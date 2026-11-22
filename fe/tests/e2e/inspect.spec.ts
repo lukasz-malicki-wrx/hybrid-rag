@@ -40,6 +40,8 @@ test("a document page shows its chunks, their sizes and a text filter", async ({
   await expect(page.getByText("1 of 3 chunks shown")).toBeVisible();
   await expect(page.getByText("Qualified Persons certify batch release.")).toBeVisible();
   await expect(page.getByText("Cover page of the annex.").first()).toBeHidden();
+  // The searched text is marked in the chunk, whatever its case in the document.
+  await expect(page.locator("mark")).toHaveText(["Qualified"]);
 });
 
 test("a sidebar document opens its chunks, not the PDF", async ({ page }) => {
