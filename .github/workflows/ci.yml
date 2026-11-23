@@ -167,7 +167,7 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
-      - run: npm ci
+      - run: npm ci --ignore-scripts
       - run: npx --no --workspace @hybrid-rag/landing playwright install --with-deps chromium
       - run: npm run test:e2e --workspace @hybrid-rag/landing
       # Needs the build the e2e run just made.
@@ -192,7 +192,7 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
-      - run: npm ci
+      - run: npm ci --ignore-scripts
       - run: npx --no --workspace @hybrid-rag/landing playwright install --with-deps chromium
       - run: npm run build --workspace @hybrid-rag/landing
       - run: npm run lighthouse --workspace @hybrid-rag/landing

@@ -19,7 +19,7 @@ export function catalogGet(dictionary: unknown, path: string): string | Record<s
   return found as string | Record<string, string> | undefined;
 }
 
-const placeholders = (text: string) => [...text.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort();
+const placeholders = (text: string) => [...text.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort((a, b) => a.localeCompare(b));
 
 const sample = (message: string | Record<string, string> | undefined) =>
   typeof message === "string" ? message : (message?.other ?? "");

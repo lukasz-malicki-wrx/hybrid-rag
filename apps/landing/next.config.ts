@@ -18,13 +18,13 @@ const nextConfig: NextConfig = {
   reactMaxHeadersLength: 1,
   // Keep `next dev` from writing extra files into the project tree.
   agentRules: false,
-  async headers() {
+  headers() {
     // The CSP is not here: it carries a nonce per request and is set by src/proxy.ts.
-    return [
+    return Promise.resolve([
       { source: "/:path*", headers: securityHeaders(process.env.VERCEL_ENV) },
       { source: "/:locale(en|pl)/:path*", headers: [{ key: "Cache-Control", value: "private, no-cache" }] },
       { source: "/:locale(en|pl)", headers: [{ key: "Cache-Control", value: "private, no-cache" }] },
-    ];
+    ]);
   },
   turbopack: {
     root: repoRoot,

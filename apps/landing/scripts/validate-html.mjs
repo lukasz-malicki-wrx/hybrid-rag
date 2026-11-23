@@ -3,10 +3,10 @@
 //   npm run build -w @hybrid-rag/landing && npm run validate:html -w @hybrid-rag/landing
 //
 // Starts `next start` on the validateHtml port of ports.json unless HTML_VALIDATE_URL points at a running server.
-import { spawn } from "node:child_process";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { HtmlValidate } from "html-validate/node";
+import { nextStart } from "./bin.mjs";
 import { VALIDATE_HTML_PORT as PORT } from "./ports.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
@@ -28,7 +28,7 @@ async function waitFor(url) {
 
 const server = process.env.HTML_VALIDATE_URL
   ? null
-  : spawn("npx", ["next", "start", "-p", String(PORT)], { cwd: root, stdio: "ignore" });
+  : nextStart(PORT, root);
 let failed = false;
 try {
   await waitFor(`${base}/en`);

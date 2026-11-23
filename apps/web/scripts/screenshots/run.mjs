@@ -5,6 +5,7 @@
 // at twice the listed size, as WebP.
 import { spawn, spawnSync } from "node:child_process";
 import { mkdirSync } from "node:fs";
+import { createRequire } from "node:module";
 import path from "node:path";
 import { chromium } from "@playwright/test";
 import sharp from "sharp";
@@ -95,7 +96,8 @@ async function waitForServer() {
 
 const env = { NEXT_PUBLIC_API_URL: `${BASE}${MOCK}`, NEXT_TELEMETRY_DISABLED: "1" };
 run("npm", ["run", "build"], env);
-const server = spawn("npx", ["next", "start", "-p", String(PORT)], { cwd: APP, env: { ...process.env, ...env }, stdio: "ignore" });
+const next = createRequire(import.meta.url).resolve("next/dist/bin/next");
+const server = spawn(process.execPath, [next, "start", "-p", String(PORT)], { cwd: APP, env: { ...process.env, ...env }, stdio: "ignore" });
 mkdirSync(OUT, { recursive: true });
 
 try {

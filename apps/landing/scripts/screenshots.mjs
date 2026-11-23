@@ -1,11 +1,11 @@
 // Screenshots of the website for the repository README (assets/readme/), light and dark.
 // Usage, from apps/landing after `npm run build`: `npm run screenshots`. It serves the production
 // build on its own port (ports.json) and saves the top of each page listed below as WebP.
-import { spawn } from "node:child_process";
 import { mkdirSync } from "node:fs";
 import path from "node:path";
 import { chromium } from "@playwright/test";
 import sharp from "sharp";
+import { nextStart } from "./bin.mjs";
 import { SCREENSHOTS_PORT as PORT } from "./ports.mjs";
 
 const APP = path.resolve(import.meta.dirname, "..");
@@ -30,7 +30,7 @@ async function waitForServer() {
   throw new Error(`no server on ${BASE}`);
 }
 
-const server = spawn("npx", ["next", "start", "-p", String(PORT)], { cwd: APP, stdio: "ignore" });
+const server = nextStart(PORT, APP);
 mkdirSync(OUT, { recursive: true });
 try {
   await waitForServer();

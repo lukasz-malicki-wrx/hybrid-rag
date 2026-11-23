@@ -58,7 +58,9 @@ export function pagePath(id: PageId, locale: Locale): string {
 
 /** The page a path belongs to, or null (a 404). Accepts a trailing slash. */
 export function pageIdFromPath(pathname: string): { id: PageId; locale: Locale } | null {
-  const [, first = "", ...rest] = pathname.replace(/\/+$/, "").split("/");
+  let end = pathname.length;
+  while (end > 0 && pathname[end - 1] === "/") end--;
+  const [, first = "", ...rest] = pathname.slice(0, end).split("/");
   const locale = LOCALES.find((l) => l === first);
   if (!locale) return null;
   const slug = rest.join("/");

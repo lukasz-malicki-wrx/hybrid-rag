@@ -10,7 +10,8 @@
 // `--external` also requests every other https address once (needs the network; off by default,
 // because CI must not fail on somebody else's outage). Starts `next start` on the checkLinks port of ports.json unless
 // CHECK_LINKS_URL points at a running server.
-import { spawn, spawnSync } from "node:child_process";
+import { spawnSync } from "node:child_process";
+import { GIT, nextStart } from "./bin.mjs";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { CHECK_LINKS_PORT as PORT } from "./ports.mjs";
@@ -30,7 +31,7 @@ const NOT_FOUND_PAGES = ["/en/does-not-exist", "/pl/does-not-exist", "/xx/does-n
  */
 const KNOWN_UNTRACKED = ["docs/"];
 
-const tracked = new Set(spawnSync("git", ["ls-files"], { cwd: repoRoot, encoding: "utf8" }).stdout.split("\n").filter(Boolean));
+const tracked = new Set(spawnSync(GIT, ["ls-files"], { cwd: repoRoot, encoding: "utf8" }).stdout.split("\n").filter(Boolean));
 const isTracked = (file) => tracked.has(file) || [...tracked].some((t) => t.startsWith(`${file.replace(/\/$/, "")}/`));
 
 async function waitFor(url) {
@@ -45,7 +46,7 @@ async function waitFor(url) {
   throw new Error(`${url} did not start`);
 }
 
-const decode = (s) => s.replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#x27;/g, "'").replace(/&#39;/g, "'");
+const decode = (s) => s.replaceAll("&amp;", "&").replaceAll("&quot;", '"').replaceAll("&#x27;", "'").replaceAll("&#39;", "'");
 const htmlCache = new Map();
 async function html(pathname) {
   if (!htmlCache.has(pathname)) {
@@ -110,7 +111,7 @@ function checkRepository(from, url) {
   else errors.push(`${from}: ${url} points at a file git does not track (${file})`);
 }
 
-const server = process.env.CHECK_LINKS_URL ? null : spawn("npx", ["next", "start", "-p", String(PORT)], { cwd: root, stdio: "ignore" });
+const server = process.env.CHECK_LINKS_URL ? null : nextStart(PORT, root);
 try {
   await waitFor(`${base}/en`);
   for (const page of [...pages, ...NOT_FOUND_PAGES]) {
@@ -142,10 +143,10 @@ try {
 }
 
 console.log(`${checked} internal and repository links checked on ${pages.length + NOT_FOUND_PAGES.length} pages; ${external.size} other addresses${process.argv.includes("--external") ? " requested" : " listed, not requested"}.`);
-for (const url of [...external].sort()) console.log(`  other: ${url}`);
+for (const url of [...external].sort((a, b) => a.localeCompare(b))) console.log(`  other: ${url}`);
 if (known.size) {
   console.log(`\nKNOWN ISSUE (not failing): ${known.size} link(s) into docs/, which git does not track, so GitHub answers 404:`);
-  for (const k of [...known].sort()) console.log(`  ${k}`);
+  for (const k of [...known].sort((a, b) => a.localeCompare(b))) console.log(`  ${k}`);
 }
 if (errors.length) {
   console.log("\nFAIL");

@@ -11,9 +11,19 @@ export type Block =
 
 type ListBlock = Extract<Block, { kind: "list" }>;
 
-const BULLET = /^\s*[-*•+]\s+(.*)$/;
-const NUMBER = /^\s*(\d{1,3})[.)]\s+(.*)$/;
-const HEADING = /^\s{0,3}#{1,6}\s+(.*?)\s*#*\s*$/;
+// The text after the mark starts with a non-space, so the spaces before it have one way to match.
+const BULLET = /^\s*[-*•+]\s+(\S.*)$/;
+const NUMBER = /^\s*(\d{1,3})[.)]\s+(\S.*)$/;
+const HEADING = /^ {0,3}#{1,6}\s+(\S.*)$/;
+
+/** A heading's text without the optional closing #s ("## Title ##"); "C#" keeps its #. */
+function headingText(text: string): string {
+  const trimmed = text.trimEnd();
+  let end = trimmed.length;
+  while (end > 0 && trimmed[end - 1] === "#") end--;
+  if (end === 0) return trimmed;
+  return end < trimmed.length && /\s/.test(trimmed[end - 1]) ? trimmed.slice(0, end).trimEnd() : trimmed;
+}
 const CONTINUATION = /^\s{2,}\S/;
 
 /**
@@ -51,7 +61,7 @@ export function parseBlocks(text: string): Block[] {
     } else if (heading) {
       endParagraph();
       open.list = null;
-      blocks.push({ kind: "heading", text: heading[1] });
+      blocks.push({ kind: "heading", text: headingText(heading[1]) });
     } else {
       open.list = null;
       paragraph.push(line);

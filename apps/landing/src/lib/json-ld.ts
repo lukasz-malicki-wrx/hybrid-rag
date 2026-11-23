@@ -8,9 +8,9 @@ export type JsonLdNode = { [key: string]: JsonLdValue };
  */
 export function serializeJsonLd(data: JsonLdNode): string {
   return JSON.stringify({ "@context": "https://schema.org", ...data })
-    .replace(/</g, "\\u003c")
-    .replace(/\u2028/g, "\\u2028")
-    .replace(/\u2029/g, "\\u2029");
+    .replaceAll("<", "\\u003c")
+    .replaceAll("\u2028", "\\u2028")
+    .replaceAll("\u2029", "\\u2029");
 }
 
 /** A BreadcrumbList from (name, absolute URL) pairs, first to last. */

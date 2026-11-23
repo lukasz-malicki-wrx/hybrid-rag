@@ -4,7 +4,7 @@ export function normalizeText(text: string): string {
     .normalize("NFD")
     .replace(/\p{M}/gu, "")
     .toLocaleLowerCase()
-    .replace(/ł/g, "l")
+    .replaceAll("ł", "l")
     .trim();
 }
 

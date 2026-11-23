@@ -67,5 +67,5 @@ export function richTagNames(text: string): string[] {
     }
   };
   walk(parseRich(text));
-  return names.sort();
+  return names.sort((a, b) => a.localeCompare(b));
 }

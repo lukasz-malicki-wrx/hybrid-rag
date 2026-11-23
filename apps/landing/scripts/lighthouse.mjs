@@ -10,6 +10,7 @@
 // (`npx playwright install chromium`). The pages come from lighthouse/pages.json, which a test
 // keeps equal to src/lib/routes.ts.
 import { spawnSync } from "node:child_process";
+import { LHCI_BIN } from "./bin.mjs";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { chromium } from "@playwright/test";
@@ -77,7 +78,7 @@ for (const mode of modes.length ? modes : ["mobile", "desktop"]) {
   const rc = path.join(root, ".lighthouseci", `rc-${mode}.json`);
   writeFileSync(rc, JSON.stringify(config(mode, outputDir), null, 2));
   console.log(`\n=== Lighthouse ${mode}, ${pages.length} pages, ${runs} runs each ===`);
-  const result = spawnSync("npx", ["lhci", "autorun", `--config=${rc}`], { cwd: root, stdio: "inherit" });
+  const result = spawnSync(process.execPath, [LHCI_BIN, "autorun", `--config=${rc}`], { cwd: root, stdio: "inherit" });
   if (result.status !== 0) failed = true;
   summarize(outputDir);
 }

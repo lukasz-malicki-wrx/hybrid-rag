@@ -11,7 +11,7 @@ export const FAQ_GROUPS = [
 export function plainText(text: string): string {
   return text
     .replace(/<\/?[a-zA-Z][\w-]*>/g, "")
-    .replace(/ /g, " ")
+    .replaceAll("\u00a0", " ")
     .replace(/\s+/g, " ")
     .trim();
 }

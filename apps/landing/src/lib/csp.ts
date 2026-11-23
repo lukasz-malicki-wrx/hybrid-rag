@@ -1,7 +1,7 @@
 /** Base64 of 16 random bytes: a fresh value for every request. */
 export function createNonce(): string {
   const bytes = crypto.getRandomValues(new Uint8Array(16));
-  return btoa(String.fromCharCode(...bytes));
+  return btoa(String.fromCodePoint(...bytes));
 }
 
 type CspOptions = {
