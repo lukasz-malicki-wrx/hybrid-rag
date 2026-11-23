@@ -48,7 +48,9 @@ export function ThemeToggle({ switchToLight, switchToDark }: { switchToLight: st
   const dark = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   // Switching the language re-mounts the whole <html> on the client, and the inline script of the
   // head does not run again then: put the saved choice back on the new element.
-  useLayoutEffect(() => applyTheme(readPreference()), []);
+  useLayoutEffect(() => {
+    applyTheme(readPreference());
+  }, []);
   const toggle = useCallback(() => {
     const next: ThemePreference = dark ? "light" : "dark";
     try {
