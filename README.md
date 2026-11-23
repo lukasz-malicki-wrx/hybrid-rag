@@ -5,6 +5,8 @@ search (pgvector, bge-m3 embeddings) with full-text search, fused with Reciproca
 Every answer is stored with what it was based on: the exact chunks, document versions, models
 and prompt version.
 
+Landing page can be found at https://hybrid-rag-rho.vercel.app/en
+
 Everything runs locally with Docker Compose. No accounts, API keys or hosting are required.
 
 > **Status:** API and web UI are working: upload with live indexing progress, groups,
