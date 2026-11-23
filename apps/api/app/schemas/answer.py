@@ -36,6 +36,15 @@ class AnswerRequest(BaseModel):
     mode: Literal["hybrid", "vector", "fulltext"] = "hybrid"
 
 
+class FeedbackIn(BaseModel):
+    rating: Literal["up", "down"] | None = Field(description="null withdraws the rating")
+
+
+class FeedbackOut(BaseModel):
+    answer_id: UUID
+    rating: Literal["up", "down"] | None
+
+
 class SourceOut(BaseModel):
     n: int = Field(description="Citation number used in the answer as [n]")
     chunk_id: int

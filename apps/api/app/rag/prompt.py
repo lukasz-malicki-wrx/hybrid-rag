@@ -1,7 +1,7 @@
 import re
 from typing import Any
 
-PROMPT_VERSION = "v6"
+PROMPT_VERSION = "v7"
 REFUSAL = "I could not find this in the provided documents."
 CHARS_PER_TOKEN = 3  # deliberately low (real text is ~4): over-estimating tokens is the safe side
 
@@ -31,6 +31,37 @@ _REMINDER = (
     "Answer in the language of the question. End every sentence with the number of the excerpt "
     "it is based on, in square brackets before the full stop, for example: ... is required [1]."
 )
+
+# Small models drift into the language of the excerpts (often English) even when told to use the
+# language of the question, so the language is named. Polish is the one other language of the app;
+# its letters and most common short words are enough to tell it from English.
+_POLISH_LETTERS = re.compile(r"[ąćęłńóśźż]", re.IGNORECASE)
+_POLISH_WORDS = frozenset(
+    "jak jaki jaka jakie czy co gdzie kiedy dlaczego ile jest są się nie na w z do o od po dla "
+    "to który która które czym kto mam można należy".split()
+)
+_LANGUAGE_NAMES = {"pl": "Polish"}
+
+
+def question_language(question: str) -> str | None:
+    """Return "pl" for a Polish question; None when it looks like English or anything else."""
+    if _POLISH_LETTERS.search(question):
+        return "pl"
+    words = re.findall(r"[a-ząćęłńóśźż]+", question.lower())
+    return "pl" if sum(w in _POLISH_WORDS for w in words) >= 2 else None
+
+
+def reminder(question: str) -> str:
+    """The last instruction of the prompt; names the answer language when it is known."""
+    language = _LANGUAGE_NAMES.get(question_language(question) or "")
+    if not language:
+        return _REMINDER
+    return (
+        f"Write the whole answer in {language}, even if the excerpts are in another language, "
+        "unless the user's preferences ask for a different language. The refusal sentence stays "
+        f"exactly as given. {_REMINDER}"
+    )
+
 
 _CITATION = re.compile(r"\[(\d+(?:\s*,\s*\d+)*)\]")
 _TAG = re.compile(r"<(/?)\s*excerpt", re.IGNORECASE)
@@ -66,7 +97,7 @@ def fit_to_budget(
     Ollama silently truncates an over-long prompt (dropping the instructions first), so the
     prompt is cut here, by whole excerpts, instead. At least one hit is always kept.
     """
-    fixed = _SYSTEM + question + history + personal + _REMINDER
+    fixed = _SYSTEM + question + history + personal + reminder(question)
     budget = context_tokens - answer_tokens - estimate_tokens(fixed) - 64
     kept: list[dict[str, Any]] = []
     used = 0
@@ -90,7 +121,7 @@ def build_prompt(
         earlier
         + "Excerpts:\n\n"
         + "\n\n".join(blocks)
-        + f"\n\n{preferences}Question: {question}\n\n{_REMINDER}"
+        + f"\n\n{preferences}Question: {question}\n\n{reminder(question)}"
     )
     return _SYSTEM, user
 

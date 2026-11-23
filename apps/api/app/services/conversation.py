@@ -8,7 +8,7 @@ from psycopg import Connection
 from psycopg.errors import CheckViolation
 
 from ..core.errors import ConflictError, NotFoundError
-from ..rag.conversation import HISTORY_TURNS, Turn, make_title
+from ..rag.conversation import HISTORY_TURNS, Turn, make_preview, make_title
 from ..repositories.chunk import ChunkRepository
 from ..repositories.conversation import ConversationRepository
 from ..repositories.document import DocumentRepository
@@ -28,7 +28,11 @@ class TurnContext:
 
 
 def public(row: Row) -> Row:
-    return {**row, "favorite": row.get("favorite_at") is not None}
+    return {
+        **row,
+        "favorite": row.get("favorite_at") is not None,
+        "preview": make_preview(row.get("latest_answer")),
+    }
 
 
 class ConversationService:
@@ -87,6 +91,7 @@ class ConversationService:
                     "stopped": r["stopped"],
                     "citations": r["citations"] or [],
                     "sources": sources,
+                    "rating": r["rating"],
                     "created_at": r["answered_at"],
                 }
             messages.append(
@@ -131,6 +136,9 @@ class ConversationService:
             raise ConflictError(
                 f"at most {FAVORITE_LIMIT} favourite conversations are allowed"
             ) from None
+        if conv is None:  # deleted between the check above and the update
+            self._conn.rollback()
+            raise NotFoundError("conversation not found")
         self._conn.commit()
         return public(conv)
 

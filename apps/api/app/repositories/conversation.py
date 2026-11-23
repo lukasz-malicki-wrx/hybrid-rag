@@ -8,6 +8,19 @@ from psycopg import Connection
 Row = dict[str, Any]
 
 _COLUMNS = "id, group_id, title, created_at, updated_at, favorite_at"
+# Enough of the latest complete answer to make a list preview from (rag.conversation.make_preview).
+# Refusals and answers stopped half-way ("Z", "-") say nothing about the conversation, so they
+# are skipped: the preview is the latest answer that was written to the end.
+_LATEST_ANSWER_CHARS = 400
+_WITH_LATEST_ANSWER = f"""
+    SELECT c.id, c.group_id, c.title, c.created_at, c.updated_at, c.favorite_at, la.latest_answer
+    FROM conversations c LEFT JOIN LATERAL (
+        SELECT left(a.answer, {_LATEST_ANSWER_CHARS}) AS latest_answer
+        FROM queries q JOIN answers a ON a.query_id = q.id
+        WHERE q.conversation_id = c.id AND NOT a.refused AND NOT a.stopped
+        ORDER BY q.created_at DESC LIMIT 1
+    ) la ON true
+"""  # noqa: S608 - fixed column list
 
 
 class ConversationRepository:
@@ -22,8 +35,7 @@ class ConversationRepository:
 
     def get(self, conversation_id: UUID) -> Row | None:
         return self._conn.execute(
-            f"SELECT {_COLUMNS} FROM conversations "  # noqa: S608 - fixed column list
-            "WHERE id = %s AND deleted_at IS NULL",
+            f"{_WITH_LATEST_ANSWER} WHERE c.id = %s AND c.deleted_at IS NULL",
             (conversation_id,),
         ).fetchone()
 
@@ -31,10 +43,10 @@ class ConversationRepository:
         """Active conversations, most recently used first (favourites: in the order added)."""
         order = "favorite_at" if favorites else "updated_at DESC"
         return self._conn.execute(
-            f"SELECT {_COLUMNS} FROM conversations WHERE deleted_at IS NULL "  # noqa: S608
-            "AND (%(group)s::uuid IS NULL OR group_id = %(group)s::uuid) "
-            "AND (NOT %(fav)s OR favorite_at IS NOT NULL) "
-            f"ORDER BY {order} LIMIT %(limit)s",
+            f"{_WITH_LATEST_ANSWER} WHERE c.deleted_at IS NULL "
+            "AND (%(group)s::uuid IS NULL OR c.group_id = %(group)s::uuid) "
+            "AND (NOT %(fav)s OR c.favorite_at IS NOT NULL) "
+            f"ORDER BY c.{order} LIMIT %(limit)s",
             {"group": group_id, "fav": favorites, "limit": limit},
         ).fetchall()
 
@@ -52,13 +64,13 @@ class ConversationRepository:
                 "favorite_at = CASE WHEN %(favorite)s THEN coalesce(favorite_at, now()) END"
             )
             params["favorite"] = changes["favorite"]
-        if not sets:
-            return self.get(conversation_id)
-        return self._conn.execute(
-            f"UPDATE conversations SET {', '.join(sets)} "  # noqa: S608 - fixed column names
-            f"WHERE id = %(id)s AND deleted_at IS NULL RETURNING {_COLUMNS}",
-            params,
-        ).fetchone()
+        if sets:
+            self._conn.execute(
+                f"UPDATE conversations SET {', '.join(sets)} "  # noqa: S608 - fixed column names
+                "WHERE id = %(id)s AND deleted_at IS NULL",
+                params,
+            )
+        return self.get(conversation_id)
 
     def touch(self, conversation_id: UUID) -> None:
         self._conn.execute(
@@ -121,8 +133,9 @@ class ConversationRepository:
             """
             SELECT q.id AS query_id, q.question, q.created_at, q.attached_document_ids,
                    a.id AS answer_id, a.answer, a.refused, a.uncited, a.stopped,
-                   a.citations, a.chunk_ids, a.created_at AS answered_at
+                   a.citations, a.chunk_ids, a.created_at AS answered_at, f.rating
             FROM queries q LEFT JOIN answers a ON a.query_id = q.id
+            LEFT JOIN answer_feedback f ON f.answer_id = a.id
             WHERE q.conversation_id = %s
             ORDER BY q.created_at
             """,

@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Literal
 from uuid import UUID
 
 from pydantic import BaseModel, Field
@@ -13,6 +14,9 @@ class ConversationOut(BaseModel):
     created_at: datetime
     updated_at: datetime
     favorite: bool
+    preview: str | None = Field(
+        default=None, description="Start of the latest answer; null before the first one"
+    )
 
 
 class DocumentRef(BaseModel):
@@ -45,6 +49,9 @@ class AnswerOut(BaseModel):
     stopped: bool
     citations: list[int]
     sources: list[SourceOut]
+    rating: Literal["up", "down"] | None = Field(
+        default=None, description="The reader's rating; null when not rated"
+    )
     created_at: datetime
 
 
