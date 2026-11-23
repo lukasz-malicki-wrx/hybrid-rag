@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useSyncExternalStore } from "react";
+import { useCallback, useLayoutEffect, useSyncExternalStore } from "react";
 import { ThemePill } from "@hybrid-rag/ui/theme-pill";
 import {
   applyTheme,
@@ -46,6 +46,9 @@ const getServerSnapshot = () => false;
  */
 export function ThemeToggle({ switchToLight, switchToDark }: { switchToLight: string; switchToDark: string }) {
   const dark = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  // Switching the language re-mounts the whole <html> on the client, and the inline script of the
+  // head does not run again then: put the saved choice back on the new element.
+  useLayoutEffect(() => applyTheme(readPreference()), []);
   const toggle = useCallback(() => {
     const next: ThemePreference = dark ? "light" : "dark";
     try {
