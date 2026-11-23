@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { THEME_STORAGE_KEY, type ThemePreference } from "@/lib/theme";
+import { THEME_STORAGE_KEY, type ThemePreference } from "@hybrid-rag/ui/theme";
 
 type ThemeState = {
   preference: ThemePreference;

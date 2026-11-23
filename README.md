@@ -11,6 +11,29 @@ Everything runs locally with Docker Compose. No accounts, API keys or hosting ar
 > multi-turn conversations with favourites, streamed answers with clickable citations, personal
 > answer preferences and retrieval evaluation.
 
+## Screenshots
+
+The app, with the public sample documents from `samples/` (light or dark, following your GitHub theme):
+
+| | |
+| --- | --- |
+| <picture><source media="(prefers-color-scheme: dark)" srcset="apps/landing/public/screenshots/chat-dark.webp"><img src="apps/landing/public/screenshots/chat-light.webp" alt="A conversation with a cited answer rendered as a numbered list" width="420"></picture> | <picture><source media="(prefers-color-scheme: dark)" srcset="apps/landing/public/screenshots/sources-dark.webp"><img src="apps/landing/public/screenshots/sources-light.webp" alt="The sources panel next to an answer, with the cited passages and pages" width="420"></picture> |
+| Conversation: answers with clickable citations, rating, regenerate and copy | Sources: every cited passage with its document, page and a link to the PDF |
+| <picture><source media="(prefers-color-scheme: dark)" srcset="apps/landing/public/screenshots/start-dark.webp"><img src="apps/landing/public/screenshots/start-light.webp" alt="The start screen with example questions, capabilities and limitations" width="420"></picture> | <picture><source media="(prefers-color-scheme: dark)" srcset="apps/landing/public/screenshots/search-lab-dark.webp"><img src="apps/landing/public/screenshots/search-lab-light.webp" alt="The search lab with the vector and full-text rank of each passage" width="420"></picture> |
+| Start screen and the message box with the search scope | Search lab: retrieval only, with each method's rank |
+| <picture><source media="(prefers-color-scheme: dark)" srcset="apps/landing/public/screenshots/document-dark.webp"><img src="apps/landing/public/screenshots/document-light.webp" alt="A document page with the chunks it was cut into" width="420"></picture> | <picture><source media="(prefers-color-scheme: dark)" srcset="apps/landing/public/screenshots/mobile-chat-dark.webp"><img src="apps/landing/public/screenshots/mobile-chat-light.webp" alt="The conversation on a phone" width="200"></picture> |
+| Document page: the chunks and their statistics | On a phone |
+
+The website (`apps/landing`, English and Polish):
+
+| | |
+| --- | --- |
+| <picture><source media="(prefers-color-scheme: dark)" srcset="assets/readme/landing-home-dark.webp"><img src="assets/readme/landing-home-light.webp" alt="The home page of the website" width="420"></picture> | <picture><source media="(prefers-color-scheme: dark)" srcset="assets/readme/landing-pricing-dark.webp"><img src="assets/readme/landing-pricing-light.webp" alt="The pricing page with the three preview plans" width="420"></picture> |
+| Home page | Pricing (a preview: the app has no payments) |
+
+The pictures are made from demo data: `npm run screenshots` in `apps/web` (app) and in
+`apps/landing` (website) regenerates them.
+
 ## Runs on CPU, on purpose
 
 The stack runs in Docker on **CPU only**. This is a deliberate choice: anyone can clone the
@@ -112,9 +135,11 @@ conversations are hidden (soft delete), and questions and answers are never chan
 
 ## Web UI
 
-A Gemini-style layout: the sidebar lists favourites (up to 10), groups, recent conversations
-and documents with their indexing status; the centre holds the conversation and a message box
-that also takes PDFs (button or drag and drop).
+An icon rail switches the column next to it between conversations (with a Chats / Saved tab for
+the up to 10 favourites, a title filter and a preview of each latest answer), groups and
+documents with their indexing status; the centre holds the conversation and a message box that
+also takes PDFs (button or drag and drop). The rail also holds the search lab, settings,
+language and the light/dark switch.
 
 - Files are uploaded as soon as they are added and show live indexing progress; sending waits
   until they are indexed. In a group, new files are added to that group.
@@ -126,6 +151,11 @@ that also takes PDFs (button or drag and drop).
 - Answers stream in. Citation numbers open a sources panel with the excerpt and a link to the
   original PDF at the cited page. **Stop** ends generation; the partial answer is kept.
 - Answers are labelled as AI-generated, and flagged when nothing was found or nothing is cited.
+  The model's Markdown (lists, bold, code) is rendered as such, never as HTML. A refusal is shown
+  in the language of the interface. Each answer can be rated, copied without its citation
+  markers, or asked again; turns of different days are separated by the day.
+- Answers are written in the language of the question: a Polish question is answered in Polish
+  even when the documents are in English.
 - A group page lists its conversations (favourite, delete) and documents. Deleting a group asks
   for confirmation and says how many conversations will be deleted with it.
 - English and Polish. The browser language decides (English when it is neither); Settings can
@@ -134,7 +164,7 @@ that also takes PDFs (button or drag and drop).
 - **Document page** (click a document in the sidebar): the chunks the PDF was cut into, with page,
   length and a text filter, plus size statistics and a flag on very short chunks. Bad answers
   usually start with a bad cut, so this is where to look first.
-- **Search lab** (sidebar, Tools): runs only the retrieval step, with no model. For a question it
+- **Search lab** (rail, magnifier icon): runs only the retrieval step, with no model. For a question it
   shows each chunk's rank in the vector search and in the full-text search, the distance and the
   merged score, for hybrid, vector-only or full-text-only mode. An empty result explains that the
   relevance gate refused. Each hit links to its chunk on the document page.
@@ -321,14 +351,23 @@ docs/                        requirements, plan, explanation, evaluation
 Requirements, including WCAG 2.1 and responsive design, are in
 [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md); the roadmap is in [docs/PLAN.md](docs/PLAN.md).
 
+## Website
+
+`apps/landing` is the project's website: Next.js, English and Polish (`/en`, `/pl`), with the
+pages Home, Features, How it works, Pricing (a preview, the app has no payments), About, FAQ,
+Privacy and Accessibility. It shares the components, tokens and translation code of the app
+(`packages/*`) with its own palette, sets no cookies and makes no third-party requests, and is
+checked with axe, HTML validation, a link checker and Lighthouse in CI. It is meant for Vercel;
+setup, commands and the screenshot workflow are in [apps/landing/README.md](apps/landing/README.md).
+
 ## Monorepo
 
 The JavaScript side is an npm workspace (`apps/*` and `packages/*`), and
 [Turborepo](https://turborepo.dev) runs lint, type check, tests and build in dependency order.
 `apps/api` is Python with its own `pyproject.toml` and has no `package.json`, so npm ignores it.
 
-Dependencies point one way: apps use `@hybrid-rag/ui`, and `@hybrid-rag/ui` uses
-`@hybrid-rag/design-tokens`. Nothing in `packages/` imports from `apps/`. The tokens are a
+Dependencies point one way: apps use `@hybrid-rag/ui` and `@hybrid-rag/i18n` (the translation
+core; each app keeps its own catalogs), and `@hybrid-rag/ui` uses `@hybrid-rag/design-tokens`. Nothing in `packages/` imports from `apps/`. The tokens are a
 separate package because they are plain CSS: another site can use the same colours and theme
 without React or the components. Packages ship source (`.ts`, `.tsx`, `.css`) and have no build
 step; the app compiles them.

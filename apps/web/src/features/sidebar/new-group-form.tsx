@@ -32,7 +32,7 @@ export function NewGroupForm({ onClose }: { onClose: () => void }) {
 
   return (
     <form
-      className="mx-1 mb-2 flex items-center gap-1.5 rounded-lg border border-border bg-bg p-1.5"
+      className="flex items-center gap-1.5 rounded-lg border border-border bg-surface p-1.5"
       onSubmit={submit}
       onKeyDown={(e) => e.key === "Escape" && onClose()}
     >
@@ -49,7 +49,7 @@ export function NewGroupForm({ onClose }: { onClose: () => void }) {
       <Button type="submit" variant="primary" size="sm" disabled={create.isPending}>
         {t("common.create")}
       </Button>
-      <IconButton label={t("common.cancel")} icon={<CloseIcon />} onClick={onClose} className="shrink-0 p-1.5" />
+      <IconButton label={t("common.cancel")} icon={<CloseIcon />} variant="compact" onClick={onClose} className="shrink-0" />
     </form>
   );
 }

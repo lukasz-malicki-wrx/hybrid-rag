@@ -1,5 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
+import { Checkbox } from "./checkbox";
+import { RadioGroup } from "./radio-group";
 import { Select } from "./select";
 import { TextArea } from "./text-area";
 import { TextInput } from "./text-input";
@@ -85,5 +87,77 @@ describe("Select", () => {
     expect(labelFor).toBeTruthy();
     expect(labelFor).toBe(controlId);
     expect(html).toContain('<option value="pl" selected="">Polski</option>');
+  });
+});
+
+describe("field spacing and text size", () => {
+  it("puts a visible label and its control in one block with the same 6px gap, for every kind of field", () => {
+    const input = renderToStaticMarkup(<TextInput label="Name" />);
+    const select = renderToStaticMarkup(<Select label="Doc"><option>a</option></Select>);
+    const area = renderToStaticMarkup(<TextArea label="Notes" />);
+    expect(input).toMatch(/^<div class="space-y-1\.5"><label/);
+    expect(select).toMatch(/^<div class="space-y-1\.5"><label/);
+    expect(area).toMatch(/^<div class="space-y-1\.5"><label/);
+  });
+
+  it("uses one label style: 14px medium", () => {
+    for (const html of [
+      renderToStaticMarkup(<TextInput label="Name" />),
+      renderToStaticMarkup(<Select label="Doc"><option>a</option></Select>),
+      renderToStaticMarkup(<TextArea label="Notes" />),
+    ]) {
+      expect(html).toMatch(/<label[^>]*class="block text-sm font-medium"/);
+    }
+  });
+
+  it("adds no wrapper around a field whose label is hidden, so it can sit in a row", () => {
+    const html = renderToStaticMarkup(<TextInput label="Name" hideLabel />);
+    expect(html).toMatch(/^<label[^>]*sr-only/);
+    expect(html).not.toContain("space-y");
+  });
+
+  it("is 14px from md up (16px below, so iOS does not zoom in) in every text field", () => {
+    for (const html of [
+      renderToStaticMarkup(<TextInput label="Name" />),
+      renderToStaticMarkup(<Select label="Doc"><option>a</option></Select>),
+      renderToStaticMarkup(<TextArea label="Notes" />),
+    ]) {
+      expect(html).toContain("text-base");
+      expect(html).toContain("md:text-sm");
+    }
+  });
+
+  it("has a title size that replaces the default, not adds to it", () => {
+    const html = renderToStaticMarkup(<TextInput label="Name" size="title" />);
+    expect(html).toContain("text-xl");
+    expect(html).not.toContain("text-base");
+  });
+
+  it("sets the legend and the radio labels in 14px like the fields", () => {
+    const html = renderToStaticMarkup(
+      <RadioGroup legend="Mode" name="m" options={[{ value: "a", label: "A" }]} value="a" onChange={() => {}} />,
+    );
+    expect(html).toMatch(/<legend class="[^"]*text-sm font-medium/);
+    expect(html).toMatch(/<label class="[^"]*text-sm/);
+  });
+});
+
+describe("one text size and label style", () => {
+  it("sets the legend of a radio group like the label of a field", () => {
+    const radios = renderToStaticMarkup(
+      <RadioGroup legend="Mode" name="m" options={[{ value: "a", label: "A" }]} value="a" onChange={() => {}} />,
+    );
+    const field = renderToStaticMarkup(<TextInput label="Name" />);
+    const legend = /<legend class="([^"]+)"/.exec(radios)?.[1] ?? "";
+    const label = /<label for="[^"]+" class="([^"]+)"/.exec(field)?.[1] ?? "";
+    for (const cls of label.split(" ")) expect(legend).toContain(cls);
+  });
+
+  it("shows radio and checkbox labels at 14px", () => {
+    const radios = renderToStaticMarkup(
+      <RadioGroup legend="Mode" name="m" options={[{ value: "a", label: "A" }]} value="a" onChange={() => {}} />,
+    );
+    expect(radios).toMatch(/<label class="[^"]*text-sm/);
+    expect(renderToStaticMarkup(<Checkbox label="Doc" />)).toMatch(/<label class="[^"]*text-sm/);
   });
 });

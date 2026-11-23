@@ -1,0 +1,99 @@
+{
+  "hero": {
+    "title": "Cennik",
+    "lead": "Trzy plany, z których istnieje tylko jeden. Free to aplikacja, którą uruchamiasz u siebie. Basic i Unlimited to szkic usługi hostowanej, której jeszcze nie ma.",
+    "eyebrow": "Podgląd"
+  },
+  "notice": {
+    "lead": "Podgląd cennika. Płatności jeszcze nie działają i niczego nie można kupić.",
+    "detail": "hybrid-rag nie ma kont, płatności ani usługi hostowanej. Basic i Unlimited są dopiero planowane, mogą się zmienić albo nigdy nie powstać."
+  },
+  "plans": {
+    "perMonth": "miesięcznie",
+    "priceLabel": "{price} miesięcznie",
+    "available": "Dostępny",
+    "soon": "Wkrótce",
+    "soonNote": "Nie jest na sprzedaż. Na razie nie ma czego kupić ani gdzie się zapisać.",
+    "freeCta": "Pobierz z GitHuba",
+    "free": {
+      "name": "Free",
+      "tagline": "Cała aplikacja na Twoim komputerze.",
+      "points": {
+        "setup": "Działa w Docker Compose",
+        "scope": "Bez konta i bez klucza API",
+        "terms": "Licencja MIT, kod na GitHubie"
+      }
+    },
+    "basic": {
+      "name": "Basic",
+      "tagline": "W planach: usługa hostowana do lekkiego użytku.",
+      "points": {
+        "setup": "W planach: usługa hostowana, nic nie instalujesz",
+        "scope": "W planach: do {documents} dokumentów",
+        "terms": "W planach: do {questions} pytań miesięcznie"
+      }
+    },
+    "unlimited": {
+      "name": "Unlimited",
+      "tagline": "W planach: usługa hostowana bez limitów.",
+      "points": {
+        "setup": "W planach: usługa hostowana, nic nie instalujesz",
+        "scope": "W planach: bez limitu dokumentów i pytań",
+        "terms": "W planach: zgłoszenia na GitHubie obsługiwane w pierwszej kolejności"
+      }
+    },
+    "eyebrow": "Plany",
+    "title": "Istnieje jeden plan, dwa to szkic"
+  },
+  "table": {
+    "heading": "Porównanie planów",
+    "caption": "Co obejmuje każdy plan. Basic i Unlimited są dopiero planowane i nie można ich kupić, więc ich kolumny pokazują zamierzenia, a nie to, co istnieje.",
+    "regionLabel": "Tabela porównania planów",
+    "feature": "Funkcja",
+    "included": "Wchodzi w skład",
+    "notIncluded": "Nie wchodzi w skład",
+    "noLimit": "Bez limitu",
+    "groups": {
+      "run": "Gdzie działa",
+      "limits": "Limity",
+      "included": "Co dostajesz",
+      "support": "Pomoc"
+    },
+    "rows": {
+      "selfHosted": "Uruchamiasz u siebie w Docker Compose",
+      "hosted": "Usługa hostowana",
+      "localData": "Dokumenty zostają na Twoim komputerze",
+      "documents": "Dokumenty",
+      "questions": "Pytania w miesiącu",
+      "citations": "Odpowiedzi z cytatem i stroną PDF",
+      "relevanceGate": "Mówi wprost, gdy odpowiedzi nie ma w dokumentach",
+      "groups": "Grupy i zakres wyszukiwania",
+      "languages": "Interfejs po angielsku i polsku",
+      "community": "Pomoc przez zgłoszenia na GitHubie",
+      "priority": "Priorytet dla zgłoszeń"
+    },
+    "eyebrow": "Porównanie"
+  },
+  "faq": {
+    "heading": "Pytania o cennik",
+    "items": {
+      "buy": {
+        "q": "Czy mogę kupić plan?",
+        "a": "Nie. Aplikacja nie ma płatności, kont ani usługi hostowanej, a ta strona nie ma koszyka. Ceny to tylko podgląd."
+      },
+      "free": {
+        "q": "Czy Free jest naprawdę darmowy?",
+        "a": "Tak. hybrid-rag jest otwartym oprogramowaniem na licencji MIT i działa na Twoim komputerze, więc nie ma opłat ani limitu czasu. Płacisz tylko za własny sprzęt i prąd. Jeśli do odpowiedzi wybierzesz Claude API (<code>LLM_PROVIDER=anthropic</code>), rachunek za podany przez Ciebie klucz API wystawia Anthropic."
+      },
+      "hosted": {
+        "q": "Czy Basic i Unlimited powstaną?",
+        "a": "To pomysł, a nie obietnica. Usługa hostowana nie jest zbudowana, nie ma terminu, a ceny, limity i nazwy mogą się zmienić albo zniknąć."
+      },
+      "follow": {
+        "q": "Jak się dowiem, jeśli coś się zmieni?",
+        "a": "Nie ma tu zapisów ani listy mailingowej. Każda zmiana pojawiłaby się w <repo>repozytorium na GitHubie</repo>."
+      }
+    },
+    "eyebrow": "Pytania"
+  }
+}

@@ -2,6 +2,8 @@
 @import "@hybrid-rag/design-tokens";
 @import "@hybrid-rag/ui/styles.css";
 
+@import "@hybrid-rag/ui/fonts.css";
+
 /* Source files of this app. The classes of @hybrid-rag/ui are registered by its own styles.css. */
 @source "../";
 @source not "../**/*.test.{ts,tsx}";

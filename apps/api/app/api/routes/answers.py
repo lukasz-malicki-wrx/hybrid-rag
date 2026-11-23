@@ -1,13 +1,20 @@
 from collections.abc import AsyncIterator
+from uuid import UUID
 
 from fastapi import APIRouter
 from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import StreamingResponse
 
 from ...rag.conversation import retrieval_query
-from ...schemas.answer import AnswerRequest, ConversationEvent
+from ...schemas.answer import AnswerRequest, ConversationEvent, FeedbackIn, FeedbackOut
 from ...services.answer import AnswerRun
-from ..deps import AnswerServiceDep, ConversationServiceDep, SearchServiceDep, SettingsServiceDep
+from ..deps import (
+    AnswerServiceDep,
+    ConversationServiceDep,
+    FeedbackServiceDep,
+    SearchServiceDep,
+    SettingsServiceDep,
+)
 
 router = APIRouter(prefix="/answers", tags=["answers"])
 
@@ -77,3 +84,13 @@ async def answer(
         media_type="text/event-stream",
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )
+
+
+@router.put(
+    "/{answer_id}/feedback",
+    response_model=FeedbackOut,
+    responses={404: {"description": "No such answer, or its conversation was deleted"}},
+)
+def set_feedback(answer_id: UUID, body: FeedbackIn, feedback: FeedbackServiceDep):
+    """Rate an answer; rating again replaces the rating, null withdraws it."""
+    return feedback.set(answer_id, body.rating)

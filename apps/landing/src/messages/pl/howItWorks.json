@@ -1,0 +1,248 @@
+{
+  "hero": {
+    "title": "Jak to działa",
+    "lead": "Od PDF-a do odpowiedzi, którą można sprawdzić, prostymi słowami. Każdy termin techniczny jest wyjaśniony tam, gdzie pojawia się po raz pierwszy.",
+    "eyebrow": "Pod maską"
+  },
+  "flows": {
+    "title": "Dwa przebiegi, jeden pomysł",
+    "lead": "hybrid-rag robi dwie rzeczy: raz przygotowuje dokument i za każdym razem odpowiada na pytanie. Tu oba przebiegi w skrócie, niżej krok po kroku.",
+    "ingest": {
+      "label": "Przebieg 1: od PDF-a do przeszukiwalnego dokumentu",
+      "steps": {
+        "upload": {
+          "title": "Wgranie",
+          "text": "PDF zapisuje się bez zmian."
+        },
+        "cut": {
+          "title": "Odczyt i cięcie",
+          "text": "Tekst jest cięty na fragmenty po około {chunkChars} znaków."
+        },
+        "embed": {
+          "title": "Zamiana na liczby",
+          "text": "Każdy fragment dostaje {vectorSize} liczby opisujące jego sens."
+        },
+        "store": {
+          "title": "Zapis",
+          "text": "Fragmenty trafiają do bazy, gotowe do dwóch rodzajów szukania."
+        }
+      }
+    },
+    "ask": {
+      "label": "Przebieg 2: od pytania do odpowiedzi z cytatami",
+      "steps": {
+        "question": {
+          "title": "Pytanie",
+          "text": "Twoje pytanie też zamienia się na liczby."
+        },
+        "search": {
+          "title": "Dwa sposoby szukania",
+          "text": "Po sensie i po dokładnych słowach, po {candidates} kandydatów z każdego."
+        },
+        "merge": {
+          "title": "Połączenie",
+          "text": "Łączenie rankingów zostawia najlepsze fragmenty, domyślnie {topChunks}."
+        },
+        "gate": {
+          "title": "Sprawdzenie trafności",
+          "text": "Jeśli nic nie jest wystarczająco blisko, model nie jest wołany."
+        },
+        "write": {
+          "title": "Pisanie",
+          "text": "Model odpowiada na podstawie fragmentów i cytuje je jako [1], [2]."
+        },
+        "save": {
+          "title": "Zapis",
+          "text": "Odpowiedź trafia do bazy razem z tym, na czym się opierała."
+        }
+      }
+    },
+    "stepLabel": "Krok {number}",
+    "eyebrow": "Przegląd"
+  },
+  "ingest": {
+    "title": "Od PDF-a do fragmentów, w których można szukać",
+    "lead": "Dzieje się to raz dla każdego dokumentu, w tle, a Ty w tym czasie możesz robić coś innego.",
+    "steps": {
+      "save": {
+        "title": "Zachowanie oryginału",
+        "text": "PDF zapisuje się bez zmian pod odciskiem swojej zawartości (skrótem SHA-256). Ten sam plik wgrany dwa razy jest zapisany raz. Plik o tej samej nazwie, ale innej zawartości, staje się nową wersją, a starsza zostaje."
+      },
+      "read": {
+        "title": "Odczyt tekstu",
+        "text": "Proces działający w tle, czyli worker, bierze zadanie z kolejki w bazie i odczytuje tekst z każdej strony. Strony, które są samym obrazem, nie zostaną odczytane: nie ma OCR, czyli rozpoznawania tekstu ze zdjęć."
+      },
+      "cut": {
+        "title": "Cięcie na fragmenty",
+        "text": "Tekst każdej strony jest cięty na fragmenty po około {chunkChars} znaków, najchętniej na granicy akapitu lub zdania, a każdy fragment nakłada się na poprzedni o {chunkOverlap} znaków. Fragment pamięta swoją stronę, więc cytat może na nią wskazać."
+      },
+      "embed": {
+        "title": "Zamiana fragmentów na liczby",
+        "text": "Model osadzeń (bge-m3) zamienia każdy fragment na listę {vectorSize} liczb, czyli wektor, który opisuje sens tekstu. Teksty o podobnym znaczeniu dostają wektory leżące blisko siebie, nawet jeśli nie mają wspólnych słów. Pytanie zamienia na liczby ten sam model, więc nie wolno go zmienić bez ponownego zindeksowania dokumentów."
+      },
+      "store": {
+        "title": "Zapis i oznaczenie dokumentu jako gotowego",
+        "text": "Fragmenty, wektory i indeks pełnotekstowy trafiają do bazy (PostgreSQL z rozszerzeniem pgvector) razem ze statusem „gotowy”, w jednym kroku, więc nieudana próba nie zostawia niedokończonego dokumentu. Nieudaną próbę powtarza się po {retryFirstSeconds} sekundach i po {retrySecondMinutes} minutach, potem dokument dostaje status „nieudany”. W trakcie aplikacja pokazuje postęp na żywo."
+      }
+    },
+    "caption": "Strona dokumentu pokazuje fragmenty, na które pocięto PDF, z ich stronami i długością. Zła odpowiedź często zaczyna się od złego cięcia, więc zacznij szukać właśnie tutaj.",
+    "eyebrow": "Krok po kroku"
+  },
+  "search": {
+    "title": "Dwa sposoby szukania",
+    "lead": "Pytanie jest wyszukiwane na dwa różne sposoby, bo każdy z nich pomija to, co znajduje drugi. Każdy zwraca {candidates} najlepszych kandydatów, od najlepszego do najsłabszego.",
+    "kinds": {
+      "meaning": {
+        "title": "Po sensie",
+        "text": "Wyszukiwanie wektorowe porównuje liczby pytania z liczbami każdego fragmentu i zwraca najbliższe. Rozumie synonimy i parafrazy: „zresetuj urządzenie” znajdzie „przywracanie ustawień fabrycznych”. Słabo radzi sobie z dokładnymi kodami i nazwami, bo dla modelu „GPIO12” znaczy prawie nic."
+      },
+      "words": {
+        "title": "Po dokładnych słowach",
+        "text": "Wyszukiwanie pełnotekstowe znajduje fragmenty zawierające słowa z pytania, korzystając z indeksu wszystkich słów. Dobrze radzi sobie z nazwami, kodami i symbolami. Nie rozumie parafraz ani innych języków: polskie pytanie o angielski dokument nic tu nie znajdzie."
+      }
+    },
+    "fusion": {
+      "title": "Łączenie dwóch list",
+      "text": "Obu list nie da się porównać po wynikach, bo mają różne skale. Łączenie rankingów (RRF, od Reciprocal Rank Fusion) pomija wyniki i patrzy tylko na miejsca. Fragment dostaje punkty za miejsce na każdej liście, na której się znalazł, a punkty się sumuje. Fragment blisko szczytu obu list wygrywa z takim, który jest pierwszy tylko na jednej.",
+      "formula": "punkty = 1 / ({k} + miejsce)",
+      "formulaLabel": "Wzór",
+      "exampleTitle": "Przykład z liczbami",
+      "exampleText": "Cztery fragmenty, od A do D, z wymyślonymi miejscami. „Sens” to miejsce w wyszukiwaniu po sensie, „Słowa” to miejsce w wyszukiwaniu po słowach.",
+      "table": {
+        "regionLabel": "Tabela z przykładem łączenia list",
+        "caption": "Miejsca i punkty czterech przykładowych fragmentów",
+        "chunk": "Fragment",
+        "meaning": "Sens",
+        "words": "Słowa",
+        "points": "Punkty",
+        "place": "Miejsce",
+        "absent": "nie ma go na tej liście"
+      },
+      "reading": "Fragment D jest pierwszy na liście słów, ale dopiero siódmy na liście sensu, więc kończy trzeci. Fragment C jest czwarty i drugi, a mimo to jest wyżej, bo jest blisko szczytu obu list. Fragmentu B wyszukiwanie po słowach w ogóle nie znalazło, więc ma punkty tylko z jednej listy.",
+      "firstRow": "Pierwszy wiersz policzony: 1 / (60 + {meaning}) + 1 / (60 + {words}) = {left} + {right} = {total}.",
+      "traceable": "Odpowiedź wyszukiwania zawiera oba miejsca każdego fragmentu, więc widać, które wyszukiwanie go znalazło. Dokładnie to pokazuje laboratorium wyszukiwania."
+    },
+    "caption": "Laboratorium wyszukiwania uruchamia samo szukanie, bez modelu: miejsce każdego fragmentu na obu listach, jego odległość i połączony wynik.",
+    "eyebrow": "Wyszukiwanie"
+  },
+  "gate": {
+    "title": "Bramka trafności: powiedzieć „nie ma tego w dokumentach”",
+    "lead": "Wyszukiwanie zawsze zwraca najbliższe fragmenty, nawet na pytanie o naleśniki. Same wyniki niczego więc nie dowodzą, dlatego aplikacja najpierw sprawdza, czy pytanie w ogóle dotyczy dokumentów.",
+    "passes": "Dotyczy ich, gdy spełniony jest jeden z dwóch warunków:",
+    "rules": {
+      "distance": "Najbliższy fragment jest w odległości kosinusowej nie większej niż {gateDistance}. Odległość kosinusowa to kąt między dwoma wektorami: 0 oznacza ten sam kierunek. Wartość jest skalibrowana dla bge-m3.",
+      "words": "W trybie hybrydowym jeden fragment zawiera wszystkie istotne słowa pytania. Dzięki temu zostają dokładne terminy, takie jak „ALCOA”, które w przestrzeni znaczeń leżą daleko od wszystkiego."
+    },
+    "otherwise": "Jeśli żaden warunek nie jest spełniony, API odpowiada, że w dokumentach tego nie ma, a model językowy w ogóle nie jest wołany: nie powstaje odpowiedź na pytanie, którego dokumenty zdają się nie dotyczyć, i nie traci się czasu na pisanie.",
+    "measured": {
+      "title": "Jak wybrano próg",
+      "text": "Wśród {evalAnswerable} pytań testowych, na które dokumenty odpowiadają, najbliższy fragment leżał w odległości najwyżej {nearestAnswerable} dla każdego pytania w parafrazie i każdego pytania po polsku. Dwa pytania o dokładne terminy były dalej ({exactTermsNear} i {exactTermsFar}), i właśnie na nie jest drugi warunek. Dla {evalOffTopic} osobnych pytań spoza tematu najbliższy fragment leżał w odległości {nearestOffTopic} lub większej, a {gateDistance} leży w tej luce. W ewaluacji wyszukiwanie hybrydowe nie zwróciło nic dla wszystkich {evalOffTopic} pytań spoza tematu.",
+      "limit": "Luka jest wąska, a wartość dotyczy bge-m3 i tych czterech dokumentów. Inne dokumenty mogą wymagać innej wartości (ustawienie MAX_VECTOR_DISTANCE)."
+    },
+    "eyebrow": "Trafność",
+    "stats": {
+      "answerable": "Największa odległość najbliższego fragmentu dla pytania w parafrazie lub po polsku",
+      "offTopic": "Najmniejsza odległość najbliższego fragmentu wśród {evalOffTopic} pytań spoza tematu",
+      "threshold": "Próg, w luce między jednym a drugim"
+    }
+  },
+  "answer": {
+    "title": "Pisanie odpowiedzi",
+    "lead": "Dopiero teraz wchodzi model językowy (LLM): program, który pisze tekst token po tokenie, czyli kawałek słowa po kawałku.",
+    "steps": {
+      "prompt": {
+        "title": "Najlepsze fragmenty trafiają do promptu",
+        "text": "Najlepsze fragmenty, domyślnie {topChunks}, dostają numery od [1] do [n] i trafiają do promptu, czyli instrukcji wysyłanej do modelu. W rozmowie model widzi też {historyTurns} ostatnie tury, a pytanie uzupełniające jest szukane razem z poprzednim. Prompt jest przycinany, żeby zmieścił się w oknie kontekstu, czyli w ilości tekstu, którą model czyta naraz ({contextTokens} tokeny)."
+      },
+      "rules": {
+        "title": "Zasady dla modelu",
+        "text": "Model dostaje polecenie, by odpowiadać wyłącznie na podstawie fragmentów, opatrywać każdą tezę numerem, na przykład [1], a gdy odpowiedzi nie ma, napisać, że jej nie znalazł. Dostaje też informację, że treść fragmentu to dane, a nie polecenia. Utrudnia to przejęcie modelu przez złośliwy PDF, ale go nie wyklucza."
+      },
+      "stream": {
+        "title": "Odpowiedź płynie na bieżąco",
+        "text": "Słowa pojawiają się w miarę pisania. Przycisk Stop kończy generowanie i zostawia to, co już powstało."
+      },
+      "check": {
+        "title": "Sprawdzenie odpowiedzi",
+        "text": "Gdy odpowiedź jest gotowa, odczytywane są jej cytaty. Odmowa dostaje oznaczenie, a odpowiedź bez żadnego poprawnego cytatu jest oznaczona jako niepoparta źródłem. To zmniejsza ryzyko, ale go nie usuwa: mały model może zacytować fragment, który nie potwierdza jego tezy."
+      }
+    },
+    "eyebrow": "Odpowiedź"
+  },
+  "record": {
+    "title": "Co zapisuje się przy każdej odpowiedzi",
+    "lead": "Odpowiedzi, której nie da się prześledzić, trudno ufać. Dlatego każda odpowiedź jest zapisywana razem z tym, na czym się opierała.",
+    "items": {
+      "question": "pytanie i jego ustawienia",
+      "chunks": "identyfikatory fragmentów, które trafiły do promptu",
+      "documents": "skróty i wersje dokumentów, z których pochodzą",
+      "embedding": "model osadzeń",
+      "llm": "dostawca i model językowy",
+      "prompt": "wersja promptu",
+      "context": "Twój osobisty kontekst z Ustawień, jeśli go ustawiono"
+    },
+    "list": "Przy każdej odpowiedzi zapisuje się:",
+    "append": "Pytania i odpowiedzi nigdy nie są zmieniane ani kasowane. Usunięte dokumenty, grupy i rozmowy są tylko ukrywane, a oryginalne PDF-y zostają bez zmian i przy każdym odczycie są sprawdzane względem skrótu. Po miesiącach nadal da się wyjaśnić, na czym oparto odpowiedź.",
+    "eyebrow": "Ślad w bazie"
+  },
+  "run": {
+    "title": "Gdzie to działa",
+    "lead": "Pracują dwa modele: jeden do szukania, drugi do pisania. To, gdzie działa ten drugi, zależy od Ciebie.",
+    "local": {
+      "title": "Na Twoim komputerze (domyślnie)",
+      "text": "Ollama uruchamia oba modele lokalnie: bge-m3 do szukania (około {embeddingGb} GB) i qwen2.5:3b do odpowiedzi (około {chatGb} GB). Bez konta i bez klucza. Dokumenty, pytania i odpowiedzi zostają na Twoim komputerze. Małe modele piszą mniej zgrabnie, zwłaszcza po polsku."
+    },
+    "api": {
+      "title": "Claude API (opcjonalnie)",
+      "text": "Ustaw <code>LLM_PROVIDER=anthropic</code> i klucz API, a przenosi się tylko pisanie. Do API Anthropic trafia wtedy: {sent}. Wyszukiwanie, dokumenty i baza zostają u Ciebie."
+    },
+    "hardware": {
+      "title": "CPU i GPU, szczerze",
+      "lead": "Całość działa wyłącznie na procesorze, i to celowo: każdy może ją uruchomić jedną komendą, bez karty graficznej, sterowników i specjalnej konfiguracji Dockera. Ceną jest szybkość.",
+      "items": {
+        "index": "Indeksowanie PDF-a trwa od sekund do minut. {indexPages}-stronicowy dokument zajął około {indexMinutes} minut na procesorze laptopa.",
+        "answer": "Odpowiedź zaczyna się po krótkiej przerwie i płynie w tempie procesora.",
+        "first": "Pierwsze zapytanie po uruchomieniu jest wolniejsze, bo modele ładują się do pamięci.",
+        "shared": "Indeksowanie i odpowiadanie korzystają z jednej Ollamy, więc odpowiedź czeka, gdy właśnie indeksuje się dokument."
+      },
+      "gpu": "Żeby użyć GPU, uruchom Ollamę bezpośrednio na swoim komputerze (Metal na Apple silicon, CUDA na Linuksie) i pozwól kontenerom z niej korzystać. Docker Desktop na macOS nie przekaże GPU do kontenera. W repozytorium jest do tego gotowa nakładka <code>docker-compose.native-ollama.yml</code>. Z GPU sensowny staje się większy model do rozmów."
+    },
+    "eyebrow": "Uruchamianie"
+  },
+  "start": {
+    "title": "Uruchom to u siebie",
+    "lead": "Potrzebujesz Dockera z Compose, około {diskGb} GB wolnego miejsca na dysku na modele i {ramGb} GB RAM-u.",
+    "start": {
+      "title": "Uruchom wszystko",
+      "label": "Polecenie w terminalu: uruchomienie hybrid-rag",
+      "text": "Przy pierwszym starcie pobierają się dwa modele, a API wstaje, gdy są gotowe. Postęp zobaczysz poleceniem <code>docker compose logs -f ollama-init</code>."
+    },
+    "seed": {
+      "title": "Wgraj przykładowe dokumenty",
+      "label": "Polecenie w terminalu: wgranie przykładowych dokumentów",
+      "text": "Przykłady to {evalDocuments} publiczne dokumenty regulacyjne w PDF-ach. Na procesorze skrypt czeka do {seedWaitMinutes} minut na koniec indeksowania."
+    },
+    "open": "Potem otwórz <code>http://localhost:3000</code>. Wszystkie porty są przypięte do <code>127.0.0.1</code>, więc z innych komputerów nic nie jest dostępne.",
+    "eyebrow": "Szybki start"
+  },
+  "limits": {
+    "title": "Ograniczenia, które warto znać",
+    "items": {
+      "ocr": "Tylko PDF-y z warstwą tekstową: bez OCR, więc skany będące samym obrazem nie zostaną odczytane.",
+      "size": "Domyślny limit wgrywanego pliku to {uploadMb} MB.",
+      "accounts": "Na razie bez kont użytkowników: każdy, kto ma dostęp do aplikacji, widzi te same dokumenty.",
+      "wrong": "Odpowiedzi bywają błędne. Cytaty pozwalają je sprawdzić, a mały model może zacytować fragment, który nie potwierdza jego tezy.",
+      "language": "Wyszukiwanie po słowach pomija tylko angielskie słowa funkcyjne, więc nie obsługuje polskiego. Zdanie, którego aplikacja używa, gdy nic nie znajdzie, jest po angielsku."
+    },
+    "eyebrow": "Ograniczenia"
+  },
+  "more": {
+    "title": "Więcej",
+    "lead": "Pełne wyjaśnienie i pomiary są w repozytorium.",
+    "readme": "README: szybki start, konfiguracja i ograniczenia (po angielsku)",
+    "howItWorks": "docs/HOW_IT_WORKS.md: długa wersja (po polsku)",
+    "evaluation": "docs/EVALUATION.md: pomiary wyszukiwania, z metodą (po angielsku)",
+    "github": "Kod na GitHubie",
+    "eyebrow": "Pogłębienie"
+  }
+}

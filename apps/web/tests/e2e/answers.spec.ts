@@ -140,13 +140,15 @@ test("the chat and the sources panel scroll separately; the page itself does not
       const main = document.getElementById("main")!;
       const chat = document.querySelector('[aria-label="Messages"]')!.parentElement!;
       const aside = [...document.querySelectorAll("aside")].find((a) => a.querySelector("h2")?.textContent === "Sources")!;
-      const sources = aside; // the panel itself scrolls, so its list passes under the bar
+      // The panel's bar stays where it is; the list under it is what scrolls.
+      const sources = aside.querySelector("div.overflow-y-auto")!;
       return {
         mainOverflow: main.scrollHeight - main.clientHeight,
         // The document itself must never scroll (it would carry the sources panel away).
         documentOverflow: document.scrollingElement!.scrollHeight - innerHeight,
         windowY: scrollY,
         panelTop: aside.getBoundingClientRect().top,
+        sourcesTitle: aside.querySelector("h2")!.getBoundingClientRect().top,
         chat: { top: chat.scrollTop, overflow: chat.scrollHeight - chat.clientHeight },
         sources: { top: sources.scrollTop, overflow: sources.scrollHeight - sources.clientHeight },
         panelHeight: aside.getBoundingClientRect().height,
@@ -173,9 +175,11 @@ test("the chat and the sources panel scroll separately; the page itself does not
   await expect.poll(async () => (await scroll()).sources.top).toBeGreaterThan(0);
   const afterPanel = await scroll();
   expect(afterPanel.chat.top).toBe(before.chat.top);
+  expect(afterPanel.sourcesTitle).toBe(before.sourcesTitle); // the bar did not scroll away
   expect(afterPanel.mainOverflow).toBeLessThanOrEqual(1);
 
-  await page.mouse.move(300, 300);
+  // Over the chat (the sidebar takes the first 384px), not over the sources panel.
+  await page.mouse.move(700, 300);
   await page.mouse.wheel(0, -400);
   await expect.poll(async () => (await scroll()).chat.top).toBeLessThan(before.chat.top);
   const afterChat = await scroll();
@@ -197,34 +201,38 @@ for (const grouped of [true, false]) {
       json(r, { ...conversation, group_id: grouped ? conversation.group_id : null, documents: [], messages: [answeredMessage] }),
     );
     await page.goto("/c/c1");
-    await expect(page.getByRole("link", { name: "GxP" }).first()).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: conversation.title })).toBeVisible();
     await page.getByRole("button", { name: /^Source 1:/ }).click();
     const panel = page.getByRole("complementary", { name: "Sources" });
     await expect(panel).toBeVisible();
 
     const bars = await page.evaluate(() => {
+      // A heading sits in the bar's text block, which sits in the bar.
+      const bar = (heading: Element) => heading.parentElement!.parentElement!;
       const edge = (el: Element) => {
         const r = el.getBoundingClientRect();
         return { top: r.top, bottom: r.bottom };
       };
       const aside = [...document.querySelectorAll("aside")].find((a) => a.querySelector("h2")?.textContent === "Sources")!;
+      const chatHeading = document.querySelector("main h1")!;
+      const sourcesHeading = aside.querySelector("h2")!;
       return {
-        conversation: edge(document.querySelector("main h1")!.closest(".border-b")!),
-        sources: edge(aside.querySelector("h2")!.parentElement!.parentElement!),
-        titles: {
-          conversation: document.querySelector("main h1")!.getBoundingClientRect().top,
-          sources: aside.querySelector("h2")!.getBoundingClientRect().top,
-        },
+        conversation: edge(bar(chatHeading)),
+        sources: edge(bar(sourcesHeading)),
+        titles: { conversation: chatHeading.getBoundingClientRect().top, sources: sourcesHeading.getBoundingClientRect().top },
+        height: bar(chatHeading).getBoundingClientRect().height,
       };
     });
     expect(bars.conversation.top).toBe(bars.sources.top);
     expect(bars.conversation.bottom).toBe(bars.sources.bottom);
-    // The headings sit at the same height too, not only the lines under them.
+    expect(bars.height).toBe(64);
+    // The headings sit at the same height too, not only the lines under them: both bars have a
+    // subtitle, whether it is the group of the conversation or its number of questions.
     expect(bars.titles.conversation).toBe(bars.titles.sources);
   });
 }
 
-test("the bar stays on top and blurs the conversation scrolling under it", async ({ page }) => {
+test("the bar stays in view while the conversation scrolls under it, and does not cover it", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 600 });
   const messages = Array.from({ length: 12 }, (_, i) => ({
     ...answeredMessage,
@@ -235,26 +243,30 @@ test("the bar stays on top and blurs the conversation scrolling under it", async
   await page.route(`**${MOCK}/conversations/c1`, (r) => json(r, { ...conversation, documents: [], messages }));
   await page.goto("/c/c1");
 
-  const bar = page.locator("main").getByRole("heading", { level: 1 }).locator("xpath=ancestor::div[contains(@class,'sticky')][1]");
-  const top = () => bar.evaluate((el) => el.getBoundingClientRect().top);
+  const heading = page.locator("main").getByRole("heading", { level: 1, name: conversation.title });
+  const bar = heading.locator("xpath=../..");
   const first = page.getByText("Question number 1?");
   await expect(page.getByText("Question number 12?")).toBeVisible();
   // The chat opens at its end; go back to the top, where the first message must start below the bar.
   await page.evaluate(() => {
     document.querySelector('[aria-label="Messages"]')!.parentElement!.scrollTop = 0;
   });
-  const barBottom = await bar.evaluate((el) => el.getBoundingClientRect().bottom);
-  expect((await first.boundingBox())!.y).toBeGreaterThanOrEqual(barBottom);
+  const barBox = (await bar.boundingBox())!;
+  expect(barBox.y).toBe(0);
+  expect((await first.boundingBox())!.y).toBeGreaterThanOrEqual(barBox.y + barBox.height);
 
-  await page.mouse.move(400, 300);
+  await page.mouse.move(700, 300);
   await page.mouse.wheel(0, 500);
-  await expect.poll(async () => (await first.boundingBox())!.y).toBeLessThan(barBottom);
-  expect(await top()).toBe(0);
+  // The first message has scrolled out of sight (the panel clips it), the bar has not moved.
+  await expect.poll(async () => (await first.boundingBox())!.y).toBeLessThan(barBox.y + barBox.height);
+  await expect(first).not.toBeInViewport();
+  await expect(heading).toBeInViewport({ ratio: 1 });
+  expect(await bar.boundingBox()).toEqual(barBox);
+  // An ordinary block, not an overlay: nothing paints over the messages from the bar.
   const style = await bar.evaluate((el) => {
     const css = getComputedStyle(el);
-    return { blur: css.backdropFilter, background: css.backgroundColor };
+    return { position: css.position, blur: css.backdropFilter };
   });
-  expect(style.blur).toContain("blur");
-  // Translucent, or the blur would show nothing.
-  expect(style.background).not.toMatch(/rgb\(/);
+  expect(style.position).toBe("static");
+  expect(style.blur).toBe("none");
 });

@@ -297,6 +297,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/answers/{answer_id}/feedback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Set Feedback
+         * @description Rate an answer; rating again replaces the rating, null withdraws it.
+         */
+        put: operations["set_feedback_answers__answer_id__feedback_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/settings": {
         parameters: {
             query?: never;
@@ -341,6 +361,11 @@ export interface components {
             citations: number[];
             /** Sources */
             sources: components["schemas"]["SourceOut"][];
+            /**
+             * Rating
+             * @description The reader's rating; null when not rated
+             */
+            rating?: ("up" | "down") | null;
             /**
              * Created At
              * Format: date-time
@@ -436,6 +461,11 @@ export interface components {
             /** Favorite */
             favorite: boolean;
             /**
+             * Preview
+             * @description Start of the latest answer; null before the first one
+             */
+            preview?: string | null;
+            /**
              * Documents
              * @description Pinned documents. When non-empty, the conversation searches only these (inactive ones are skipped); otherwise its group's documents, or all documents.
              */
@@ -474,6 +504,11 @@ export interface components {
             updated_at: string;
             /** Favorite */
             favorite: boolean;
+            /**
+             * Preview
+             * @description Start of the latest answer; null before the first one
+             */
+            preview?: string | null;
         };
         /**
          * ConversationUpdate
@@ -549,6 +584,24 @@ export interface components {
             status: string;
             /** Active */
             active: boolean;
+        };
+        /** FeedbackIn */
+        FeedbackIn: {
+            /**
+             * Rating
+             * @description null withdraws the rating
+             */
+            rating: ("up" | "down") | null;
+        };
+        /** FeedbackOut */
+        FeedbackOut: {
+            /**
+             * Answer Id
+             * Format: uuid
+             */
+            answer_id: string;
+            /** Rating */
+            rating: ("up" | "down") | null;
         };
         /** GroupDeleted */
         GroupDeleted: {
@@ -1660,6 +1713,48 @@ export interface operations {
                 content: {
                     "text/event-stream": components["schemas"]["AnswerEvent"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_feedback_answers__answer_id__feedback_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                answer_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FeedbackIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FeedbackOut"];
+                };
+            };
+            /** @description No such answer, or its conversation was deleted */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {

@@ -6,6 +6,7 @@ const turn = (key: string, conversationId: string | null): Omit<ActiveTurn, "bus
   conversationId,
   question: "q",
   attachments: [],
+  startedAt: 1_000,
   baseCount: 0,
   sources: [],
   text: "",
@@ -42,6 +43,15 @@ describe("chat store", () => {
     expect(turns[key]).toBeUndefined();
     expect(turns.c9).toMatchObject({ key: "c9", conversationId: "c9", busy: true });
     expect(controllers.c9).toBe(controller);
+  });
+
+  it("keeps the time the question was sent through updates, moving and finishing", () => {
+    const key = newTurnKey();
+    useChatStore.getState().begin({ ...turn(key, null), startedAt: 1_700_000_000_000 }, new AbortController());
+    useChatStore.getState().update(key, (t) => ({ text: t.text + "hi", status: "streaming" }));
+    useChatStore.getState().rekey(key, "c9");
+    useChatStore.getState().finish("c9");
+    expect(useChatStore.getState().turns.c9.startedAt).toBe(1_700_000_000_000);
   });
 
   it("finishing keeps the turn on screen but no longer busy", () => {

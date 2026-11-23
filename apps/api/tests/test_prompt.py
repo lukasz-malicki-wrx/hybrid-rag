@@ -86,3 +86,21 @@ def test_personal_context_takes_room_from_the_excerpt_budget():
     assert len(fit_to_budget("q", big, 8192, 768, personal="p" * 6000)) < len(
         fit_to_budget("q", big, 8192, 768)
     )
+
+
+def test_polish_questions_are_recognised():
+    from app.rag.prompt import question_language
+
+    assert question_language("jaki jest numer świadectwa energetycznego?") == "pl"
+    assert question_language("jak podłaczyc adapter do kotla?") == "pl"
+    assert question_language("czy to jest w dokumencie") == "pl"
+    assert question_language("Who certifies batch release?") is None
+    assert question_language("What is ALCOA?") is None
+
+
+def test_the_prompt_names_polish_as_the_answer_language():
+    _, user = build_prompt("jaka jest powierzchnia użytkowa domu?", HITS)
+    assert "Write the whole answer in Polish" in user
+    assert user.rstrip().endswith("for example: ... is required [1].")
+    _, english = build_prompt("What is the floor area?", HITS)
+    assert "Polish" not in english

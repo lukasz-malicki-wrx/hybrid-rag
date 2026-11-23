@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { AppShell } from "@/features/layout/app-shell";
 import { Providers } from "@/features/layout/providers";
-import { THEME_SCRIPT } from "@/lib/theme";
+import { THEME_SCRIPT } from "@hybrid-rag/ui/theme";
 import "./globals.css";
 
 export const metadata: Metadata = {

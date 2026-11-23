@@ -1,0 +1,51 @@
+{
+  "hero": {
+    "title": "Deklaracja dostępności",
+    "lead": "Ta strona ma spełniać WCAG 2.2 na poziomie AA. Znajdziesz tu, co zrobiono i sprawdzono, czego jeszcze brakuje i jak zgłosić problem.",
+    "updated": "Data deklaracji: <time>{date}</time>",
+    "eyebrow": "Informacje"
+  },
+  "status": {
+    "title": "Na jakim etapie jesteśmy",
+    "text": "Celem jest poziom AA wytycznych WCAG (Web Content Accessibility Guidelines) 2.2. Ta strona nie twierdzi, że spełnia je w całości: mówi, co zrobiono, jak to sprawdzono i czego, jak wiadomo, brakuje.",
+    "method": "Deklarację napisano w dniu podanym wyżej, a obejmuje ona to, co sprawdzają wymienione niżej testy automatyczne. Strona nie przeszła audytu zewnętrznego eksperta i nie ma certyfikatu."
+  },
+  "built": {
+    "title": "Jak zbudowano stronę",
+    "items": {
+      "structure": "Każda strona ma jeden główny nagłówek, nagłówki w porządku hierarchii i obszary nawigacyjne (nagłówek strony, nawigacja, treść główna, stopka).",
+      "keyboard": "Stroną można posługiwać się samą klawiaturą. Pierwszym przystankiem jest link pomijający nawigację, fokus jest zawsze widoczny, a menu zamyka się klawiszem Escape i oddaje fokus swojemu przyciskowi.",
+      "targets": "Przyciski i linki poza tekstem ciągłym mają co najmniej 24 na 24 piksele, czyli minimalny rozmiar celu z WCAG 2.2.",
+      "reflow": "Układ mieści się na ekranie szerokim na 320 pikseli i przy powiększeniu 200% bez przewijania na boki.",
+      "contrast": "Kontrast kolorów sprawdzono w jasnym i ciemnym motywie. Motyw podąża za ustawieniem systemu, a przełącznik w nagłówku pozwala go zmienić.",
+      "motion": "Animacje są wyłączone, gdy system prosi o ograniczenie ruchu.",
+      "forced": "W trybie wymuszonych kolorów (wysokiego kontrastu) przyciski i linki zachowują swój kształt.",
+      "language": "Każda strona podaje swój język, a nazwa drugiego języka jest oznaczona jego własnym.",
+      "noScript": "Tekst da się przeczytać, a menu otworzyć bez JavaScriptu. Potrzebuje go tylko przełącznik motywu."
+    }
+  },
+  "checked": {
+    "title": "Jak to sprawdzono",
+    "lead": "Automatyczne sprawdzanie obejmuje każdą stronę, po angielsku i po polsku.",
+    "items": {
+      "axe": "axe-core z regułami WCAG 2.0, 2.1 i 2.2 na poziomach A i AA oraz z regułami dobrych praktyk, w jasnym i ciemnym motywie, przy szerokości 320 i 1280 pikseli. Strona z naruszeniem oblewa test.",
+      "keyboard": "Testy, które obsługują stronę samą klawiaturą: link pomijający nawigację, menu na telefonie (otwarcie, zamknięcie klawiszem Escape, powrót fokusu na przycisk) i bloki kodu, które można zaznaczyć fokusem, żeby je przewijać.",
+      "layout": "Testy przewijania na boki przy 320 pikselach i powiększeniu 200% oraz widoczności elementów w trybie wymuszonych kolorów.",
+      "lighthouse": "Lighthouse (wynik dostępności i trzy pozostałe) dla każdej strony w obu językach, na telefonie i na komputerze."
+    }
+  },
+  "limits": {
+    "title": "Znane ograniczenia",
+    "items": {
+      "automated": "Narzędzia automatyczne wykrywają tylko część problemów. Nie ocenią, czy tekst jest łatwy do zrozumienia, czy tekst alternatywny ma sens ani czy kolejność czytania jest sensowna.",
+      "people": "Dotąd nie przeprowadzono testów z osobami, które korzystają z technologii asystujących.",
+      "screenshots": "Zrzuty ekranu aplikacji mają opis tego, co pokazują. Nie powtarza on każdego słowa widocznego na zrzucie.",
+      "languages": "Strona jest tylko po angielsku i po polsku.",
+      "app": "Deklaracja dotyczy strony internetowej. Aplikacja hybrid-rag to osobny produkt: jej własne testy sprawdzają interfejs narzędziem axe względem WCAG 2.1 AA (jasny i ciemny motyw, okna dialogowe, telefon o szerokości 320 pikseli)."
+    }
+  },
+  "report": {
+    "title": "Zgłoś problem",
+    "text": "Jeśli coś na tej stronie jest trudne lub niemożliwe do użycia, otwórz zgłoszenie na <link>GitHubie</link>. Napisz, o którą stronę chodzi, z czego korzystasz (przeglądarka i ewentualnie technologia asystująca) i co poszło nie tak. Problemy z dostępnością są traktowane jak błędy. Adresu e-mail tu nie ma, i to celowo."
+  }
+}

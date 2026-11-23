@@ -1,7 +1,7 @@
 import type { Locale } from "./config";
 import { en } from "./messages/en";
 import { pl } from "./messages/pl";
-import type { Dictionary, PluralKeys, TextKeys } from "./types";
+import type { Dictionary, PluralKeys, TextKeys } from "@hybrid-rag/i18n";
 
 export type Messages = Dictionary<typeof en>;
 export type MessageKey = TextKeys<typeof en>;

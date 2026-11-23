@@ -7,12 +7,12 @@ import { useTranslation } from "@/i18n/use-translation";
 
 export type QuestionFile = { id: string; filename: string; active?: boolean };
 
-/** Files sent with a question, shown above it (links open the original PDF). */
+/** Files sent with a question, shown below it (links open the original PDF). */
 export const QuestionFiles = memo(function QuestionFiles({ files }: { files: QuestionFile[] }) {
   const { t } = useTranslation();
   if (!files.length) return null;
   return (
-    <ul aria-label={t("composer.attachedFiles")} className="flex flex-wrap justify-end gap-2">
+    <ul aria-label={t("composer.attachedFiles")} className="flex flex-wrap justify-start gap-2">
       {files.map((f) => (
         <li key={f.id}>
           {f.active === false ? (

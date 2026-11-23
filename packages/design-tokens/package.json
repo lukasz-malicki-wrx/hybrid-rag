@@ -2,11 +2,14 @@
   "name": "@hybrid-rag/design-tokens",
   "version": "0.1.0",
   "private": true,
-  "sideEffects": ["**/*.css"],
+  "sideEffects": [
+    "**/*.css"
+  ],
   "exports": {
     ".": "./src/index.css",
     "./theme.css": "./src/theme.css",
-    "./palettes/*.css": "./src/palettes/*.css"
+    "./palettes/*.css": "./src/palettes/*.css",
+    "./colors": "./src/colors.ts"
   },
   "scripts": {
     "lint": "eslint",

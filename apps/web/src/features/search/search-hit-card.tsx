@@ -16,7 +16,7 @@ export const SearchHitCard = memo(function SearchHitCard({ hit, position }: { hi
   const fulltext =
     hit.fulltext_rank === null ? t("searchLab.notInFulltext") : t("searchLab.fulltextRank", { rank: hit.fulltext_rank });
   return (
-    <li className="rounded-lg border border-border bg-surface p-3">
+    <li className="rounded-lg bg-bubble-user p-3">
       <div className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
         <span className="text-base font-semibold">{position}</span>
         <Link

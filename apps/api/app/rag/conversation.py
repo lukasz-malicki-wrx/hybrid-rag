@@ -4,10 +4,21 @@ import re
 from dataclasses import dataclass
 
 TITLE_CHARS = 80
+PREVIEW_CHARS = 160
 HISTORY_TURNS = 3
 HISTORY_ANSWER_CHARS = 1200
 
 _CITATION = re.compile(r"\s*\[\d+(?:\s*,\s*\d+)*\]")
+_CUT_CITATION_CHARS = frozenset("0123456789, \t\n")
+
+
+def _strip_cut_citation(text: str) -> str:
+    """Drops a marker cut in half by the caller's own truncation: "[1" or "[2, " at the very end.
+    Done by hand, not with a regex: a pattern for it backtracks over long runs of spaces."""
+    start = text.rfind("[")
+    if start == -1 or not set(text[start + 1 :]) <= _CUT_CITATION_CHARS:
+        return text
+    return text[:start].rstrip()
 
 
 @dataclass(frozen=True)
@@ -23,6 +34,19 @@ def make_title(question: str, limit: int = TITLE_CHARS) -> str:
         return text
     cut = text[:limit].rsplit(" ", 1)[0] or text[:limit]
     return cut.rstrip(" ,.;:-") + "…"
+
+
+# Markdown that models put in answers: list bullets and numbers, headings, emphasis and code marks.
+_MARKDOWN_LINE = re.compile(r"^\s*(?:[-*•+]\s+|\d+[.)]\s+|#{1,6}\s+|>\s*)", re.MULTILINE)
+_MARKDOWN_INLINE = re.compile(r"\*\*|__|`")
+
+
+def make_preview(answer: str | None, limit: int = PREVIEW_CHARS) -> str | None:
+    """Start of an answer for a conversation list: one line of plain text, without citation
+    numbers or Markdown marks."""
+    text = _strip_cut_citation(_CITATION.sub("", answer or ""))
+    text = _MARKDOWN_INLINE.sub("", _MARKDOWN_LINE.sub("", text))
+    return make_title(text, limit) or None
 
 
 def retrieval_query(question: str, history: list[Turn]) -> str:

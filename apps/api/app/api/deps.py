@@ -8,6 +8,7 @@ from ..core.config import Settings, get_settings
 from ..core.db import connect, connect_listener, get_conn
 from ..rag.embedding import Embedder, OllamaEmbedder
 from ..rag.llm import LLMProvider, build_llm
+from ..repositories.answer import FeedbackRepository
 from ..repositories.chunk import ChunkRepository
 from ..repositories.conversation import ConversationRepository
 from ..repositories.document import DocumentRepository
@@ -18,6 +19,7 @@ from ..services.answer import AnswerService
 from ..services.conversation import ConversationService
 from ..services.document import DocumentService
 from ..services.document_events import DocumentStatusStream
+from ..services.feedback import FeedbackService
 from ..services.group import GroupService
 from ..services.health import HealthService
 from ..services.search import SearchService
@@ -75,6 +77,10 @@ def get_conversation_service(conn: ConnDep) -> ConversationService:
     )
 
 
+def get_feedback_service(conn: ConnDep) -> FeedbackService:
+    return FeedbackService(conn, FeedbackRepository(conn))
+
+
 def get_settings_service(conn: ConnDep) -> SettingsService:
     return SettingsService(conn, SettingsRepository(conn))
 
@@ -100,6 +106,7 @@ def get_health_service(settings: SettingsDep) -> HealthService:
 DocumentServiceDep = Annotated[DocumentService, Depends(get_document_service)]
 GroupServiceDep = Annotated[GroupService, Depends(get_group_service)]
 ConversationServiceDep = Annotated[ConversationService, Depends(get_conversation_service)]
+FeedbackServiceDep = Annotated[FeedbackService, Depends(get_feedback_service)]
 SettingsServiceDep = Annotated[SettingsService, Depends(get_settings_service)]
 StatusStreamDep = Annotated[DocumentStatusStream, Depends(get_status_stream)]
 SearchServiceDep = Annotated[SearchService, Depends(get_search_service)]

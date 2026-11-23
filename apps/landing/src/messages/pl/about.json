@@ -1,0 +1,117 @@
+{
+  "hero": {
+    "title": "O projekcie",
+    "lead": "hybrid-rag to otwarty projekt, który tworzy {author} z Polski. Odpowiada na pytania o Twoje pliki PDF i pokazuje, skąd pochodzi każda odpowiedź.",
+    "eyebrow": "Projekt"
+  },
+  "author": {
+    "heading": "Autor",
+    "text": "hybrid-rag tworzy {author} z Polski. Ta strona mówi tylko to, co widać w repozytorium.",
+    "github": "Profil na GitHubie",
+    "linkedin": "Profil na LinkedIn",
+    "contact": "Na tej stronie celowo nie ma adresu e-mail. Z projektem skontaktujesz się, <issues>zakładając zgłoszenie na GitHubie</issues>."
+  },
+  "why": {
+    "heading": "Po co to powstało",
+    "lead": "Repozytorium opiera się na trzech decyzjach.",
+    "items": {
+      "check": {
+        "title": "Odpowiedzi, które można sprawdzić",
+        "text": "Odpowiedź z cytatem ma sens tylko wtedy, gdy widać fragment, z którego pochodzi. Każda odpowiedź odsyła do fragmentu i do strony oryginalnego PDF-a, a zapisana jest razem z fragmentami, wersjami dokumentów, modelami i wersją promptu, na których się oparła."
+      },
+      "local": {
+        "title": "Działa tam, gdzie leżą dokumenty",
+        "text": "Jedna komenda Docker Compose uruchamia wszystko. Nie ma kont ani kluczy API, a porty nasłuchują tylko na 127.0.0.1. Model w chmurze to opcja, którą trzeba włączyć."
+      },
+      "measured": {
+        "title": "Wyszukiwanie, które zmierzono",
+        "text": "Wyszukiwanie sprawdzono na {evalQuestions} pytaniach o {evalDocuments} publiczne dokumenty. Metoda, wyniki i to, czego nie pokazują, są opisane w <evaluation>pomiarze</evaluation>."
+      }
+    }
+  },
+  "stack": {
+    "heading": "Jak to zbudowano",
+    "lead": "Z czego składa się projekt, żeby można go było ocenić po zawartości.",
+    "items": {
+      "search": {
+        "term": "Wyszukiwanie",
+        "detail": "PostgreSQL z pgvector do wyszukiwania wektorowego oraz wyszukiwanie pełnotekstowe, łączone metodą Reciprocal Rank Fusion."
+      },
+      "models": {
+        "term": "Modele",
+        "detail": "bge-m3 do embeddingów. Odpowiedzi pisze qwen2.5:3b przez Ollamę albo Claude przez API."
+      },
+      "backend": {
+        "term": "Serwer",
+        "detail": "Python i FastAPI. Osobny worker indeksuje pliki PDF z kolejki trzymanej w Postgresie."
+      },
+      "web": {
+        "term": "Aplikacja",
+        "detail": "Next.js, React, Tailwind CSS, TanStack Query i Zustand."
+      },
+      "packaging": {
+        "term": "Pakowanie",
+        "detail": "Docker Compose oraz workspace npm z Turborepo, który współdzieli tokeny projektowe i komponenty interfejsu."
+      },
+      "site": {
+        "term": "Ta strona",
+        "detail": "Next.js po angielsku i po polsku, bez ciasteczek i bez zapytań do innych serwisów."
+      }
+    }
+  },
+  "principles": {
+    "heading": "Zasady",
+    "items": {
+      "sources": {
+        "title": "Źródła ważniejsze niż płynność",
+        "text": "Odpowiedź bez cytatu jest oznaczana. Gładkie zdanie to jeszcze nie dowód."
+      },
+      "unknown": {
+        "title": "Przyznać, że się nie wie",
+        "text": "Bramka trafności odmawia, zanim model zostanie wywołany, więc aplikacja potrafi powiedzieć, że odpowiedzi nie ma w dokumentach."
+      },
+      "local": {
+        "title": "Domyślnie lokalnie",
+        "text": "Dokumenty zostają na Twoim komputerze, dopóki nie wybierzesz modelu w chmurze, a dokumentacja mówi, co wtedy jest wysyłane."
+      },
+      "honest": {
+        "title": "Ograniczenia wprost",
+        "text": "Brak OCR, tylko PDF, wolno na procesorze, brak kont, odpowiedzi, które mogą być błędne. Wszystko jest wypisane otwarcie."
+      },
+      "access": {
+        "title": "Dla każdego",
+        "text": "Obsługa z klawiatury, czytniki ekranu, jasny i ciemny motyw, polski i angielski oraz automatyczne testy dostępności."
+      }
+    }
+  },
+  "contribute": {
+    "heading": "Jak pomóc",
+    "lead": "Najbardziej pomagają drobiazgi.",
+    "items": {
+      "report": {
+        "title": "Zgłoś problem",
+        "text": "Błędna odpowiedź, źle pocięty dokument, awaria? <issues>Załóż zgłoszenie</issues> i napisz, o co zapytano i czego się spodziewano. Nie dołączaj prywatnych dokumentów."
+      },
+      "try": {
+        "title": "Wypróbuj i napisz, co było niejasne",
+        "text": "Przejdź instrukcję z <readme>README</readme> i napisz, w którym miejscu coś poszło nie tak. Niejasna instrukcja też jest błędem."
+      },
+      "change": {
+        "title": "Zaproponuj zmianę",
+        "text": "Zrób fork <repo>repozytorium</repo>, uruchom sprawdzenia opisane w README w części Development i otwórz pull request."
+      }
+    }
+  },
+  "licence": {
+    "heading": "Licencja",
+    "text": "hybrid-rag jest wydany na <licence>licencji MIT</licence>. Możesz go używać, kopiować, zmieniać i udostępniać, także komercyjnie, pod warunkiem zachowania informacji o licencji."
+  },
+  "numbers": {
+    "title": "Ewaluacja w liczbach",
+    "lead": "Wyszukiwanie zmierzono na niewielkim zbiorze pytań o publiczne dokumenty. Metoda i ograniczenia są opublikowane.",
+    "questions": "pytań w ewaluacji",
+    "documents": "publiczne dokumenty",
+    "answerable": "pytań, na które dokumenty odpowiadają",
+    "offTopic": "pytań spoza tematu, żeby sprawdzić, czy odmówi"
+  }
+}

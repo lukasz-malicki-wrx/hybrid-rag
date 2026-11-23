@@ -7,6 +7,7 @@ import { IconButton } from "@hybrid-rag/ui/icon-button";
 import { ChatIcon, StarIcon, TrashIcon } from "@hybrid-rag/ui/icons";
 import type { Conversation } from "@/api/types";
 import { AnsweringIndicator } from "@/features/chat/answering-indicator";
+import { ConversationSummary } from "@/features/chat/conversation-summary";
 import { useTranslation } from "@/i18n/use-translation";
 
 export const ConversationRow = memo(function ConversationRow({
@@ -21,14 +22,13 @@ export const ConversationRow = memo(function ConversationRow({
   onToggleFavourite: (conversation: Conversation) => void;
   onDelete: (conversation: Conversation) => void;
 }) {
-  const { t, timeAgo } = useTranslation();
+  const { t } = useTranslation();
   const { title, favorite } = conversation;
   return (
-    <li className={cn("flex items-center gap-2 rounded-xl border border-border px-3 py-2", answering && "ai-active")}>
-      <span className="shrink-0 text-muted">{answering ? <AnsweringIndicator /> : <ChatIcon />}</span>
-      <Link href={`/c/${conversation.id}`} aria-busy={answering || undefined} className="min-w-0 flex-1 hover:underline">
-        <span className="block truncate font-medium">{title}</span>
-        <span className="block text-xs text-muted">{timeAgo(conversation.updated_at)}</span>
+    <li className={cn("flex items-start gap-2 rounded-lg bg-bubble-user px-3 py-2", answering && "ai-active")}>
+      <span className="mt-2 shrink-0 text-muted">{answering ? <AnsweringIndicator /> : <ChatIcon width={14} height={14} />}</span>
+      <Link href={`/c/${conversation.id}`} aria-busy={answering || undefined} className="flex min-w-0 flex-1 flex-col rounded py-1 hover:underline">
+        <ConversationSummary conversation={conversation} />
       </Link>
       <IconButton
         label={t(favorite ? "groups.removeFavourite" : "groups.addFavourite", { title })}

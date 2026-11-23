@@ -62,3 +62,20 @@ class AnswerRepository:
                 stopped,
             ),
         ).fetchone()["id"]
+
+
+class FeedbackRepository:
+    def __init__(self, conn: Connection) -> None:
+        self._conn = conn
+
+    def set(self, answer_id: UUID, rating: str | None) -> dict[str, Any] | None:
+        """Returns None when there is no such answer in a conversation that still exists."""
+        return self._conn.execute(
+            "INSERT INTO answer_feedback (answer_id, rating) "
+            "SELECT a.id, %s FROM answers a JOIN queries q ON q.id = a.query_id "
+            "LEFT JOIN conversations c ON c.id = q.conversation_id "
+            "WHERE a.id = %s AND c.deleted_at IS NULL "
+            "ON CONFLICT (answer_id) DO UPDATE SET rating = EXCLUDED.rating, updated_at = now() "
+            "RETURNING answer_id, rating",
+            (rating, answer_id),
+        ).fetchone()

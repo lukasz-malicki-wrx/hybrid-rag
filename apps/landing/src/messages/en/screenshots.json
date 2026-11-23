@@ -1,0 +1,27 @@
+{
+  "placeholder": "Screenshot: {name}",
+  "names": {
+    "chat": "chat",
+    "sources": "sources panel",
+    "start": "start screen",
+    "groups": "group",
+    "document": "document page",
+    "search-lab": "search lab",
+    "mobile-chat": "chat on a phone",
+    "settings": "settings",
+    "hero-chat": "chat, cropped",
+    "about-sources": "sources panel, cropped",
+    "how-flow": "asking about an attached PDF"
+  },
+  "chat": "A conversation: a question about a document and an answer with numbered citations.",
+  "sources": "The sources panel next to an answer: the cited passages with their document and page.",
+  "start": "The start screen with a question box and the choice of what to search.",
+  "groups": "A group of documents with its conversations and the list of its PDFs.",
+  "document": "A document page with the chunks the text was split into and their statistics.",
+  "search-lab": "The search lab: results of vector search, full-text search and their combination side by side.",
+  "mobile-chat": "The conversation on a phone: the answer and its citations fit a narrow screen.",
+  "settings": "The settings dialog: language, appearance and personal context for answers.",
+  "hero-chat": "A conversation: a question about a document and an answer with numbered citations.",
+  "about-sources": "The sources panel next to an answer: the cited passages with their document and page.",
+  "how-flow": "A question asked with a PDF attached: the file under the question and an answer about it with numbered citations."
+}

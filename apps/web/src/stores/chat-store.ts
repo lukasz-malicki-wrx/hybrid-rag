@@ -15,6 +15,8 @@ export type ActiveTurn = {
   conversationId: string | null;
   question: string;
   attachments: Attachment[];
+  /** When the question was sent (epoch ms): the turn's day and time, not the page's. */
+  startedAt: number;
   /** Messages the conversation had when the question was sent. */
   baseCount: number;
   sources: Source[];

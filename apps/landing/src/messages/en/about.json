@@ -1,0 +1,117 @@
+{
+  "hero": {
+    "title": "About",
+    "lead": "hybrid-rag is an open source project by {author}, from Poland. It answers questions about your PDFs and shows where each answer comes from.",
+    "eyebrow": "Project"
+  },
+  "author": {
+    "heading": "The author",
+    "text": "hybrid-rag is made by {author}, from Poland. This page says only what the repository shows.",
+    "github": "GitHub profile",
+    "linkedin": "LinkedIn profile",
+    "contact": "There is no e-mail address on this site, on purpose. To reach the project, <issues>open an issue on GitHub</issues>."
+  },
+  "why": {
+    "heading": "Why it exists",
+    "lead": "The repository is built around three decisions.",
+    "items": {
+      "check": {
+        "title": "Answers you can check",
+        "text": "A cited answer is only useful if you can see the passage behind it. Every answer links to the excerpt and to the page of the original PDF, and is stored with the chunks, document versions, models and prompt version it was based on."
+      },
+      "local": {
+        "title": "It runs where your documents are",
+        "text": "One Docker Compose command starts everything. There are no accounts and no API keys, and the ports listen on 127.0.0.1 only. A cloud model is an option you switch on."
+      },
+      "measured": {
+        "title": "Search that is measured",
+        "text": "Retrieval is evaluated on {evalQuestions} questions over {evalDocuments} public documents. The method, the results and what they do not show are published in the <evaluation>evaluation</evaluation>."
+      }
+    }
+  },
+  "stack": {
+    "heading": "How it is built",
+    "lead": "The parts, so you can judge the project by what it is made of.",
+    "items": {
+      "search": {
+        "term": "Search",
+        "detail": "PostgreSQL with pgvector for vector search and full-text search, merged with Reciprocal Rank Fusion."
+      },
+      "models": {
+        "term": "Models",
+        "detail": "bge-m3 for embeddings. qwen2.5:3b through Ollama writes answers, or Claude through its API."
+      },
+      "backend": {
+        "term": "Backend",
+        "detail": "Python and FastAPI. A separate worker indexes PDFs from a queue kept in Postgres."
+      },
+      "web": {
+        "term": "App",
+        "detail": "Next.js, React, Tailwind CSS, TanStack Query and Zustand."
+      },
+      "packaging": {
+        "term": "Packaging",
+        "detail": "Docker Compose, and an npm workspace with Turborepo that shares design tokens and UI components."
+      },
+      "site": {
+        "term": "This website",
+        "detail": "Next.js in English and Polish, with no cookies and no third-party requests."
+      }
+    }
+  },
+  "principles": {
+    "heading": "Principles",
+    "items": {
+      "sources": {
+        "title": "Sources before fluency",
+        "text": "An answer without a citation is flagged. A smooth sentence is not evidence."
+      },
+      "unknown": {
+        "title": "Say when it does not know",
+        "text": "A relevance gate refuses before the model is called, so the app can say the answer is not in your documents."
+      },
+      "local": {
+        "title": "Local by default",
+        "text": "Your documents stay on your machine unless you choose a cloud model, and the documentation says what is sent then."
+      },
+      "honest": {
+        "title": "Limits stated",
+        "text": "No OCR, PDF only, slow on a CPU, no accounts, answers that can be wrong. They are listed in the open."
+      },
+      "access": {
+        "title": "Usable by everyone",
+        "text": "Keyboard use, screen readers, light and dark themes, English and Polish, and automated accessibility tests."
+      }
+    }
+  },
+  "contribute": {
+    "heading": "How to help",
+    "lead": "Small things help most.",
+    "items": {
+      "report": {
+        "title": "Report a problem",
+        "text": "A wrong answer, a bad cut of a document, a crash? <issues>Open an issue</issues> with what you asked and what you expected. Please do not attach private documents."
+      },
+      "try": {
+        "title": "Try it and say what was unclear",
+        "text": "Follow the <readme>README</readme> and tell us where you got stuck. Unclear instructions are bugs too."
+      },
+      "change": {
+        "title": "Send a change",
+        "text": "Fork <repo>the repository</repo>, run the checks described under Development in the README, and open a pull request."
+      }
+    }
+  },
+  "licence": {
+    "heading": "Licence",
+    "text": "hybrid-rag is released under the <licence>MIT licence</licence>. You may use, copy, change and share it, including commercially, as long as the licence notice stays."
+  },
+  "numbers": {
+    "title": "The evaluation in numbers",
+    "lead": "Retrieval was measured on a small set of questions over public documents. The method and the limits are published.",
+    "questions": "questions in the evaluation",
+    "documents": "public documents",
+    "answerable": "questions the documents can answer",
+    "offTopic": "off-topic questions, to see whether it refuses"
+  }
+}

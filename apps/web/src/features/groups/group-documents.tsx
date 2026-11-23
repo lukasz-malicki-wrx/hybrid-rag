@@ -19,7 +19,7 @@ export function GroupDocuments({ groupId }: { groupId: string }) {
 
   return (
     <section aria-labelledby="group-documents">
-      <Heading id="group-documents" className="mb-3">
+      <Heading level={2} id="group-documents" className="mb-3">
         {t("groups.documents")}
       </Heading>
       {documents.data?.length ? (

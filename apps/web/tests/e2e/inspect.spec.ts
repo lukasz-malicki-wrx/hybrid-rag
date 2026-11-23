@@ -1,12 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { expectAccessible } from "./a11y";
-import { doc, json, MOCK, mockApi } from "./mock-api";
-
-const chunks = [
-  { id: 1, page: 1, position: 0, text: "Cover page of the annex. ".repeat(12), chars: 300 },
-  { id: 2, page: 2, position: 0, text: "Qualified Persons certify batch release.", chars: 40 },
-  { id: 3, page: 5, position: 1, text: "Back-ups are checked at intervals.".repeat(8), chars: 270 },
-];
+import { json, MOCK, mockApi } from "./mock-api";
 
 const hit = (id: number, vector: number | null, fulltext: number | null) => ({
   id,
@@ -24,8 +18,6 @@ const hit = (id: number, vector: number | null, fulltext: number | null) => ({
 
 test.beforeEach(async ({ page }) => {
   await mockApi(page);
-  await page.route(`**${MOCK}/documents/d1`, (r) => json(r, doc));
-  await page.route(`**${MOCK}/documents/d1/chunks`, (r) => json(r, chunks));
 });
 
 test("a document page shows its chunks, their sizes and a text filter", async ({ page }) => {
@@ -46,7 +38,9 @@ test("a document page shows its chunks, their sizes and a text filter", async ({
 
 test("a sidebar document opens its chunks, not the PDF", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("complementary").getByRole("link", { name: "annex11.pdf" }).click();
+  const sidebar = page.getByRole("complementary", { name: "Sidebar" });
+  await sidebar.getByRole("button", { name: "Documents" }).click();
+  await sidebar.getByRole("link", { name: "annex11.pdf" }).click();
   await expect(page).toHaveURL(/\/d\/d1$/);
 });
 

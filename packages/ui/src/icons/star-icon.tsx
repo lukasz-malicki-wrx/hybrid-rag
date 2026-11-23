@@ -1,9 +1,9 @@
-import { Icon, type IconProps } from "./icon";
+import { createIcon, type IconProps } from "./create-icon";
+import { Star } from "./glyphs";
 
+const Outline = createIcon("StarIcon", Star);
+
+/** `filled` is the "on" state of a favourite. */
 export function StarIcon({ filled, ...props }: IconProps & { filled?: boolean }) {
-  return (
-    <Icon {...props} fill={filled ? "currentColor" : "none"}>
-      <path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3 6.4 20.2l1.1-6.2L3 9.6l6.2-.9z" />
-    </Icon>
-  );
+  return <Outline {...props} fill={filled ? "currentColor" : "none"} />;
 }

@@ -42,7 +42,7 @@ export function SourcesPanel({ selection, onClose }: { selection: SourcesSelecti
     <aside
       aria-labelledby={headingId}
       onKeyDown={(e) => e.key === "Escape" && onClose()}
-      className="fixed inset-x-0 bottom-0 z-30 max-h-[70dvh] overflow-y-auto rounded-t-2xl border-t border-border bg-bg shadow-2xl lg:relative lg:max-h-none lg:w-96 lg:shrink-0 lg:rounded-none lg:border-l lg:border-t-0 lg:shadow-none"
+      className="flex min-h-0 flex-1 flex-col"
     >
       <BarHeader
         subtitle={
@@ -50,18 +50,19 @@ export function SourcesPanel({ selection, onClose }: { selection: SourcesSelecti
             ? tp("counts.citedSources", selection.cited.length)
             : tp("counts.searchedExcerpts", selection.sources.length)
         }
-        actions={<IconButton label={t("sources.close")} icon={<CloseIcon />} onClick={onClose} />}
+        actions={<IconButton variant="tile" label={t("sources.close")} icon={<CloseIcon />} onClick={onClose} />}
       >
-        <Heading level={2} size="sm" id={headingId} ref={heading} tabIndex={-1} className="truncate focus:outline-none">
+        <Heading level={2} size="bar" id={headingId} ref={heading} tabIndex={-1} className="truncate focus:outline-none">
           {t("sources.title")}
         </Heading>
       </BarHeader>
-      <div className="space-y-5 px-4 pb-4 pt-22">
+      {/* `relative`: visually hidden text in the cards stays in this scroll area instead of stretching the page. */}
+      <div className="relative mx-4 mb-4 min-h-0 flex-1 space-y-5 overflow-y-auto rounded-lg bg-panel p-4 xl:mx-0">
         {groups.map((group) => (
           <section key={group.id} aria-labelledby={`${headingId}-${group.id}`}>
-            <h3 id={`${headingId}-${group.id}`} className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">
+            <Heading level={3} size="overline" id={`${headingId}-${group.id}`} className="mb-2 text-muted">
               {group.title}
-            </h3>
+            </Heading>
             <ol className="space-y-3">
               {group.sources.map((source) => (
                 <li key={source.n}>

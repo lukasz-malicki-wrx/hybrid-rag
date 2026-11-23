@@ -5,7 +5,7 @@ import type { Chunk } from "@/api/types";
 import { useTranslation } from "@/i18n/use-translation";
 import { SHORT_CHUNK_CHARS } from "./chunk-card";
 
-export function summarize(chunks: Chunk[]) {
+function summarize(chunks: Chunk[]) {
   const sizes = chunks.map((c) => c.chars);
   return {
     count: chunks.length,
@@ -30,7 +30,7 @@ export const ChunkStats = memo(function ChunkStats({ chunks }: { chunks: Chunk[]
   return (
     <dl className="grid grid-cols-2 gap-3 sm:grid-cols-5">
       {items.map((item) => (
-        <div key={item.label} className="rounded-lg border border-border bg-surface px-3 py-2">
+        <div key={item.label} className="rounded-lg bg-bubble-user px-3 py-2">
           <dt className="text-xs text-muted">{item.label}</dt>
           <dd className="text-lg font-semibold">{item.value}</dd>
         </div>

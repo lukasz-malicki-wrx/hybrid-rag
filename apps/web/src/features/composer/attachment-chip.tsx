@@ -38,7 +38,7 @@ export const AttachmentChip = memo(function AttachmentChip({ item, onUpdate, onR
         label={t("composer.removeAttachment", { name: item.name })}
         icon={<CloseIcon width={14} height={14} />}
         onClick={() => onRemove(item.key)}
-        className="p-1"
+        variant="compact"
       />
     </li>
   );

@@ -2,13 +2,16 @@
 
 import { useMemo, useState } from "react";
 import { BarHeader } from "@hybrid-rag/ui/bar-header";
+import { buttonClass } from "@hybrid-rag/ui/button";
 import { Heading } from "@hybrid-rag/ui/heading";
 import { ExternalIcon } from "@hybrid-rag/ui/icons";
+import { Spinner } from "@hybrid-rag/ui/spinner";
 import { Text } from "@hybrid-rag/ui/text";
 import { TextInput } from "@hybrid-rag/ui/text-input";
 import { isNotFound } from "@/api/client";
 import { documentsApi, useDocument, useDocumentChunks } from "@/api/documents";
 import type { Chunk } from "@/api/types";
+import { Page } from "@/features/layout/page";
 import { NotFoundView } from "@/features/layout/not-found-view";
 import { PageLoading } from "@/features/layout/page-loading";
 import { useTranslation } from "@/i18n/use-translation";
@@ -42,28 +45,31 @@ export function DocumentView({ id }: { id: string }) {
   const subtitle = [t("scope.version", { version: doc.version }), pages].filter(Boolean).join(" · ");
 
   return (
-    <>
-      <BarHeader
-        subtitle={subtitle}
-        actions={
-          doc.status === "ready" && (
-            <a
-              href={documentsApi.fileUrl(doc.id)}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex min-h-10 items-center gap-1.5 rounded-lg border border-border px-3 text-sm hover:bg-surface"
-            >
-              <ExternalIcon />
-              {t("documentView.openPdf")}
-            </a>
-          )
-        }
-      >
-        <Heading level={1} size="sm" className="truncate">
-          {doc.filename}
-        </Heading>
-      </BarHeader>
-      <div className="mx-auto w-full max-w-4xl space-y-6 px-4 pb-6 pt-24">
+    <Page
+      header={
+        <BarHeader
+          subtitle={subtitle}
+          actions={
+            doc.status === "ready" && (
+              <a
+                href={documentsApi.fileUrl(doc.id)}
+                target="_blank"
+                rel="noreferrer"
+                className={buttonClass({ variant: "tile", size: "tile" })}
+              >
+                <ExternalIcon width={14} height={14} />
+                {t("documentView.openPdf")}
+              </a>
+            )
+          }
+        >
+          <Heading level={1} size="bar" className="truncate">
+            {doc.filename}
+          </Heading>
+        </BarHeader>
+      }
+    >
+      <div className="mx-auto w-full max-w-4xl space-y-6 px-4 py-6">
         <DocumentStatus doc={doc} />
         <Text tone="muted" size="sm">
           {t("documentView.intro")}
@@ -78,7 +84,7 @@ export function DocumentView({ id }: { id: string }) {
           onFilter={setFilter}
         />
       </div>
-    </>
+    </Page>
   );
 }
 
@@ -98,7 +104,7 @@ function ChunkList({
   onFilter: (value: string) => void;
 }) {
   const { t, tp } = useTranslation();
-  if (isPending) return <PageLoading label="documentView.loadingChunks" />;
+  if (isPending) return <Spinner label={t("documentView.loadingChunks")} />;
   if (isError) return <Text tone="danger">{t("documentView.chunksError")}</Text>;
   if (total === 0) return <Text tone="muted">{t("documentView.noChunks")}</Text>;
   return (

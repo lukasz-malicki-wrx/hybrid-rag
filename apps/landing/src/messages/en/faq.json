@@ -1,0 +1,78 @@
+{
+  "hero": {
+    "title": "Frequently asked questions",
+    "lead": "Short answers about what hybrid-rag does, where your data goes and what it cannot do. The answers come from the repository and its evaluation.",
+    "eyebrow": "Questions"
+  },
+  "groups": {
+    "basics": "The basics",
+    "privacy": "Privacy and data",
+    "running": "Running it",
+    "documents": "Documents",
+    "answers": "Answers"
+  },
+  "items": {
+    "whatIs": {
+      "q": "What is hybrid-rag?",
+      "a": "An open source app that answers questions about your own PDFs and shows where each answer comes from. It searches by meaning and by exact words, hands the best passages to a language model, and the answer cites them. It runs on your computer with Docker Compose. See <how>how it works</how>."
+    },
+    "accounts": {
+      "q": "Do I need an account or an API key?",
+      "a": "No. The app has no accounts, and the default setup needs no API key. It has no sign-in either, which matters if you share it: see the privacy questions below."
+    },
+    "cost": {
+      "q": "What does it cost?",
+      "a": "Running it yourself is free. You pay for your own hardware and electricity, and for the Claude API only if you choose it with <code>LLM_PROVIDER=anthropic</code>. The plans on the <pricing>pricing page</pricing> are a preview: nothing can be bought."
+    },
+    "licence": {
+      "q": "What is the licence?",
+      "a": "MIT. You may use, copy, change and share it, including commercially, as long as the licence notice stays. The exact terms are in the <licence>LICENSE file</licence>."
+    },
+    "dataWhere": {
+      "q": "Where does my data go?",
+      "a": "By default your PDFs, questions and answers stay on your computer. The database and both models run in containers on your machine (the models through Ollama), the ports listen on 127.0.0.1 only, and only the first start downloads the models. If you set <code>LLM_PROVIDER=anthropic</code>, Anthropic's API writes the answer and this is sent to it: {sent}. Indexing still happens locally."
+    },
+    "website": {
+      "q": "Does this website track me?",
+      "a": "No. It sets no cookies, runs no analytics and makes no third-party requests. The only thing it stores is your theme choice in your browser. Details are on the <privacy>privacy page</privacy>."
+    },
+    "shared": {
+      "q": "Who can see my documents?",
+      "a": "Anyone who can reach the API. By default that is only you, on your computer. There is no sign-in yet, so if you expose the app to a network, everyone who reaches it sees the same documents, groups and conversations. Text from a PDF goes into the prompt; delimiters and instructions reduce prompt injection but cannot rule it out, so do not upload documents you do not trust."
+    },
+    "hardware": {
+      "q": "What hardware do I need, and how fast is it?",
+      "a": "Docker with Compose, about {ramGb} GB of RAM and {diskGb} GB of disk for the models. No GPU is needed: the stack runs on the CPU on purpose, so anyone can start it with one command. The price is speed. A {indexPages}-page PDF took about {indexMinutes} minutes to index on a laptop CPU, answers start after a short delay and arrive at CPU speed, and the first request after startup is slower. For GPU speed, run Ollama natively (Metal on Apple silicon, CUDA on Linux) and use the <code>docker-compose.native-ollama.yml</code> overlay; Docker Desktop on macOS cannot pass the GPU to a container."
+    },
+    "models": {
+      "q": "Which models does it use?",
+      "a": "bge-m3 for embeddings (about {embeddingGb} GB) and qwen2.5:3b to write answers (about {chatGb} GB), both through Ollama. Set <code>LLM_MODEL</code> for another one, for example qwen2.5:7b with a GPU, or use Claude through <code>LLM_PROVIDER=anthropic</code>. Another embedding model needs vectors of the same size and a full re-index."
+    },
+    "languages": {
+      "q": "Which languages does it handle?",
+      "a": "The interface is in English and Polish. The embedding model is multilingual: in the evaluation, all {evalPolish} Polish questions over English documents ranked the right passage first. Keyword search uses an English stopword list, and small local models can write clumsy Polish, so exact-word search and Polish answers are the weaker spots."
+    },
+    "fileTypes": {
+      "q": "Which files can I upload, and how big?",
+      "a": "PDF only, and only PDFs that contain text. Scanned pages without a text layer are not supported: there is no OCR. The default limit is {uploadMb} MB per file, changed with <code>MAX_UPLOAD_MB</code>. Identical files are stored once, and the same name with different content becomes a new version while older versions are kept."
+    },
+    "groups": {
+      "q": "Can I keep documents apart?",
+      "a": "Yes. Groups collect documents and conversations, for example \"med\" and \"legal\". A conversation in a group searches only that group's documents, and a document can belong to several groups. You can also pin chosen documents to a conversation to search only those."
+    },
+    "citations": {
+      "q": "How do citations work?",
+      "a": "The model is told to cite the excerpts it was given as [1], [2]. Each number opens the excerpt and a link to the original PDF at the cited page. Every answer is stored with the exact chunks, document versions, models and prompt version it was based on, so you can see what it relied on afterwards."
+    },
+    "notFound": {
+      "q": "What happens when the answer is not in my documents?",
+      "a": "A relevance gate checks first. If no passage is close enough to the question, the model is not called and the app says it was not found in the documents. Answers that cite nothing are flagged. In the evaluation, hybrid search returned nothing for all {evalOffTopic} off-topic questions."
+    },
+    "accuracy": {
+      "q": "Are the answers always right?",
+      "a": "No. Small local models make mistakes, so every answer is labelled as AI-generated and cites its sources for you to check. The measurement covers search, not written answers: on {evalAnswerable} answerable questions over {evalDocuments} public regulatory documents, hybrid search had the right passage in its top 10 every time (vector search alone: {vectorTop10}). That is a small sample from one domain. See the <evaluation>evaluation</evaluation> for the method and limits."
+    }
+  },
+  "more": "Your question is not here? <issues>Open an issue on GitHub</issues>, or read <how>how it works</how>.",
+  "groupsLabel": "Question groups"
+}

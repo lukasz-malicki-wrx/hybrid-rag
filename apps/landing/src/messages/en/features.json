@@ -1,0 +1,172 @@
+{
+  "hero": {
+    "title": "What hybrid‑rag does",
+    "lead": "Six areas, each with what works today and where the limits are.",
+    "eyebrow": "Product"
+  },
+  "groups": {
+    "chat": {
+      "title": "Chat",
+      "lead": "Conversations with your documents. Answers stream in, and every one says what it is based on.",
+      "more": "Chat in detail"
+    },
+    "sources": {
+      "title": "Sources",
+      "lead": "The check that makes the answer worth reading: the passage, its page and the original file.",
+      "more": "Sources in detail"
+    },
+    "documents": {
+      "title": "Documents and groups",
+      "lead": "Put PDFs in, keep them in order, and keep every version.",
+      "more": "Documents in detail"
+    },
+    "scope": {
+      "title": "Scope",
+      "lead": "You decide what an answer may search, and the app always says what it will search.",
+      "more": "Scope in detail"
+    },
+    "quality": {
+      "title": "Quality control",
+      "lead": "When an answer is wrong, you can find out whether the cut, the search or the model is to blame.",
+      "more": "Quality control in detail"
+    },
+    "access": {
+      "title": "Accessibility and languages",
+      "lead": "English and Polish, light and dark, keyboard and phone.",
+      "more": "Accessibility in detail"
+    }
+  },
+  "items": {
+    "streaming": {
+      "title": "Answers stream in",
+      "text": "Words appear as the model writes them. On CPU that is slower than a hosted chatbot, and the first answer after a start waits for the models to load."
+    },
+    "stop": {
+      "title": "Stop at any time",
+      "text": "Stop ends the generation and keeps the partial answer, marked as stopped."
+    },
+    "followUps": {
+      "title": "Follow-up questions",
+      "text": "The model sees the last {historyTurns} turns, and a follow-up is searched together with the previous question, so “how often?” works. If you change the subject, the old topic can leak in."
+    },
+    "feedback": {
+      "title": "Rate, copy, regenerate",
+      "text": "Rate an answer good or bad, copy it without its citation markers, or ask the same question again as a new turn."
+    },
+    "labels": {
+      "title": "Honest labels",
+      "text": "Every answer says it is AI-generated. A refusal shows as “Not found in the documents”, and an answer with no citation is flagged: verify before relying on it."
+    },
+    "personal": {
+      "title": "Your own instructions",
+      "text": "Settings hold a personal context, such as “answer in Polish, as bullet points”. It is sent with every new question and cannot change that answers come only from your documents."
+    },
+    "citations": {
+      "title": "Clickable citations",
+      "text": "The numbers in an answer open the sources panel."
+    },
+    "panel": {
+      "title": "The excerpt and its page",
+      "text": "Each source shows the excerpt, the document, the page and the version. “Open PDF” opens the original at that page."
+    },
+    "searched": {
+      "title": "Cited and searched",
+      "text": "The panel keeps the passages the answer cites apart from the ones that were only searched."
+    },
+    "record": {
+      "title": "Kept with the answer",
+      "text": "Every answer is stored with the passages, the document versions and hashes, the models, the prompt version and your personal context. Stored questions and answers are never changed."
+    },
+    "original": {
+      "title": "The original PDF, unchanged",
+      "text": "The file is kept under its SHA-256 and the hash is checked every time it is read."
+    },
+    "upload": {
+      "title": "Drop PDFs in the message box",
+      "text": "Use the button or drag and drop. Files upload at once and show live indexing progress; sending waits until they are indexed."
+    },
+    "versions": {
+      "title": "Versions",
+      "text": "The same name with different content becomes a new version and older versions are kept. An identical file is not processed twice. Old and new versions are both searched, so citations can repeat."
+    },
+    "groups": {
+      "title": "Groups",
+      "text": "A group collects documents and conversations, for example “med” or “legal”. A conversation in a group searches only that group’s documents. A document can be in several groups and is indexed once."
+    },
+    "favourites": {
+      "title": "Up to {favouritesLimit} favourites",
+      "text": "Star a conversation to keep it in the Saved tab. The limit of {favouritesLimit} is enforced in the database, not only in the screen."
+    },
+    "overview": {
+      "title": "Everything in the sidebar",
+      "text": "Favourites, groups, recent conversations and documents with their indexing status. Each conversation shows a preview of its latest answer."
+    },
+    "softDelete": {
+      "title": "Deleting asks first",
+      "text": "Deleting a group says how many conversations go with it. Nothing is removed from the database: documents, groups and conversations are hidden, not erased."
+    },
+    "chip": {
+      "title": "Always clear what is searched",
+      "text": "A chip next to the message box says what the next answer will search: all documents, a group, or the selected ones."
+    },
+    "pinned": {
+      "title": "Pinned documents",
+      "text": "A file attached to a message is pinned to its conversation. The chip opens a picker to choose documents or clear the selection."
+    },
+    "rule": {
+      "title": "The rule",
+      "text": "A conversation with pinned documents searches only those. Otherwise it searches its group’s documents, or all documents when it has no group."
+    },
+    "inGroup": {
+      "title": "New files join the group",
+      "text": "In a group, files you add to a message are added to that group."
+    },
+    "gate": {
+      "title": "A relevance gate",
+      "text": "Nearest neighbours always exist, so “some results” proves nothing. If the nearest passage is too far and no passage holds every content word of the question, the model is not called and the answer says it was not found."
+    },
+    "documentPage": {
+      "title": "The document page",
+      "text": "The passages a PDF was cut into, with page, length and a text filter, plus size statistics and a flag on very short ones. Bad answers often start with a bad cut, so look here first."
+    },
+    "lab": {
+      "title": "The search lab",
+      "text": "Runs only the search step, with no model. For each passage it shows its rank in the vector search and in the full-text search, the distance and the merged score. An empty result explains that the gate refused."
+    },
+    "modes": {
+      "title": "Three modes",
+      "text": "Hybrid (as used for answers), vector only, or full-text only. Each hit links to its passage on the document page."
+    },
+    "evaluation": {
+      "title": "An evaluation you can rerun",
+      "text": "{evalQuestions} questions and a script in the repository compare the modes. The results and their limits are written down."
+    },
+    "languages": {
+      "title": "English and Polish",
+      "text": "The interface follows the browser language, English when it is neither, and Settings can override it. Answers are written in the language of the question."
+    },
+    "keyboard": {
+      "title": "Keyboard and screen readers",
+      "text": "A skip link, focus kept in dialogs and the mobile menu, an announcement when an answer finishes, and reduced motion respected."
+    },
+    "axe": {
+      "title": "Checked automatically",
+      "text": "End-to-end tests run axe against WCAG 2.1 AA in light and dark mode, in dialogs and on a 320 px wide phone. Automated checks do not find everything."
+    },
+    "themes": {
+      "title": "Light and dark",
+      "text": "The theme follows the system unless Settings, under Appearance, says otherwise."
+    },
+    "phone": {
+      "title": "Fits a phone",
+      "text": "The layout works down to 320 px wide, with a menu that replaces the sidebar."
+    }
+  },
+  "more": {
+    "evaluation": "Read the evaluation on GitHub"
+  },
+  "overview": {
+    "eyebrow": "Overview",
+    "title": "Six areas, one app"
+  }
+}

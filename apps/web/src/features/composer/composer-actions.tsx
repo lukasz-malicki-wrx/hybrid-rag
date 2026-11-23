@@ -5,7 +5,7 @@ import { Button } from "@hybrid-rag/ui/button";
 import { SendIcon, StopIcon } from "@hybrid-rag/ui/icons";
 import { useTranslation } from "@/i18n/use-translation";
 
-/** Send, or Stop while an answer is being written. */
+/** Send (an icon, like the one in the design), or Stop while an answer is being written. */
 export const ComposerActions = memo(function ComposerActions({
   busy,
   canSend,
@@ -20,20 +20,19 @@ export const ComposerActions = memo(function ComposerActions({
   const { t } = useTranslation();
   if (busy)
     return (
-      <Button size="sm" onClick={onStop} icon={<StopIcon />}>
+      <Button variant="chip" size="sm" icon={<StopIcon />} onClick={onStop} className="ml-auto">
         {t("composer.stop")}
       </Button>
     );
   return (
     <Button
       variant="primary"
-      size="sm"
+      size="icon"
+      icon={<SendIcon />}
+      aria-label={t("composer.send")}
       onClick={onSend}
       disabled={!canSend}
-      aria-label={t("composer.send")}
-      className="min-w-10 px-3 disabled:opacity-40"
-    >
-      <SendIcon />
-    </Button>
+      className="ml-auto"
+    />
   );
 });

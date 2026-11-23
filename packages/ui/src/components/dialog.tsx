@@ -3,6 +3,7 @@
 import { useId, type ReactNode } from "react";
 import { useModalDialog } from "../hooks/use-modal-dialog";
 import { cn } from "../lib/cn";
+import { Heading } from "./heading";
 
 export type DialogProps = {
   open: boolean;
@@ -40,9 +41,7 @@ export function Dialog({ open, onClose, title, description, children, footer, si
       )}
     >
       <div className="border-b border-border px-6 py-4">
-        <h2 id={titleId} className="text-lg font-semibold">
-          {title}
-        </h2>
+        <Heading id={titleId}>{title}</Heading>
         {description && (
           <div id={descriptionId} className="mt-1 space-y-2 text-sm text-muted">
             {description}

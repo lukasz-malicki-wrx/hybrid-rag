@@ -1,0 +1,248 @@
+{
+  "hero": {
+    "title": "How it works",
+    "lead": "From a PDF to an answer you can check, in plain words. Each technical term is explained where it first appears.",
+    "eyebrow": "Under the hood"
+  },
+  "flows": {
+    "title": "Two flows, one idea",
+    "lead": "hybrid-rag does two things: it prepares a document once, and it answers a question every time you ask one. Both are shown here in short, then step by step below.",
+    "ingest": {
+      "label": "Flow 1: from PDF to searchable",
+      "steps": {
+        "upload": {
+          "title": "Upload",
+          "text": "The PDF is saved unchanged."
+        },
+        "cut": {
+          "title": "Read and cut",
+          "text": "The text is cut into chunks of about {chunkChars} characters."
+        },
+        "embed": {
+          "title": "Turn into numbers",
+          "text": "Each chunk gets {vectorSize} numbers that describe its meaning."
+        },
+        "store": {
+          "title": "Store",
+          "text": "Chunks go into the database, ready for two kinds of search."
+        }
+      }
+    },
+    "ask": {
+      "label": "Flow 2: from question to cited answer",
+      "steps": {
+        "question": {
+          "title": "Question",
+          "text": "Your question is turned into numbers too."
+        },
+        "search": {
+          "title": "Search two ways",
+          "text": "By meaning and by exact words, {candidates} candidates each."
+        },
+        "merge": {
+          "title": "Merge",
+          "text": "Rank fusion keeps the best chunks, {topChunks} by default."
+        },
+        "gate": {
+          "title": "Check relevance",
+          "text": "If nothing is close enough, the model is not called."
+        },
+        "write": {
+          "title": "Write",
+          "text": "The model answers from the chunks and cites them as [1], [2]."
+        },
+        "save": {
+          "title": "Save",
+          "text": "The answer is stored with everything it was based on."
+        }
+      }
+    },
+    "stepLabel": "Step {number}",
+    "eyebrow": "Overview"
+  },
+  "ingest": {
+    "title": "From PDF to searchable chunks",
+    "lead": "This happens once per document, in the background, while you keep working.",
+    "steps": {
+      "save": {
+        "title": "Keep the original",
+        "text": "The PDF is saved unchanged under a fingerprint of its content (a SHA-256 hash). The same file uploaded twice is stored once. A file with the same name but different content becomes a new version, and the older version is kept."
+      },
+      "read": {
+        "title": "Read the text",
+        "text": "A background process, the worker, takes the job from a queue in the database and reads the text of each page. Pages that are only pictures cannot be read: there is no OCR (text recognition from images)."
+      },
+      "cut": {
+        "title": "Cut it into chunks",
+        "text": "The text of each page is cut into chunks of about {chunkChars} characters, preferably at a paragraph or sentence boundary, and each chunk overlaps the one before by {chunkOverlap} characters. A chunk remembers its page, so a citation can point to it."
+      },
+      "embed": {
+        "title": "Turn chunks into numbers",
+        "text": "An embedding model (bge-m3) turns each chunk into a list of {vectorSize} numbers, a vector, that describes what the text means. Texts with a similar meaning get vectors that lie close together, even when they share no words. The question is turned into numbers by the same model, so the model must not change without indexing the documents again."
+      },
+      "store": {
+        "title": "Store them and mark the document ready",
+        "text": "Chunks, vectors and a full-text index go into the database (PostgreSQL with the pgvector extension) together with the status “ready”, in one step, so a failed attempt leaves no half-finished document. A failed attempt is retried after {retryFirstSeconds} seconds and after {retrySecondMinutes} minutes, then the document is marked as failed. While this runs, the app shows live progress."
+      }
+    },
+    "caption": "The document page shows the chunks a PDF was cut into, with their pages and lengths. A bad answer often starts with a bad cut, so look here first.",
+    "eyebrow": "Step by step"
+  },
+  "search": {
+    "title": "Searching two ways",
+    "lead": "A question is looked up in two different ways, because each one misses things the other finds. Each returns its {candidates} best candidates, ranked from best to worst.",
+    "kinds": {
+      "meaning": {
+        "title": "By meaning",
+        "text": "Vector search compares the numbers of the question with the numbers of every chunk and returns the closest. It understands synonyms and paraphrases: “reset the device” finds “restore factory settings”. It is weak with exact codes and names, because to the model “GPIO12” means almost nothing."
+      },
+      "words": {
+        "title": "By exact words",
+        "text": "Full-text search finds chunks that contain the words of the question, using an index of all words. It is good with names, codes and symbols. It does not understand paraphrases or other languages: a Polish question about an English document finds nothing this way."
+      }
+    },
+    "fusion": {
+      "title": "Merging the two lists",
+      "text": "The two lists cannot be compared by score, because the scales differ. Reciprocal rank fusion (RRF) ignores scores and uses only positions. A chunk earns points for its position in every list it appears in, and the points are added up. A chunk near the top of both lists beats one that is first in only one.",
+      "formula": "points = 1 / ({k} + position)",
+      "formulaLabel": "The formula",
+      "exampleTitle": "A worked example",
+      "exampleText": "Four chunks, A to D, with invented positions. “Meaning” is where the meaning search put the chunk, “Words” where the word search put it.",
+      "table": {
+        "regionLabel": "Rank fusion example table",
+        "caption": "Positions and points of four example chunks",
+        "chunk": "Chunk",
+        "meaning": "Meaning",
+        "words": "Words",
+        "points": "Points",
+        "place": "Place",
+        "absent": "not in this list"
+      },
+      "reading": "Chunk D is first in the word list, but only seventh in the meaning list, so it ends third. Chunk C is fourth and second, and still finishes above it, because it is near the top of both. Chunk B was not found by the word search at all, so it gets points from one list only.",
+      "traceable": "The answer to a search carries both positions of every chunk, so you can see which search found it. The search lab shows exactly this.",
+      "firstRow": "The first row, worked out: 1 / (60 + {meaning}) + 1 / (60 + {words}) = {left} + {right} = {total}."
+    },
+    "caption": "The search lab runs only the search, with no model: the position of each chunk in both lists, its distance and the merged score.",
+    "eyebrow": "Search"
+  },
+  "gate": {
+    "title": "The relevance gate: saying “not in the documents”",
+    "lead": "A search always returns the nearest chunks, even for a question about pancakes. Having results proves nothing, so the app first asks whether the question is related to the documents at all.",
+    "passes": "It is related when either of these is true:",
+    "rules": {
+      "distance": "The nearest chunk is within a cosine distance of {gateDistance}. The cosine distance is the angle between two vectors: 0 means the same direction. The value is calibrated for bge-m3.",
+      "words": "In hybrid mode, a single chunk contains every content word of the question. This keeps exact terms such as “ALCOA”, which lie far from everything in the space of meanings."
+    },
+    "otherwise": "If neither is true, the API answers that the documents do not contain it, and the language model is not called at all: no answer is written for a question the documents do not seem to cover, and no time is spent on writing.",
+    "measured": {
+      "title": "How the threshold was chosen",
+      "text": "Among the {evalAnswerable} evaluation questions the documents can answer, the nearest chunk was at most {nearestAnswerable} away for every paraphrase and every Polish question. Two questions about exact terms were further away ({exactTermsNear} and {exactTermsFar}), which is what the second rule is for. The {evalOffTopic} separate off-topic questions had their nearest chunk at {nearestOffTopic} or more, and {gateDistance} sits in that gap. In the evaluation, hybrid search returned nothing for all {evalOffTopic} off-topic questions.",
+      "limit": "The gap is narrow, and the value is specific to bge-m3 and to those four documents. Other documents may need another value (the setting MAX_VECTOR_DISTANCE)."
+    },
+    "eyebrow": "Relevance",
+    "stats": {
+      "answerable": "Largest nearest-chunk distance for a paraphrased or a Polish question",
+      "offTopic": "Smallest nearest-chunk distance among the {evalOffTopic} off-topic questions",
+      "threshold": "The threshold, in the gap between the two"
+    }
+  },
+  "answer": {
+    "title": "Writing the answer",
+    "lead": "Only now is the language model (LLM) used: a program that writes text one token, a piece of a word, at a time.",
+    "steps": {
+      "prompt": {
+        "title": "The best chunks go into the prompt",
+        "text": "The top chunks, {topChunks} by default, are numbered [1] to [n] and put into the prompt: the instructions sent to the model. In a conversation the model also sees the last {historyTurns} turns, and a follow-up question is searched together with the previous one. The prompt is trimmed to fit the context window, the amount of text the model can read at once ({contextTokens} tokens)."
+      },
+      "rules": {
+        "title": "Rules for the model",
+        "text": "The model is instructed to answer only from the chunks, to cite each claim as [1], and otherwise to say it cannot find the answer. It is told that the text of a chunk is data, not instructions, which makes it harder for a malicious PDF to take over but cannot rule it out."
+      },
+      "stream": {
+        "title": "The answer streams in",
+        "text": "Words appear as they are written. Pressing Stop ends the generation and keeps the part that was written."
+      },
+      "check": {
+        "title": "The answer is checked",
+        "text": "When the answer is finished, its citations are read. A refusal is flagged, and an answer without any valid citation is marked as not backed by a source. This lowers the risk but does not remove it: a small model can cite a passage that does not support its claim."
+      }
+    },
+    "eyebrow": "Answer"
+  },
+  "record": {
+    "title": "What is stored with each answer",
+    "lead": "An answer you cannot trace is hard to trust. So every answer is saved together with what it was based on.",
+    "items": {
+      "question": "the question and its settings",
+      "chunks": "the ids of the chunks that went into the prompt",
+      "documents": "the hashes and versions of the documents they came from",
+      "embedding": "the embedding model",
+      "llm": "the language model provider and model",
+      "prompt": "the version of the prompt",
+      "context": "your personal context from Settings, if you set one"
+    },
+    "list": "Saved with each answer:",
+    "append": "Questions and answers are never changed or deleted. Removed documents, groups and conversations are only hidden, and original PDFs are kept unchanged and checked against their hash every time they are read. Months later you can still explain what an answer was based on.",
+    "eyebrow": "Audit trail"
+  },
+  "run": {
+    "title": "Where it runs",
+    "lead": "Two models do the work: one for search, one for writing. Where the writing model runs is your choice.",
+    "local": {
+      "title": "On your computer (default)",
+      "text": "Ollama runs both models locally: bge-m3 for search (about {embeddingGb} GB) and qwen2.5:3b for answers (about {chatGb} GB). No account and no key. Documents, questions and answers stay on your machine. Small models write clumsier answers, especially in Polish."
+    },
+    "api": {
+      "title": "Claude API (optional)",
+      "text": "Set <code>LLM_PROVIDER=anthropic</code> and an API key, and only the writing moves. Sent to Anthropic's API: {sent}. Search, documents and the database stay on your machine."
+    },
+    "hardware": {
+      "title": "CPU and GPU, honestly",
+      "lead": "The stack runs on the CPU only, on purpose: anyone can start it with one command, without a GPU, drivers or a special Docker setup. The price is speed.",
+      "items": {
+        "index": "Indexing a PDF takes seconds to minutes. A {indexPages}-page document took about {indexMinutes} minutes on a laptop CPU.",
+        "answer": "An answer starts after a short delay and arrives at CPU speed.",
+        "first": "The first request after a start is slower, because the models are loaded into memory.",
+        "shared": "Indexing and answering share one Ollama, so an answer waits while a document is being indexed."
+      },
+      "gpu": "For GPU speed, run Ollama directly on your computer (Metal on Apple silicon, CUDA on Linux) and let the containers call it. Docker Desktop on macOS cannot pass the GPU to a container. The repository has a ready overlay for it, <code>docker-compose.native-ollama.yml</code>. With a GPU a larger chat model is practical."
+    },
+    "eyebrow": "Running it"
+  },
+  "start": {
+    "title": "Start it on your computer",
+    "lead": "You need Docker with Compose, about {diskGb} GB of free disk space for the models and {ramGb} GB of RAM.",
+    "start": {
+      "title": "Start everything",
+      "label": "Terminal command: start hybrid-rag",
+      "text": "The first start downloads the two models and the API starts when they are in place. Follow the progress with <code>docker compose logs -f ollama-init</code>."
+    },
+    "seed": {
+      "title": "Load the sample documents",
+      "label": "Terminal command: load the sample documents",
+      "text": "The samples are {evalDocuments} public regulatory PDFs. On a CPU the script waits up to {seedWaitMinutes} minutes for indexing to finish."
+    },
+    "open": "Then open <code>http://localhost:3000</code>. Every port is bound to <code>127.0.0.1</code>, so nothing is reachable from other machines.",
+    "eyebrow": "Quick start"
+  },
+  "limits": {
+    "title": "Limits worth knowing",
+    "items": {
+      "ocr": "Only PDFs with a text layer: no OCR, so scans that are only pictures are not read.",
+      "size": "Uploads are limited to {uploadMb} MB by default.",
+      "accounts": "No user accounts yet: everyone who can reach the app sees the same documents.",
+      "wrong": "Answers can be wrong. Citations let you check them, and a small model can still cite a passage that does not support its claim.",
+      "language": "Keyword search ignores English stopwords only, so it does not support Polish. The sentence the app uses when it finds nothing is in English."
+    },
+    "eyebrow": "Limits"
+  },
+  "more": {
+    "title": "Read more",
+    "lead": "The full explanation and the measurements are in the repository.",
+    "readme": "README: quick start, configuration and limits",
+    "howItWorks": "docs/HOW_IT_WORKS.md: the long version (in Polish)",
+    "evaluation": "docs/EVALUATION.md: the retrieval measurements, with the method",
+    "github": "Source on GitHub",
+    "eyebrow": "Go deeper"
+  }
+}

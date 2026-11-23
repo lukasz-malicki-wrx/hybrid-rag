@@ -6,6 +6,8 @@ import uuid
 import pytest
 
 from app.core.errors import ConflictError, NotFoundError
+from app.rag.prompt import REFUSAL
+from app.repositories.answer import FeedbackRepository
 from app.repositories.chunk import ChunkRepository
 from app.repositories.conversation import ConversationRepository
 from app.repositories.document import DocumentRepository
@@ -13,6 +15,7 @@ from app.repositories.group import GroupRepository
 from app.schemas.answer import DoneEvent, TokenEvent
 from app.services.answer import AnswerService
 from app.services.conversation import ConversationService
+from app.services.feedback import FeedbackService
 from app.services.group import GroupService
 
 
@@ -299,3 +302,134 @@ def test_unpinning_is_soft_and_repinning_restores(conn):
     assert kept == 1
     svc.set_documents(cid, [doc["id"]])
     assert [d["id"] for d in svc.detail(cid)["documents"]] == [doc["id"]]
+
+
+def answered(connect, conn, svc, question, tokens, conversation_id=None):
+    """Run one turn to completion; returns the conversation id."""
+    hit = chunk_hit(conn)
+    turn = svc.start_turn(question, conversation_id, None)
+    cid = turn.conversation["id"]
+    drain(
+        AnswerService(FakeLLM(tokens), connect, "bge-m3").start(
+            question, cid, turn.history, None, {}, [hit]
+        )
+    )
+    return cid
+
+
+def listed(svc, cid):
+    return next(c for c in svc.list(None, False, 200) if c["id"] == cid)
+
+
+def test_preview_is_empty_until_the_first_answer(connect, conn):
+    svc = conversations(conn)
+    turn = svc.start_turn("Anything yet?", None, None)
+    cid = turn.conversation["id"]
+    assert turn.conversation.get("preview") is None
+    assert listed(svc, cid)["preview"] is None
+    assert svc.detail(cid)["preview"] is None
+    answered(connect, conn, svc, "Anything now?", ["Backups ", "must be tested [1]."], cid)
+    assert listed(svc, cid)["preview"] == "Backups must be tested."
+
+
+def test_preview_comes_from_the_latest_answer(connect, conn):
+    svc = conversations(conn)
+    cid = answered(connect, conn, svc, "First?", ["Old answer [1]."])
+    answered(connect, conn, svc, "Second?", ["New answer [1]."], cid)
+    assert listed(svc, cid)["preview"] == "New answer."
+    assert svc.detail(cid)["preview"] == "New answer."
+    # a question still waiting for its answer does not hide the previous preview
+    svc.start_turn("Third?", cid, None)
+    assert listed(svc, cid)["preview"] == "New answer."
+
+
+def test_preview_survives_update_and_group_lists(connect, conn):
+    svc = conversations(conn)
+    g = groups(conn).create(unique("prev"))
+    turn = svc.start_turn("Grouped?", None, g["id"])
+    cid = turn.conversation["id"]
+    drain(
+        AnswerService(FakeLLM(["Grouped answer."]), connect, "bge-m3").start(
+            "Grouped?", cid, [], None, {}, [chunk_hit(conn)]
+        )
+    )
+    assert svc.update(cid, {"favorite": True})["preview"] == "Grouped answer."
+    assert svc.update(cid, {"title": "Renamed"})["preview"] == "Grouped answer."
+    assert [c["preview"] for c in svc.list(g["id"], False, 50)] == ["Grouped answer."]
+    assert [c["preview"] for c in svc.list(None, True, 50) if c["id"] == cid] == ["Grouped answer."]
+
+
+def test_preview_cuts_a_long_answer_without_a_dangling_citation(connect, conn):
+    svc = conversations(conn)
+    # the 400th character falls inside the "[1]" marker
+    cid = answered(connect, conn, svc, "Long?", ["x" * 397 + " [1] and more text"])
+    preview = listed(svc, cid)["preview"]
+    assert "[" not in preview and preview.endswith("…")
+
+
+def test_preview_skips_refusals_and_stopped_answers(connect, conn):
+    svc = conversations(conn)
+    cid = answered(connect, conn, svc, "Backups?", ["Backups must be tested [1]."])
+    # a refusal says nothing about the conversation: the earlier answer stays the preview
+    answered(connect, conn, svc, "Pancakes?", [REFUSAL], cid)
+    assert listed(svc, cid)["preview"] == "Backups must be tested."
+    # an answer stopped after a word or two neither
+    turn = svc.start_turn("Restore?", cid, None)
+    run = AnswerService(FakeLLM(["Z"] + ["word "] * 200, delay=0.01), connect, "bge-m3").start(
+        "Restore?", cid, turn.history, None, {}, [chunk_hit(conn)]
+    )
+    run.next_event()
+    run.cancel()
+    drain(run)
+    assert svc.detail(cid)["messages"][-1]["answer"]["stopped"]
+    assert listed(svc, cid)["preview"] == "Backups must be tested."
+    # only refusals: no preview at all
+    only = answered(connect, conn, svc, "Weather?", [REFUSAL])
+    assert listed(svc, only)["preview"] is None
+
+
+def rate(conn, answer_id, rating):
+    return FeedbackService(conn, FeedbackRepository(conn)).set(answer_id, rating)
+
+
+def first_answer(svc, cid):
+    return svc.detail(cid)["messages"][0]["answer"]
+
+
+def test_rating_an_answer_can_be_replaced_and_withdrawn(connect, conn):
+    svc = conversations(conn)
+    cid = answered(connect, conn, svc, "Rate me?", ["Fine [1]."])
+    answer = first_answer(svc, cid)
+    assert answer["rating"] is None
+
+    assert rate(conn, answer["id"], "up") == {"answer_id": answer["id"], "rating": "up"}
+    assert first_answer(svc, cid)["rating"] == "up"
+    assert rate(conn, answer["id"], "down")["rating"] == "down"
+    assert first_answer(svc, cid)["rating"] == "down"
+    assert rate(conn, answer["id"], None)["rating"] is None
+    assert first_answer(svc, cid)["rating"] is None
+    n = conn.execute(
+        "SELECT count(*) AS n FROM answer_feedback WHERE answer_id = %s", (answer["id"],)
+    ).fetchone()["n"]
+    assert n == 1  # one row per answer, kept when withdrawn
+
+
+def test_rating_an_unknown_answer_is_not_found(conn):
+    with pytest.raises(NotFoundError):
+        rate(conn, uuid.uuid4(), "up")
+
+
+def test_rating_an_answer_of_a_deleted_conversation_is_not_found(connect, conn):
+    svc = conversations(conn)
+    cid = answered(connect, conn, svc, "Gone soon?", ["Yes [1]."])
+    answer_id = first_answer(svc, cid)["id"]
+    svc.delete(cid)
+    with pytest.raises(NotFoundError):
+        rate(conn, answer_id, "up")
+    conn.rollback()
+    assert (
+        conn.execute(
+            "SELECT count(*) AS n FROM answer_feedback WHERE answer_id = %s", (answer_id,)
+        ).fetchone()["n"]
+        == 0
+    )

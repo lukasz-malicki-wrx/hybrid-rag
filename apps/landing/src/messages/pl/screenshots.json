@@ -1,0 +1,27 @@
+{
+  "placeholder": "Zrzut: {name}",
+  "names": {
+    "chat": "czat",
+    "sources": "panel źródeł",
+    "start": "ekran startowy",
+    "groups": "grupa",
+    "document": "strona dokumentu",
+    "search-lab": "laboratorium wyszukiwania",
+    "mobile-chat": "czat na telefonie",
+    "settings": "ustawienia",
+    "hero-chat": "czat, kadr",
+    "about-sources": "panel źródeł, kadr",
+    "how-flow": "pytanie o dołączony PDF"
+  },
+  "chat": "Rozmowa: pytanie o dokument i odpowiedź z ponumerowanymi cytatami.",
+  "sources": "Panel źródeł obok odpowiedzi: zacytowane fragmenty z dokumentem i stroną.",
+  "start": "Ekran startowy z polem pytania i wyborem, co przeszukiwać.",
+  "groups": "Grupa dokumentów z jej rozmowami i listą plików PDF.",
+  "document": "Strona dokumentu z fragmentami, na które podzielono tekst, i ich statystykami.",
+  "search-lab": "Laboratorium wyszukiwania: wyniki szukania wektorowego, pełnotekstowego i ich połączenia obok siebie.",
+  "mobile-chat": "Rozmowa na telefonie: odpowiedź i cytaty mieszczą się na wąskim ekranie.",
+  "settings": "Okno ustawień: język, wygląd i osobisty kontekst odpowiedzi.",
+  "hero-chat": "Rozmowa: pytanie o dokument i odpowiedź z ponumerowanymi cytatami.",
+  "about-sources": "Panel źródeł obok odpowiedzi: zacytowane fragmenty z dokumentem i stroną.",
+  "how-flow": "Pytanie zadane z dołączonym plikiem PDF: plik pod pytaniem i odpowiedź o nim z numerowanymi cytatami."
+}

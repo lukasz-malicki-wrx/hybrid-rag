@@ -1,0 +1,4 @@
+{
+  "extends": "@hybrid-rag/typescript-config/react-library.json",
+  "include": ["src"]
+}
