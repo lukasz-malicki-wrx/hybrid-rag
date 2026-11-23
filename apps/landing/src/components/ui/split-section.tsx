@@ -20,6 +20,8 @@ type SplitSectionProps = {
    * border or rounded corners, and is cropped to that (a picture under the site header).
    */
   bleed?: boolean;
+  /** On a phone the text comes before the picture (a page's top), instead of the picture first. */
+  textFirst?: boolean;
   /** The text: an eyebrow, a heading, paragraphs, buttons. */
   children: ReactNode;
   className?: string;
@@ -29,12 +31,12 @@ const BLEED =
   "max-lg:-mx-gutter max-lg:aspect-[375/240] max-lg:rounded-none max-lg:border-0 max-lg:[&_.screenshot]:h-full max-lg:[&_.screenshot_img]:h-full max-lg:[&_.screenshot_img]:object-cover max-lg:[&_.screenshot_img]:object-left-top";
 
 /** A picture and a text side by side in two equal columns (540px each at the design width, 120px apart). */
-export function SplitSection({ media, side = "right", doodle = false, align = "center", bleed = false, children, className }: SplitSectionProps) {
+export function SplitSection({ media, side = "right", doodle = false, align = "center", bleed = false, textFirst = false, children, className }: SplitSectionProps) {
   const left = side === "left";
   const top = align === "top";
   return (
     <div className={cn("grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-x-16 xl:gap-x-30", top ? "items-start" : "items-center", className)}>
-      <div className={cn("max-lg:order-first", !left && "lg:order-last", top && "lg:self-stretch")}>
+      <div className={cn(textFirst ? "max-lg:order-last" : "max-lg:order-first", !left && "lg:order-last", top && "lg:self-stretch")}>
         <div className={cn("relative", top && "lg:sticky lg:top-6")}>
           {doodle ? <Doodle className={cn("absolute -top-12 hidden lg:block", left ? "-scale-x-100 lg:-right-(--doodle-outset)" : "lg:-left-(--doodle-outset)")} /> : null}
           <div className={cn("overflow-hidden rounded-xl border border-border bg-panel", bleed && BLEED)}>{media}</div>

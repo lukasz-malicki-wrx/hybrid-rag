@@ -15,7 +15,7 @@ type PageHeaderProps = {
   eyebrow?: ReactNode;
   /** Buttons or facts under the lead. */
   actions?: ReactNode;
-  /** A picture beside the text (on the right; above it on a phone), with strokes over its corner. */
+  /** A picture beside the text (on the right; under it on a phone), with strokes over its corner. */
   media?: ReactNode;
   /** "panel" is the tinted band of the top of a page; the first section after it is then "plain". */
   tone?: "panel" | "plain";
@@ -37,14 +37,13 @@ export function PageHeader({ title, lead, eyebrow, actions, media, tone = "panel
     <header
       className={cn(
         "pb-section",
-        // The space above is a section's on every page. A picture runs right under the site header on a phone.
-        media ? "pt-0 lg:pt-section" : "pt-section",
+        "pt-section",
         tone === "panel" && "surface-panel",
       )}
     >
       <Container>
         {media ? (
-          <SplitSection media={media} doodle bleed>
+          <SplitSection media={media} doodle bleed textFirst>
             {text}
           </SplitSection>
         ) : (

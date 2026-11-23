@@ -17,18 +17,18 @@ test.describe("home page", () => {
     expect(errors).toEqual([]);
   });
 
-  test("puts the picture before the text on a phone", async ({ page }) => {
+  test("puts the text before the picture on a phone", async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 800 });
     await page.goto("/en");
     const picture = await page.locator("main header [role='img'], main header .screenshot").first().boundingBox();
     const heading = await page.getByRole("heading", { level: 1 }).boundingBox();
-    expect(picture && heading && picture.y < heading.y).toBe(true);
+    expect(picture && heading && heading.y < picture.y).toBe(true);
   });
 
-  test("lists what it is built with, four items", async ({ page }) => {
+  test("lists what it is built with, five items", async ({ page }) => {
     await page.goto("/en");
     const list = page.getByRole("list", { name: "Built with" });
-    await expect(list.getByRole("listitem")).toHaveText(["PostgreSQL + pgvector", "Ollama", "FastAPI", "Next.js"]);
+    await expect(list.getByRole("listitem")).toHaveText(["PostgreSQL + pgvector", "Ollama", "FastAPI", "Next.js", "Claude API"]);
   });
 
   test("has four strengths, each with its own link", async ({ page }) => {

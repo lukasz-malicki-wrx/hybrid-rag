@@ -1,4 +1,4 @@
-import { siFastapi, siNextdotjs, siOllama, siPostgresql } from "simple-icons";
+import { siClaude, siFastapi, siNextdotjs, siOllama, siPostgresql } from "simple-icons";
 import type { IconProps } from "./create-icon";
 
 /**
@@ -16,6 +16,7 @@ function brand(path: string) {
   };
 }
 
+export const Claude = brand(siClaude.path);
 export const Postgres = brand(siPostgresql.path);
 export const Ollama = brand(siOllama.path);
 export const FastApi = brand(siFastapi.path);

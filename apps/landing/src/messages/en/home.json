@@ -12,7 +12,8 @@
       "postgres": "PostgreSQL + pgvector",
       "ollama": "Ollama",
       "fastapi": "FastAPI",
-      "next": "Next.js"
+      "next": "Next.js",
+      "claude": "Claude API"
     }
   },
   "strengths": {

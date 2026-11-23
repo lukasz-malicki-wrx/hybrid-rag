@@ -46,6 +46,7 @@ export const RepoIcon = createIcon("RepoIcon", glyphs.Repo);
 export const LanguagesIcon = createIcon("LanguagesIcon", glyphs.Languages);
 export const PictureIcon = createIcon("PictureIcon", glyphs.Picture);
 
+export const ClaudeIcon = createIcon("ClaudeIcon", glyphs.Claude);
 export const FastApiIcon = createIcon("FastApiIcon", glyphs.FastApi);
 export const NextJsIcon = createIcon("NextJsIcon", glyphs.NextJs);
 export const OllamaIcon = createIcon("OllamaIcon", glyphs.Ollama);

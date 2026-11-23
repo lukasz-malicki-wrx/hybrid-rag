@@ -1,4 +1,4 @@
-import { FastApiIcon, NextJsIcon, OllamaIcon, PostgresIcon } from "@hybrid-rag/ui/icons";
+import { ClaudeIcon, FastApiIcon, NextJsIcon, OllamaIcon, PostgresIcon } from "@hybrid-rag/ui/icons";
 import { Text } from "@hybrid-rag/ui/text";
 import { Container } from "@/components/ui/container";
 import type { HomeSectionProps } from "./props";
@@ -8,6 +8,7 @@ const ITEMS = [
   { id: "ollama", Icon: OllamaIcon },
   { id: "fastapi", Icon: FastApiIcon },
   { id: "next", Icon: NextJsIcon },
+  { id: "claude", Icon: ClaudeIcon },
 ] as const;
 
 /** The parts it is made of: each logo with its name (no claims): a row on wide screens, a bordered 2x2 grid on a phone. */
@@ -15,9 +16,9 @@ export function BuiltWith({ t }: Pick<HomeSectionProps, "t">) {
   return (
     <section aria-labelledby="home-built-with" className="surface-panel pb-section pt-10 lg:pt-5">
       <Container>
-        <div className="flex flex-col items-center gap-6 lg:flex-row lg:gap-25">
-          <div className="flex shrink-0 flex-col items-center gap-3 lg:flex-row lg:gap-25">
-            <Text id="home-built-with" size="lead" tone="muted" className="max-lg:text-center lg:w-50">
+        <div className="flex flex-col items-center gap-6 lg:flex-row lg:gap-12">
+          <div className="flex shrink-0 flex-col items-center gap-3 lg:flex-row lg:gap-8">
+            <Text id="home-built-with" size="lead" tone="muted" className="max-lg:text-center ">
               {t("home.builtWith.label")}
             </Text>
             <span aria-hidden="true" className="h-px w-20 shrink-0 bg-fg" />
