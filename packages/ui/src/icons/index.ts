@@ -45,3 +45,8 @@ export const UserIcon = createIcon("UserIcon", glyphs.User);
 export const RepoIcon = createIcon("RepoIcon", glyphs.Repo);
 export const LanguagesIcon = createIcon("LanguagesIcon", glyphs.Languages);
 export const PictureIcon = createIcon("PictureIcon", glyphs.Picture);
+
+export const FastApiIcon = createIcon("FastApiIcon", glyphs.FastApi);
+export const NextJsIcon = createIcon("NextJsIcon", glyphs.NextJs);
+export const OllamaIcon = createIcon("OllamaIcon", glyphs.Ollama);
+export const PostgresIcon = createIcon("PostgresIcon", glyphs.Postgres);
