@@ -45,3 +45,5 @@ export {
   Languages,
   Image as Picture,
 } from "lucide-react";
+
+export { FastApi, NextJs, Ollama, Postgres } from "./brand-glyphs";
