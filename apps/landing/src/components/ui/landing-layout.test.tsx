@@ -85,7 +85,8 @@ describe("SplitSection and PageHeader", () => {
     expect(plain).toContain("pt-section");
     expect(plain).not.toContain("pt-section-tight");
     const withPicture = html(<PageHeader title="T" media="m" />);
-    expect(withPicture).toContain("pt-0 lg:pt-section");
+    expect(withPicture).toContain("pt-section");
+    expect(withPicture).not.toContain("max-lg:order-first");
     expect(withPicture).toContain("max-lg:-mx-gutter");
   });
 

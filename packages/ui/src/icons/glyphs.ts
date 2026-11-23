@@ -46,4 +46,4 @@ export {
   Image as Picture,
 } from "lucide-react";
 
-export { FastApi, NextJs, Ollama, Postgres } from "./brand-glyphs";
+export { Claude, FastApi, NextJs, Ollama, Postgres } from "./brand-glyphs";
