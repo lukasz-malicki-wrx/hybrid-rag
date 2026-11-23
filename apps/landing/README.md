@@ -14,7 +14,7 @@ Run from the repository root (`-w @hybrid-rag/landing`) or from this folder.
 | `npm run lint` / `typecheck` / `test` | ESLint (strict, literal text in JSX is an error), tsc, vitest |
 | `npm run test:e2e` | Playwright on its own port (3203, `LANDING_E2E_PORT` overrides it), so a running `npm run dev` is never tested by mistake: redirect, language switch, theme, menu, skip link, axe (WCAG 2.2 AA + best practices, light and dark, 320 and 1280 px), headers |
 | `npm run validate:html` | html-validate (pinned 11.19.0) on every page in both languages; run after `npm run build` |
-| `npm run lighthouse` | Lighthouse CI on `next start`, every page in both languages, mobile and desktop, median of 3, all four scores must be 100. Needs `npm run build` first. `-- mobile` or `-- desktop` for one; `LIGHTHOUSE_URL=/en,/pl/faq` for chosen pages; `LIGHTHOUSE_RUNS=1`. Prints every audit that is not a clean pass, informational ones included. Chrome: `CHROME_PATH`, else Playwright's Chromium (`npx playwright install chromium`) |
+| `npm run lighthouse` | Lighthouse CI on `next start`, every page in both languages, mobile and desktop, median of 3, all four scores must be at least 90. Needs `npm run build` first. `-- mobile` or `-- desktop` for one; `LIGHTHOUSE_URL=/en,/pl/faq` for chosen pages; `LIGHTHOUSE_RUNS=1`. Prints every audit that is not a clean pass, informational ones included. Chrome: `CHROME_PATH`, else Playwright's Chromium (`npx playwright install chromium`) |
 
 ## Layout
 

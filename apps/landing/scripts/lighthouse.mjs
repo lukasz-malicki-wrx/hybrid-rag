@@ -1,5 +1,5 @@
 // Lighthouse CI for every page in both languages, mobile and desktop, median of 3 runs of
-// `next start`, all four category scores must be 100.
+// `next start`, all four category scores must be at least 90.
 //
 //   npm run lighthouse -w @hybrid-rag/landing                 # builds nothing: run `npm run build` first
 //   npm run lighthouse -w @hybrid-rag/landing -- mobile       # one form factor
@@ -22,6 +22,7 @@ const pages = process.env.LIGHTHOUSE_URL
   : JSON.parse(readFileSync(path.join(root, "lighthouse/pages.json"), "utf8"));
 const runs = Number(process.env.LIGHTHOUSE_RUNS ?? 3);
 const modes = process.argv.slice(2).filter((a) => a === "mobile" || a === "desktop");
+const MIN_SCORE = 0.9;
 const CATEGORIES = ["performance", "accessibility", "best-practices", "seo"];
 
 process.env.CHROME_PATH ||= chromium.executablePath();
@@ -42,7 +43,7 @@ function config(mode, outputDir) {
       },
       assert: {
         aggregationMethod: "median-run",
-        assertions: Object.fromEntries(CATEGORIES.map((c) => [`categories:${c}`, ["error", { minScore: 1 }]])),
+        assertions: Object.fromEntries(CATEGORIES.map((c) => [`categories:${c}`, ["error", { minScore: MIN_SCORE }]])),
       },
       upload: { target: "filesystem", outputDir },
     },

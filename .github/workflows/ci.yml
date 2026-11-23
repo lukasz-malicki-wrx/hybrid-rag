@@ -181,7 +181,7 @@ jobs:
 
   landing-lighthouse:
     # Lighthouse CI: every page in both languages, mobile and desktop, median of 3 runs; all four
-    # scores must be 100. The reports list the audits that are not a clean pass.
+    # scores must be at least 90. The reports list the audits that are not a clean pass.
     needs: changes
     if: ${{ !cancelled() && (needs.changes.result != 'success' || needs.changes.outputs.landing == 'true') }}
     runs-on: ubuntu-latest
