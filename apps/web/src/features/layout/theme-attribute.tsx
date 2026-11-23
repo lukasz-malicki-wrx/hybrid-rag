@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { applyTheme } from "@/lib/theme";
+import { applyTheme } from "@hybrid-rag/ui/theme";
 import { useThemeStore } from "@/stores/theme-store";
 
 /**

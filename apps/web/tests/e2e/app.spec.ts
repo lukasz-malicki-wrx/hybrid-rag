@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import { expectAccessible } from "./a11y";
 import { answeredMessage, conversation, doc, json, MOCK, mockApi, source, sse } from "./mock-api";
 
@@ -6,9 +6,14 @@ test.beforeEach(async ({ page }) => {
   await mockApi(page);
 });
 
+/** The conversation itself; the same words also show in the sidebar card's preview. */
+const messages = (page: Page) => page.getByRole("list", { name: "Messages" });
+
 test("start page is accessible in light and dark mode", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "What do you want to know?" })).toBeVisible();
+  // Groups are one rail click away; the column starts on the chats.
+  await page.getByRole("complementary", { name: "Sidebar" }).getByRole("button", { name: "Groups" }).click();
   await expect(page.getByRole("link", { name: "GxP" })).toBeVisible();
   await expectAccessible(page);
   // Reduced motion turns off colour transitions, so axe measures the final dark colours rather
@@ -50,7 +55,7 @@ test("a question streams an answer with clickable citations", async ({ page }) =
   await box.press("Enter");
 
   await expect(page).toHaveURL(/\/c\/c-new$/);
-  await expect(page.getByText("Only Qualified Persons may certify batch release")).toBeVisible();
+  await expect(messages(page).getByText("Only Qualified Persons may certify batch release")).toBeVisible();
   await page.getByRole("button", { name: "Source 1: annex11.pdf, page 5" }).click();
 
   const panel = page.getByRole("complementary", { name: "Sources" });
@@ -84,7 +89,7 @@ test("the favourite limit is reported to the user", async ({ page }) => {
   );
   await page.goto("/c/c1");
   await page.getByRole("button", { name: "Add to favourites" }).click();
-  await expect(page.getByRole("status")).toContainText("at most 10 favourite conversations");
+  await expect(page.getByRole("status").filter({ hasText: "at most 10 favourite conversations" })).toBeVisible();
 });
 
 test("sending waits until attached PDFs are indexed", async ({ page }) => {
@@ -123,15 +128,16 @@ test("sending waits until attached PDFs are indexed", async ({ page }) => {
 test("works on a 320 px wide phone", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 640 });
   await page.goto("/c/c1");
-  await expect(page.getByText("Only Qualified Persons may certify batch release")).toBeVisible();
+  await expect(messages(page).getByText("Only Qualified Persons may certify batch release")).toBeVisible();
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
   expect(overflow).toBeLessThanOrEqual(0);
   await expectAccessible(page);
 
   await page.getByRole("button", { name: "Open menu" }).click();
   const sidebar = page.getByRole("complementary", { name: "Sidebar" });
-  await expect(sidebar.getByRole("link", { name: "GxP" })).toBeVisible();
   await expect(sidebar.getByRole("button", { name: "Close menu" })).toBeFocused();
+  await sidebar.getByRole("button", { name: "Groups" }).click();
+  await expect(sidebar.getByRole("link", { name: "GxP" })).toBeVisible();
   await expectAccessible(page);
   await page.keyboard.press("Escape");
   await expect(page.getByRole("button", { name: "Open menu" })).toBeVisible();
@@ -240,7 +246,7 @@ test("the personal context is edited in Settings at the bottom of the sidebar", 
   await dialog.getByRole("button", { name: "Save" }).click();
   await expect.poll(() => saved).toBe("Answer in Polish, as bullet points.");
   await expect(dialog).toBeHidden();
-  await expect(page.getByRole("status")).toContainText("Settings saved");
+  await expect(page.getByRole("status").filter({ hasText: "Settings saved" })).toBeVisible();
 });
 
 test("the conversation being answered is highlighted in the sidebar", async ({ page }) => {
@@ -276,6 +282,7 @@ test("the conversation being answered is highlighted in the sidebar", async ({ p
 test("the new group form can be cancelled", async ({ page }) => {
   await page.goto("/");
   const sidebar = page.getByRole("complementary", { name: "Sidebar" });
+  await sidebar.getByRole("button", { name: "Groups" }).click();
   const add = sidebar.getByRole("button", { name: "New group" });
   const name = sidebar.getByRole("textbox", { name: "Group name" });
 

@@ -1,0 +1,7 @@
+{
+  "dev": 3200,
+  "validateHtml": 3201,
+  "checkLinks": 3202,
+  "e2e": 3203,
+  "screenshots": 3204
+}

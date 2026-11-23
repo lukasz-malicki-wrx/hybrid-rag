@@ -15,7 +15,7 @@ export type AskOptions = {
   groupId?: string | null;
   /** Documents chosen as the conversation's search scope. */
   pinDocumentIds?: string[];
-  /** Files sent with this question: shown above it and pinned to the conversation. */
+  /** Files sent with this question: shown below it and pinned to the conversation. */
   attachments?: Attachment[];
   /** Called as soon as the server names the conversation (new ones included). */
   onConversation?: (id: string, created: boolean) => void;
@@ -48,6 +48,7 @@ export function useAskQuestion() {
           conversationId,
           question,
           attachments: options.attachments ?? [],
+          startedAt: Date.now(),
           baseCount: cached?.messages.length ?? 0,
           sources: [],
           text: "",

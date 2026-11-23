@@ -25,7 +25,7 @@ export function GroupConversations({ groupId }: { groupId: string }) {
 
   return (
     <section aria-labelledby="group-conversations">
-      <Heading id="group-conversations" className="mb-3">
+      <Heading level={2} id="group-conversations" className="mb-3">
         {t("groups.conversations")}
       </Heading>
       {conversations.data?.length ? (

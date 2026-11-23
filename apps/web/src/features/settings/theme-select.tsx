@@ -3,7 +3,7 @@
 import { memo, useMemo } from "react";
 import { RadioGroup, type RadioOption } from "@hybrid-rag/ui/radio-group";
 import { useTranslation } from "@/i18n/use-translation";
-import type { ThemePreference } from "@/lib/theme";
+import type { ThemePreference } from "@hybrid-rag/ui/theme";
 
 /** Appearance: light, dark or whatever the device uses. */
 export const ThemeSelect = memo(function ThemeSelect({

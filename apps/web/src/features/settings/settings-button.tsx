@@ -1,11 +1,12 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { Button } from "@hybrid-rag/ui/button";
+import { IconButton } from "@hybrid-rag/ui/icon-button";
 import { SettingsIcon } from "@hybrid-rag/ui/icons";
 import { useTranslation } from "@/i18n/use-translation";
 import { SettingsDialog } from "./settings-dialog";
 
+/** The settings tile of the rail; opens the settings dialog. */
 export function SettingsButton() {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
@@ -19,16 +20,14 @@ export function SettingsButton() {
 
   return (
     <>
-      <Button
-        variant="ghost"
-        size="sm"
+      <IconButton
+        variant="tile"
+        label={t("rail.settings")}
+        title={t("rail.settings")}
+        icon={<SettingsIcon />}
         aria-haspopup="dialog"
         onClick={show}
-        icon={<SettingsIcon className="text-muted" />}
-        className="w-full justify-start px-2"
-      >
-        {t("sidebar.settings")}
-      </Button>
+      />
       <SettingsDialog open={open} session={session} onClose={close} />
     </>
   );

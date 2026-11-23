@@ -7,9 +7,14 @@ import { useScrollToEnd } from "@/hooks/use-scroll-to-end";
 import { useTranslation } from "@/i18n/use-translation";
 import { citedNumbers } from "@/lib/citations";
 import { useChatStore } from "@/stores/chat-store";
+import { AnswerActions, AnswerActionsEnd } from "./answer-actions";
 import { AnswerBody } from "./answer-body";
 import { AnswerFlags } from "./answer-flags";
+import { DaySeparator } from "./day-separator";
+import { AnswerBubble, Message } from "./message";
+import { CopyButton } from "./copy-button";
 import { QuestionBubble } from "./question-bubble";
+import { RegenerateButton } from "./regenerate-button";
 import { SourcesButton } from "./sources-button";
 import type { OpenSources } from "./use-sources-panel";
 
@@ -23,7 +28,19 @@ function waitingKey(hasSources: boolean, queued: boolean) {
  * The question being answered under `turnKey`. The only component that reads the streaming
  * text, so each token re-renders this alone.
  */
-export function LiveTurn({ turnKey, onOpenSources }: { turnKey: string; onOpenSources: OpenSources }) {
+export function LiveTurn({
+  turnKey,
+  onOpenSources,
+  day,
+  onRegenerate,
+}: {
+  turnKey: string;
+  onOpenSources: OpenSources;
+  /** The divider to show before this turn (it is the first of its day). */
+  day?: string;
+  /** Offered when the answer failed: asks the same question again. */
+  onRegenerate?: (question: string) => void;
+}) {
   const { t } = useTranslation();
   const turn = useChatStore((s) => s.turns[turnKey]);
   // On CPU the model writes one answer at a time; a second one waits without tokens.
@@ -37,26 +54,41 @@ export function LiveTurn({ turnKey, onOpenSources }: { turnKey: string; onOpenSo
   if (!turn) return null;
 
   const streaming = turn.status === "connecting" || turn.status === "streaming";
+  const failed = turn.status === "error";
   return (
-    <li className="space-y-3">
-      <QuestionBubble text={turn.question} files={turn.attachments} />
-      <div aria-busy={streaming}>
-        <span className="sr-only">{t("chat.assistant")} </span>
-        {turn.text ? (
-          <AnswerBody text={turn.text} sources={turn.sources} onCite={cite} />
-        ) : (
-          streaming && <Spinner label={t(waitingKey(turn.sources.length > 0, queued))} />
-        )}
-        {turn.status === "error" && (
-          <p role="alert" className="mt-2 inline-flex items-center gap-1 text-sm text-danger">
-            <AlertIcon width={16} height={16} /> {turn.error ?? t("errors.generic")}
-          </p>
-        )}
-        {!streaming && turn.status !== "error" && (
-          <AnswerFlags refused={turn.refused} uncited={turn.uncited} stopped={turn.status === "stopped"} />
-        )}
-        {!streaming && <SourcesButton sources={turn.sources} cited={cited} onOpen={onOpenSources} />}
-      </div>
+    <li className="space-y-6">
+      {day && <DaySeparator label={day} />}
+      <Message role="user" time={turn.startedAt}>
+        <QuestionBubble text={turn.question} files={turn.attachments} />
+      </Message>
+      <Message role="assistant" live>
+        <AnswerBubble busy={streaming}>
+          {turn.text ? (
+            <AnswerBody text={turn.text} sources={turn.sources} onCite={cite} refused={turn.refused} />
+          ) : (
+            streaming && <Spinner label={t(waitingKey(turn.sources.length > 0, queued))} />
+          )}
+          {failed && (
+            <p role="alert" className="mt-2 inline-flex items-center gap-1 text-danger">
+              <AlertIcon width={16} height={16} /> {turn.error ?? t("errors.generic")}
+            </p>
+          )}
+          {!streaming && !failed && (
+            <AnswerFlags refused={turn.refused} uncited={turn.uncited} stopped={turn.status === "stopped"} />
+          )}
+          {!streaming && (
+            <AnswerActions>
+              <SourcesButton sources={turn.sources} cited={cited} onOpen={onOpenSources} />
+              <AnswerActionsEnd>
+                {failed && onRegenerate && (
+                  <RegenerateButton conversationId={turn.conversationId} question={turn.question} onRegenerate={onRegenerate} />
+                )}
+                {!failed && turn.text && <CopyButton text={turn.text} sourceCount={turn.sources.length} />}
+              </AnswerActionsEnd>
+            </AnswerActions>
+          )}
+        </AnswerBubble>
+      </Message>
       <div ref={endRef} />
     </li>
   );

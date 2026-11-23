@@ -6,7 +6,7 @@ import { Divider } from "@hybrid-rag/ui/divider";
 import { TextArea } from "@hybrid-rag/ui/text-area";
 import { PERSONAL_CONTEXT_MAX } from "@/api/settings";
 import { useTranslation } from "@/i18n/use-translation";
-import type { ThemePreference } from "@/lib/theme";
+import type { ThemePreference } from "@hybrid-rag/ui/theme";
 import type { LocalePreference } from "@/stores/locale-store";
 import { LanguageSelect } from "./language-select";
 import { ThemeSelect } from "./theme-select";
@@ -56,7 +56,7 @@ export function SettingsForm({
           placeholder={t("settings.personalContextPlaceholder")}
         />
         {personalContext.length > 0 && (
-          <Button variant="link" size="sm" className="px-0" onClick={() => setPersonalContext("")}>
+          <Button variant="link" size="text" onClick={() => setPersonalContext("")}>
             {t("common.clear")}
           </Button>
         )}

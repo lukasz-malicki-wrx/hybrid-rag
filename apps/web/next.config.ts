@@ -10,7 +10,7 @@ const nextConfig: NextConfig = {
   // local `next start` and the e2e tests use the regular build.
   output: process.env.NEXT_OUTPUT === "standalone" ? "standalone" : undefined,
   outputFileTracingRoot: repoRoot,
-  transpilePackages: ["@hybrid-rag/ui"],
+  transpilePackages: ["@hybrid-rag/ui", "@hybrid-rag/i18n"],
   cacheComponents: true,
   partialPrefetching: true,
   // Keep `next dev` from writing extra files into the project tree.

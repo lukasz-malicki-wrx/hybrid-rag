@@ -10,14 +10,14 @@ export function MobileHeader() {
   const open = useUiStore((s) => s.sidebarOpen);
   const openSidebar = useUiStore((s) => s.openSidebar);
   return (
-    <header className="flex h-12 shrink-0 items-center gap-2 border-b border-border px-2 md:hidden">
+    <header className="flex h-12 shrink-0 items-center gap-2 border-b border-border px-2 lg:hidden">
       <IconButton
         label={t("app.openMenu")}
         icon={<MenuIcon />}
         onClick={openSidebar}
         aria-expanded={open}
         aria-controls="sidebar"
-        className="text-fg"
+        tone="strong"
       />
       <span className="font-semibold">{t("app.name")}</span>
     </header>

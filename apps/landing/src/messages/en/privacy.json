@@ -1,0 +1,56 @@
+{
+  "hero": {
+    "title": "Privacy",
+    "lead": "What this website stores and what it does not, in short. A separate part covers the hybrid-rag app, which you run yourself.",
+    "updated": "Last updated: <time>{date}</time>",
+    "eyebrow": "Legal"
+  },
+  "site": {
+    "title": "This website",
+    "never": {
+      "title": "What it does not do",
+      "items": {
+        "cookies": "It sets no cookies.",
+        "analytics": "It has no analytics, no advertising and no tracking of any kind.",
+        "thirdParty": "It makes no requests to other sites: scripts, fonts and images all come from this site. The browser is told to enforce this (the Content-Security-Policy header), so a request to another site would be blocked.",
+        "forms": "It has no forms and collects nothing you type.",
+        "accounts": "It has no accounts or logins."
+      }
+    },
+    "storage": {
+      "title": "What your browser keeps",
+      "text": "One thing, and only if you use the light/dark switch: your choice of theme, in the browser's local storage under the key <code>{key}</code>. It stays on your device and is never sent anywhere. The site's own code reads it to show the theme you chose as the page opens. To remove it, clear this site's data in your browser. The language is part of the address (<code>/en</code> or <code>/pl</code>) and is not stored."
+    },
+    "hosting": {
+      "title": "Hosting",
+      "text": "The site is hosted on Vercel. To deliver a page, a web host processes technical data about the request: your IP address, the user-agent text of your browser, the address requested and the time. That is done by the host, under <link>Vercel's privacy notice</link>. The site adds nothing to it: no analytics or measuring tool is part of the site."
+    },
+    "links": {
+      "title": "Links to other sites",
+      "text": "Links to GitHub and LinkedIn leave this site. When you follow one, that site's own rules apply, and your browser tells it only the address of this site, not which page you came from."
+    }
+  },
+  "app": {
+    "title": "The hybrid-rag app",
+    "lead": "hybrid-rag itself is software you run on your own computer. This website never sees any of its data.",
+    "local": {
+      "title": "Where your data stays",
+      "text": "By default your PDFs, questions and answers stay on your machine: they are kept in local Docker volumes and a local database, the models run locally in Ollama, and every port is bound to <code>127.0.0.1</code>, so none of it can be reached from other machines. No account or API key is needed, and only the first start downloads the models."
+    },
+    "claude": {
+      "title": "If you choose the Claude API",
+      "text": "With <code>LLM_PROVIDER=anthropic</code> the answer is written by Anthropic's API, and this is sent to it: {sent}. What Anthropic does with it is described in <link>Anthropic's privacy policy</link>. Search, the documents and the database stay on your machine.",
+      "sent": "the instructions for the model, the question, the last {historyTurns} turns of the conversation, your personal context from Settings and the excerpts found in your documents, with their file names and page numbers"
+    },
+    "access": {
+      "title": "Who can see the documents",
+      "text": "The app has no user accounts yet. Everyone who can reach it sees the same documents, groups and conversations, so run it only where that is acceptable."
+    }
+  },
+  "who": {
+    "title": "Who is responsible",
+    "text": "Lukasz Malicki, Poland, runs this website and the hybrid-rag project. There is no e-mail or postal address here on purpose: questions about this page or the project go through <link>GitHub Issues</link>.",
+    "changes": "When this page changes, the date at the top changes too. Earlier versions are in the repository's history.",
+    "notLegal": "This page describes what the website does. It is not legal advice and does not claim compliance with any particular law."
+  }
+}

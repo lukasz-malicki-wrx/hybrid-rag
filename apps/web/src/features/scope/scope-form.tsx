@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useState, type FormEvent } from "react";
+import { Button } from "@hybrid-rag/ui/button";
 import { Text } from "@hybrid-rag/ui/text";
 import { useTranslation } from "@/i18n/use-translation";
 import { ScopeOption } from "./scope-option";
@@ -62,9 +63,9 @@ export function ScopeForm({
         </Text>
       )}
       {choice.length > 0 && (
-        <button type="button" onClick={() => setChoice([])} className="text-sm text-accent hover:underline">
+        <Button variant="link" size="text" onClick={() => setChoice([])}>
           {t("scope.clearSelection")}
-        </button>
+        </Button>
       )}
     </form>
   );

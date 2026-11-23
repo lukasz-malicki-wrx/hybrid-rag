@@ -15,7 +15,7 @@ describe("Dialog", () => {
     );
     const labelledBy = /<dialog[^>]* aria-labelledby="([^"]+)"/.exec(html)?.[1];
     expect(labelledBy).toBeTruthy();
-    expect(html).toMatch(new RegExp(`<h2 id="${labelledBy}"[^>]*>Settings</h2>`));
+    expect(html).toMatch(new RegExp(`<h2 [^>]*id="${labelledBy}"[^>]*>Settings</h2>`));
   });
 
   it("is described by its description, when it has one", () => {

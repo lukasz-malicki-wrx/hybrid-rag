@@ -1,0 +1,223 @@
+@import "tailwindcss" source(none);
+/* The bright palette (vintage hues arranged for a marketing page); the app keeps vintage. Values for
+   what cannot use CSS variables are in src/config/palette.ts. */
+@import "@hybrid-rag/design-tokens/palettes/bright.css";
+@import "@hybrid-rag/design-tokens/theme.css";
+@import "@hybrid-rag/ui/styles.css";
+@import "@hybrid-rag/ui/fonts.css";
+
+/* Source files of this app. The classes of @hybrid-rag/ui are registered by its own styles.css. */
+@source "../";
+@source not "../**/*.test.{ts,tsx}";
+
+/* While Inter loads, text is set in Arial scaled to Inter's metrics: when the font arrives the
+   lines keep their height and nothing below moves (layout shift). */
+@font-face {
+  font-family: "Inter Fallback";
+  src: local("Arial");
+  ascent-override: 90.44%;
+  descent-override: 22.52%;
+  line-gap-override: 0%;
+  size-adjust: 107.12%;
+}
+
+@theme inline {
+  --font-sans: "Inter Variable", "Inter Fallback", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+}
+
+/* The type scale, spacing and page width of the site: defined here once, used by name (text-h2,
+   py-section, max-w-page). Sizes are fluid (clamp between a phone, 375px, and the design width,
+   1440px) and in rem, so they follow the reader's font size and zoom. The values are the design's:
+   H1 64/76 and 36/44 on a phone, H2 38/45 and 28/33, a card title 24/30 and 20/25, a paragraph
+   18/27 and 16/24, an eyebrow 16/20 and 12/15, a number 48/72 and 36/44. */
+@theme {
+  --text-h1: clamp(2.25rem, 1.634rem + 2.629vw, 4rem);
+  --text-h1--line-height: 1.19;
+  --text-h1--letter-spacing: -0.02em;
+  --text-h2: clamp(1.75rem, 1.53rem + 0.939vw, 2.375rem);
+  --text-h2--line-height: 1.18;
+  --text-h2--letter-spacing: -0.015em;
+  --text-h3: clamp(1.25rem, 1.162rem + 0.376vw, 1.5rem);
+  --text-h3--line-height: 1.25;
+  --text-lead: clamp(1rem, 0.956rem + 0.188vw, 1.125rem);
+  --text-lead--line-height: 1.5;
+  --text-eyebrow: clamp(0.75rem, 0.662rem + 0.376vw, 1rem);
+  --text-eyebrow--line-height: 1.25;
+  --text-stat: clamp(2.25rem, 1.99rem + 1.127vw, 3rem);
+  --text-stat--line-height: 1.2;
+
+  /* Between sections: 60px on a phone, 100px on the design width. Inside a hero or a page header
+     the top is the tight one. A heading is followed by its content at 40 / 60px. */
+  --spacing-section: clamp(3.75rem, 2.87rem + 3.756vw, 6.25rem);
+  --spacing-section-tight: clamp(2rem, 1.4rem + 3vw, 3.5rem);
+  --spacing-heading: clamp(2.5rem, 2.06rem + 1.878vw, 3.75rem);
+  /* The side margin: 24px (20px on the narrowest phones). On wide screens the page is the
+     container, so the margin is what is left of the screen: 120px at 1440px. */
+  --spacing-gutter: 1.5rem;
+
+  /* The soft shadow under the header and its menus. */
+  --shadow-header: 0 1px 2px rgb(0 0 0 / 0.05), 0 8px 24px -8px rgb(0 0 0 / 0.12);
+
+  /* 1200px of content between two gutters. */
+  --container-page: 78rem;
+  /* The measure of running text, in em of the text it holds: about 70 characters of Inter per line at any size. */
+  --container-copy: 32em;
+}
+
+@media (max-width: 359px) {
+  :root {
+    --spacing-gutter: 1.25rem;
+  }
+}
+
+/* A panel: the tinted band that tells neighbouring sections apart. Cards inside it take the
+   lighter `card-raised` colour (the shared Card reads --card-bg), so they stand out from it. */
+@utility surface-panel {
+  background-color: var(--color-panel);
+  --card-bg: var(--color-card-raised);
+}
+
+@layer base {
+  :root {
+    /* How far the doodle reaches outside the corner of a picture: 56px, less where the margin of the page
+       is narrower (24px at 1024, 40px at 1280), so it never leaves the screen. */
+    --doodle-outset: min(3.5rem, max(1rem, calc(50vw - 38rem)));
+  }
+
+  html {
+    /* Anchors and focus are never hidden behind the top edge. */
+    scroll-padding-top: 1rem;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    line-height: 1.6;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* A flex or grid item does not shrink below its longest word (min-width: auto). Text may: it wraps or
+     breaks, and nothing sticks out when the text is large. Zero specificity, so min-w-* classes still win. */
+  body :where(h1, h2, h3, h4, p, li, span, a, dt, dd, figcaption, summary, blockquote) {
+    min-width: 0;
+  }
+
+  main {
+    flex: 1;
+  }
+
+  /* No line of running text is longer than about 70 characters, whatever the column it is in. Zero
+     specificity: a text that has its own max-w-* keeps it. */
+  main :where(p, dd) {
+    max-width: var(--container-copy);
+  }
+
+  /* The skip link moves focus here: no outline on the whole page, the content has its own. */
+  main:focus {
+    outline: none;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  p,
+  li {
+    text-wrap: pretty;
+  }
+
+  /* Never wider than the screen (reflow at 320px and 400% zoom, or large text): long words and URLs break.
+     "anywhere", not "break-word": only that lets a flex item or a shrink-to-fit box get narrower than its
+     longest word. Tables keep whole words (they scroll). */
+  :where(main, footer) {
+    overflow-wrap: anywhere;
+  }
+
+  table {
+    overflow-wrap: normal;
+  }
+
+  /* Without a stylesheet colour the default link colour would be used on the page colour. */
+  a {
+    color: inherit;
+  }
+
+  /* The focus ring is the accent colour, which has no contrast on the dark band or on the accent
+     band: inside them it takes the colour of their text. */
+  .on-band :focus-visible {
+    outline-color: var(--color-band-fg);
+  }
+
+  .on-accent :focus-visible {
+    outline-color: var(--accent-fg);
+  }
+}
+
+/* Screenshots (components/screenshot.tsx): the <picture> follows the device's theme and is the
+   only one downloaded. A theme chosen on the site (data-theme) wins, as for the colours: the
+   picture is then hidden and the lazy image of that theme shown instead. */
+.shot-forced {
+  display: none;
+}
+
+:root[data-theme] .shot-auto {
+  display: none;
+}
+
+:root[data-theme="light"] .shot-forced-light,
+:root[data-theme="dark"] .shot-forced-dark {
+  display: block;
+}
+
+/* Long-form text (Prose): rhythm, measure, lists and code. Headings are the shared Heading and
+   links the shared TextLink, which bring their own size and look; only the space around a heading
+   is set here. */
+@layer components {
+  .prose-copy {
+    max-width: var(--container-copy);
+    font-size: 1.0625rem;
+    line-height: 1.7;
+  }
+
+  .prose-copy > * + * {
+    margin-top: 1.25rem;
+  }
+
+  .prose-copy :is(h2, h3, h4) {
+    margin-top: 2.5rem;
+  }
+
+  .prose-copy :is(h2, h3, h4) + * {
+    margin-top: 0.75rem;
+  }
+
+  .prose-copy ul,
+  .prose-copy ol {
+    padding-left: 1.5rem;
+  }
+
+  .prose-copy ul {
+    list-style: disc;
+  }
+
+  .prose-copy ol {
+    list-style: decimal;
+  }
+
+  .prose-copy li + li {
+    margin-top: 0.5rem;
+  }
+
+  .prose-copy code {
+    border-radius: 0.25rem;
+    background: var(--surface-2);
+    padding: 0.1em 0.35em;
+    font-size: 0.9em;
+  }
+}

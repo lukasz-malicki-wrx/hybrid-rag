@@ -1,10 +1,10 @@
 "use client";
 
 import { memo, useCallback, useState } from "react";
-import { Button } from "@hybrid-rag/ui/button";
+import { BarHeader } from "@hybrid-rag/ui/bar-header";
 import { Heading } from "@hybrid-rag/ui/heading";
+import { IconButton } from "@hybrid-rag/ui/icon-button";
 import { PencilIcon, TrashIcon } from "@hybrid-rag/ui/icons";
-import { Text } from "@hybrid-rag/ui/text";
 import type { Group } from "@/api/types";
 import { useTranslation } from "@/i18n/use-translation";
 import { DeleteGroupDialog } from "./delete-group-dialog";
@@ -18,27 +18,38 @@ export const GroupHeader = memo(function GroupHeader({ group }: { group: Group }
   const closeDelete = useCallback(() => setDeleting(false), []);
 
   return (
-    <div className="flex flex-wrap items-center gap-2 border-b border-border py-4">
+    <>
       {renaming ? (
-        <RenameGroupForm id={group.id} name={group.name} onDone={stopRenaming} />
+        <BarHeader className="gap-3">
+          <RenameGroupForm id={group.id} name={group.name} onDone={stopRenaming} />
+        </BarHeader>
       ) : (
-        <>
-          <Heading level={1} size="lg" className="min-w-0 flex-1 truncate">
+        <BarHeader
+          subtitle={`${tp("counts.conversations", group.conversation_count)} · ${tp("counts.documents", group.document_count)}`}
+          actions={
+            <>
+              <IconButton
+                variant="tile"
+                label={t("groups.rename")}
+                icon={<PencilIcon />}
+                onClick={() => setRenaming(true)}
+              />
+              <IconButton
+                variant="tile"
+                tone="danger"
+                label={t("groups.delete")}
+                icon={<TrashIcon />}
+                onClick={() => setDeleting(true)}
+              />
+            </>
+          }
+        >
+          <Heading level={1} size="bar" className="truncate">
             {group.name}
           </Heading>
-          <Button variant="ghost" size="sm" icon={<PencilIcon />} onClick={() => setRenaming(true)}>
-            {t("groups.rename")}
-          </Button>
-          <Button variant="danger-ghost" size="sm" icon={<TrashIcon />} onClick={() => setDeleting(true)}>
-            {t("groups.delete")}
-          </Button>
-        </>
+        </BarHeader>
       )}
-      <Text tone="muted" size="sm" className="w-full">
-        {tp("counts.conversations", group.conversation_count)} · {tp("counts.documents", group.document_count)}.{" "}
-        {t("groups.scopeNote")}
-      </Text>
       <DeleteGroupDialog group={group} open={deleting} onClose={closeDelete} />
-    </div>
+    </>
   );
 });

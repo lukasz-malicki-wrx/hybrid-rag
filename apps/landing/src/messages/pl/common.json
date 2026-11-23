@@ -1,0 +1,49 @@
+{
+  "skipToContent": "Przejdź do treści",
+  "homeLink": "hybrid-rag, strona główna",
+  "pages": {
+    "home": "Strona główna",
+    "features": "Funkcje",
+    "how-it-works": "Jak to działa",
+    "pricing": "Cennik",
+    "about": "O projekcie",
+    "faq": "FAQ",
+    "privacy": "Prywatność",
+    "accessibility": "Dostępność"
+  },
+  "languages": {
+    "en": "English",
+    "pl": "Polski"
+  },
+  "header": {
+    "navLabel": "Główna",
+    "menu": "Menu",
+    "github": "GitHub",
+    "githubLabel": "GitHub, kod źródłowy hybrid-rag",
+    "switchToLight": "Przełącz na jasny motyw",
+    "switchToDark": "Przełącz na ciemny motyw",
+    "menuNavLabel": "Menu główne",
+    "product": "Produkt"
+  },
+  "footer": {
+    "label": "Stopka",
+    "tagline": "Odpowiedzi z Twoich PDF-ów, ze źródłami, które możesz sprawdzić.",
+    "follow": "Obserwuj na GitHubie",
+    "productHeading": "Produkt",
+    "projectHeading": "Projekt",
+    "legalHeading": "Informacje",
+    "github": "Kod na GitHubie",
+    "issues": "Zgłoś problem",
+    "linkedin": "LinkedIn",
+    "licence": "Licencja MIT",
+    "copyright": "© {year} {author}. {licence}.",
+    "note": "Bez ciasteczek, bez analityki, bez zapytań do zewnętrznych serwisów."
+  },
+  "cta": {
+    "title": "Wypróbuj na własnych PDF-ach",
+    "text": "Potrzebujesz Dockera z Compose, około 4 GB miejsca na dysku na modele i 8 GB pamięci RAM. Pierwsze uruchomienie pobiera dwa modele, razem około 3 GB.",
+    "command": "docker compose up -d --build",
+    "github": "Zobacz na GitHubie",
+    "how": "Jak to działa"
+  }
+}

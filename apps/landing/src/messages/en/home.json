@@ -1,0 +1,121 @@
+{
+  "hero": {
+    "eyebrow": "Open source, on your own computer",
+    "title": "Ask your PDFs. Check every answer.",
+    "lead": "hybrid-rag answers questions about your PDFs and cites the page each answer comes from. By default it all runs on your own computer.",
+    "github": "View on GitHub",
+    "how": "How it works"
+  },
+  "builtWith": {
+    "label": "Built with",
+    "items": {
+      "postgres": "PostgreSQL + pgvector",
+      "ollama": "Ollama",
+      "fastapi": "FastAPI",
+      "next": "Next.js"
+    }
+  },
+  "strengths": {
+    "eyebrow": "Strengths",
+    "title": "What you get",
+    "items": {
+      "checkable": {
+        "title": "Every answer can be checked",
+        "text": "Each citation opens the passage it comes from, with its document and page, and a link to the original PDF.",
+        "link": "About sources"
+      },
+      "honest": {
+        "title": "It says when it does not know",
+        "text": "A question your documents do not relate to is refused before the model is called. An uncited answer is flagged.",
+        "link": "How the check works"
+      },
+      "local": {
+        "title": "It runs on your computer",
+        "text": "Docker Compose, no accounts, no API keys. The Claude API is optional, and what it receives is listed on the privacy page.",
+        "link": "Where your data goes"
+      },
+      "twoWays": {
+        "title": "It searches two ways",
+        "text": "By meaning and by exact words, merged into one ranking. A paraphrase and a term like “ALCOA” both find their passage.",
+        "link": "How the search works"
+      }
+    }
+  },
+  "about": {
+    "eyebrow": "Why it exists",
+    "title": "A model that answers from memory is hard to trust",
+    "problem": "Ask a language model about a document it has never read and it still answers, fluently. You find out it was wrong when someone checks the original.",
+    "solution": "hybrid-rag searches your PDFs first. Only the passages it finds go to the model, which is told to cite them. You read each cited passage next to the answer, with the page of the original PDF.",
+    "link": "See how it works"
+  },
+  "numbers": {
+    "ratio": "{evalOffTopicRefused}/{evalOffTopic}",
+    "items": {
+      "questions": "questions in the test",
+      "top10": "right passage in the top 10",
+      "offTopic": "off-topic questions refused",
+      "passages": "passages searched"
+    },
+    "method": "Only the search step was measured: {evalAnswerable} questions that the documents answer and {evalOffTopic} that they do not, over {evalDocuments} public regulatory documents. A result counts when a passage with the expected phrase is in the top 10. It does not measure how well an answer is written, and {evalAnswerable} questions from one domain are a small sample.",
+    "link": "Full method and tables on GitHub"
+  },
+  "gallery": {
+    "eyebrow": "The app",
+    "title": "See the app",
+    "tabsLabel": "Areas of the app",
+    "areas": {
+      "all": "All",
+      "chat": "Chat",
+      "sources": "Sources",
+      "documents": "Documents",
+      "quality": "Quality"
+    },
+    "cards": {
+      "chat": {
+        "title": "Ask in the message box, read the answer",
+        "link": "More about the chat"
+      },
+      "start": {
+        "title": "Choose what an answer may search",
+        "link": "More about scope"
+      },
+      "sources": {
+        "title": "Click a number to see the passage and its page",
+        "link": "More about sources"
+      },
+      "groups": {
+        "title": "Keep documents and conversations in groups",
+        "link": "More about documents"
+      },
+      "document": {
+        "title": "See how a PDF was cut into passages",
+        "link": "More about quality control"
+      },
+      "searchLab": {
+        "title": "Compare the two searches, without a model",
+        "link": "More about the search lab"
+      }
+    },
+    "cta": "Explore all features"
+  },
+  "examples": {
+    "eyebrow": "Answers",
+    "title": "What an answer looks like",
+    "note": "Both examples are written by hand to show the format. They are not the output of a real run. The passage in the first one is from EU GMP Annex 11, a public document, page 3.",
+    "badge": "Hand-written example",
+    "questionLabel": "Question",
+    "cited": {
+      "question": "Is a second check required when critical data is entered by hand?",
+      "answer": "Yes. Annex 11 asks for an additional check on the accuracy of critical data entered manually, done by a second operator or by validated electronic means <ref>[1]</ref>.",
+      "source": "Source 1: eu-gmp-annex11.pdf, page 3"
+    },
+    "refused": {
+      "question": "What is a good recipe for pancakes?",
+      "answer": "Not found in the documents. Nothing in your documents relates to this question, so the model was not asked.",
+      "source": "No source: nothing was found"
+    }
+  },
+  "jsonLd": {
+    "operatingSystem": "Any system that runs Docker Compose"
+  }
+}

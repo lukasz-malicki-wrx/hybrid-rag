@@ -10,10 +10,12 @@
     "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run",
     "test:e2e": "playwright test",
-    "api:types": "openapi-typescript ${API_URL:-http://localhost:8000}/openapi.json -o src/api/schema.d.ts"
+    "api:types": "openapi-typescript ${API_URL:-http://localhost:8000}/openapi.json -o src/api/schema.d.ts",
+    "screenshots": "node scripts/screenshots/run.mjs"
   },
   "dependencies": {
     "@hybrid-rag/design-tokens": "*",
+    "@hybrid-rag/i18n": "*",
     "@hybrid-rag/ui": "*",
     "@tanstack/react-query": "5.108.2",
     "next": "16.4.6",
@@ -32,6 +34,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "openapi-typescript": "7.13.0",
+    "sharp": "0.35.5",
     "tailwindcss": "4.3.3",
     "typescript": "^5",
     "vitest": "5.1.1"

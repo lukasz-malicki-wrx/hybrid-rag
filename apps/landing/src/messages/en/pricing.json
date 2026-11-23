@@ -1,0 +1,99 @@
+{
+  "hero": {
+    "title": "Pricing",
+    "lead": "Three plans, and only one of them exists. Free is the app you run yourself. Basic and Unlimited are a sketch of a hosted service that is not built.",
+    "eyebrow": "Preview"
+  },
+  "notice": {
+    "lead": "Preview pricing. Payments do not work yet and nothing can be bought.",
+    "detail": "hybrid-rag has no accounts, no payments and no hosted service. Basic and Unlimited are planned and may change or never happen."
+  },
+  "plans": {
+    "perMonth": "per month",
+    "priceLabel": "{price} per month",
+    "available": "Available today",
+    "soon": "Coming soon",
+    "soonNote": "Not for sale. There is nothing to buy or sign up for yet.",
+    "freeCta": "Get it on GitHub",
+    "free": {
+      "name": "Free",
+      "tagline": "The whole app, on your own computer.",
+      "points": {
+        "setup": "Runs with Docker Compose",
+        "scope": "No account and no API key",
+        "terms": "MIT licence, source on GitHub"
+      }
+    },
+    "basic": {
+      "name": "Basic",
+      "tagline": "Planned: a hosted service for light use.",
+      "points": {
+        "setup": "Planned: hosted for you, nothing to install",
+        "scope": "Planned: up to {documents} documents",
+        "terms": "Planned: up to {questions} questions a month"
+      }
+    },
+    "unlimited": {
+      "name": "Unlimited",
+      "tagline": "Planned: a hosted service without limits.",
+      "points": {
+        "setup": "Planned: hosted for you, nothing to install",
+        "scope": "Planned: no limit on documents or questions",
+        "terms": "Planned: priority replies to issues"
+      }
+    },
+    "eyebrow": "Plans",
+    "title": "One plan exists, two are a sketch"
+  },
+  "table": {
+    "heading": "Compare the plans",
+    "caption": "What each plan includes. Basic and Unlimited are planned and cannot be bought, so their columns show what is intended, not what exists.",
+    "regionLabel": "Plan comparison table",
+    "feature": "Feature",
+    "included": "Included",
+    "notIncluded": "Not included",
+    "noLimit": "No limit set",
+    "groups": {
+      "run": "Where it runs",
+      "limits": "Limits",
+      "included": "What you get",
+      "support": "Support"
+    },
+    "rows": {
+      "selfHosted": "You run it yourself with Docker Compose",
+      "hosted": "Hosted for you",
+      "localData": "Documents stay on your computer",
+      "documents": "Documents",
+      "questions": "Questions per month",
+      "citations": "Answers cite the passage and the PDF page",
+      "relevanceGate": "Says so when the answer is not in the documents",
+      "groups": "Groups and search scope",
+      "languages": "English and Polish interface",
+      "community": "Help through GitHub Issues",
+      "priority": "Priority replies"
+    },
+    "eyebrow": "Compare"
+  },
+  "faq": {
+    "heading": "Pricing questions",
+    "items": {
+      "buy": {
+        "q": "Can I buy a plan?",
+        "a": "No. The app has no payments, no accounts and no hosted service, and this page has no checkout. The prices are a preview."
+      },
+      "free": {
+        "q": "Is Free really free?",
+        "a": "Yes. hybrid-rag is open source under the MIT licence and runs on your computer, so there is nothing to pay and no time limit. Your hardware and electricity are the cost. If you choose the Claude API for answers (<code>LLM_PROVIDER=anthropic</code>), Anthropic bills the API key you provide."
+      },
+      "hosted": {
+        "q": "Will Basic and Unlimited exist?",
+        "a": "They are an idea, not a promise. A hosted service is not built, there is no date, and the prices, limits and names may change or be dropped."
+      },
+      "follow": {
+        "q": "How would I find out if that changes?",
+        "a": "There is no sign-up and no mailing list here. Any change would show up in the <repo>repository on GitHub</repo>."
+      }
+    },
+    "eyebrow": "Questions"
+  }
+}

@@ -15,7 +15,7 @@
     },
     "build": {
       "dependsOn": ["transit", "typecheck"],
-      "env": ["NEXT_PUBLIC_API_URL", "NEXT_OUTPUT"],
+      "env": ["NEXT_PUBLIC_API_URL", "NEXT_OUTPUT", "NEXT_PUBLIC_SITE_URL", "VERCEL_PROJECT_PRODUCTION_URL", "VERCEL_ENV"],
       "passThroughEnv": ["NEXT_TELEMETRY_DISABLED"],
       "outputs": [".next/**", "!.next/cache/**"]
     },

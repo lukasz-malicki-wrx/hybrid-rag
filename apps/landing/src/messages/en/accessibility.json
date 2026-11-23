@@ -1,0 +1,51 @@
+{
+  "hero": {
+    "title": "Accessibility statement",
+    "lead": "This website aims to meet WCAG 2.2 level AA. This page says what was done and checked, where it falls short and how to report a problem.",
+    "updated": "Statement date: <time>{date}</time>",
+    "eyebrow": "Legal"
+  },
+  "status": {
+    "title": "Where it stands",
+    "text": "The target is level AA of the Web Content Accessibility Guidelines (WCAG) 2.2. This page does not claim full conformance: it says what was done, how it was checked and what is known to be missing.",
+    "method": "The statement was written on the date above and covers what the automated checks listed below test. The site has not been audited by an outside expert and holds no certificate."
+  },
+  "built": {
+    "title": "How the site was built",
+    "items": {
+      "structure": "Every page has one main heading, headings in order, and landmarks (header, navigation, main, footer).",
+      "keyboard": "The site can be used with the keyboard alone. A skip link is the first stop, the focus is always visible, and the menu closes with Escape and returns focus to its button.",
+      "targets": "Buttons and links outside running text are at least 24 by 24 pixels, the minimum target size of WCAG 2.2.",
+      "reflow": "The layout fits a 320 pixel wide screen and 200% zoom without scrolling sideways.",
+      "contrast": "Colours are checked for contrast in the light and the dark theme. The theme follows your system, and a switch in the header changes it.",
+      "motion": "Animations are switched off when your system asks for reduced motion.",
+      "forced": "In forced-colors (high-contrast) mode, buttons and links keep their shape.",
+      "language": "Each page declares its language, and the name of the other language is marked with its own.",
+      "noScript": "The text can be read, and the menu opened, without JavaScript. Only the theme switch needs it."
+    }
+  },
+  "checked": {
+    "title": "How it was checked",
+    "lead": "Automated checks run on every page, in English and in Polish.",
+    "items": {
+      "axe": "axe-core, with the WCAG 2.0, 2.1 and 2.2 level A and AA rules and its best-practice rules, in the light and the dark theme, at 320 and at 1280 pixels wide. A page with a violation fails the test.",
+      "keyboard": "Tests that drive the page with the keyboard: the skip link, the mobile menu (open, close with Escape, focus returns to its button) and the code blocks, which can be focused to scroll them.",
+      "layout": "Tests for sideways scrolling at 320 pixels and at 200% zoom, and for visible controls in forced-colors mode.",
+      "lighthouse": "Lighthouse (the accessibility score and the other three), on every page in both languages, on a phone and on a desktop."
+    }
+  },
+  "limits": {
+    "title": "Known limits",
+    "items": {
+      "automated": "Automated tools find only part of the problems. They cannot tell whether a text is easy to understand, whether alternative text is meaningful, or whether the reading order makes sense.",
+      "people": "No usability testing with people who use assistive technology has been done so far.",
+      "screenshots": "Screenshots of the app have a text description of what they show. It does not repeat every word visible in them.",
+      "languages": "The site is in English and Polish only.",
+      "app": "This statement covers the website. The hybrid-rag app is separate: its own tests check its interface with axe against WCAG 2.1 AA (light and dark theme, dialogs, a 320 pixel wide phone)."
+    }
+  },
+  "report": {
+    "title": "Report a problem",
+    "text": "If something on this site is hard or impossible to use, please open an issue on <link>GitHub</link>. Say which page it is, what you used (browser and assistive technology, if any) and what went wrong. Accessibility problems are treated as bugs. There is no e-mail address here on purpose."
+  }
+}

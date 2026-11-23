@@ -1,0 +1,40 @@
+{
+  "home": {
+    "title": "hybrid-rag: pytaj swoje PDF-y, sprawdzaj każdą odpowiedź",
+    "description": "hybrid-rag odpowiada na pytania o Twoje PDF-y i pokazuje, skąd pochodzi każda odpowiedź."
+  },
+  "features": {
+    "title": "Funkcje",
+    "description": "Co robi hybrid-rag: odpowiedzi z cytatami, dwa sposoby szukania, grupy i narzędzia do sprawdzania, skąd wzięła się błędna odpowiedź."
+  },
+  "how-it-works": {
+    "title": "Jak to działa",
+    "description": "Od PDF-a do odpowiedzi: jak hybrid-rag dzieli, indeksuje i przeszukuje dokumenty i dlaczego potrafi powiedzieć, że niczego nie znalazł."
+  },
+  "pricing": {
+    "title": "Cennik",
+    "description": "Plany Free, Basic i Unlimited. Tylko podgląd: aplikacja nie ma jeszcze płatności."
+  },
+  "about": {
+    "title": "O hybrid-rag i jego autorze",
+    "description": "Kto tworzy hybrid-rag, po co powstał i jak pomóc. Projekt open source Lukasza Malickiego z Polski."
+  },
+  "faq": {
+    "title": "Najczęstsze pytania",
+    "description": "Odpowiedzi o tym, co hybrid-rag potrafi, a czego nie, dokąd trafiają Twoje dane i jak go uruchomić."
+  },
+  "privacy": {
+    "title": "Prywatność",
+    "description": "Co ta strona zapisuje, a czego nie: bez ciasteczek, bez analityki, bez zapytań do zewnętrznych serwisów."
+  },
+  "accessibility": {
+    "title": "Deklaracja dostępności",
+    "description": "Jak ta strona została zbudowana i sprawdzona pod kątem dostępności oraz jak zgłosić problem."
+  },
+  "manifest": {
+    "description": "Zadawaj pytania o swoje PDF-y i otrzymuj odpowiedzi z cytatami."
+  },
+  "og": {
+    "alt": "{title}. {description}"
+  }
+}

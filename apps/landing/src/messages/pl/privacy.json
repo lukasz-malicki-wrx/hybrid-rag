@@ -1,0 +1,56 @@
+{
+  "hero": {
+    "title": "Prywatność",
+    "lead": "Krótko o tym, co ta strona zapisuje, a czego nie. Osobna część dotyczy aplikacji hybrid-rag, którą uruchamiasz samodzielnie.",
+    "updated": "Ostatnia aktualizacja: <time>{date}</time>",
+    "eyebrow": "Informacje"
+  },
+  "site": {
+    "title": "Ta strona internetowa",
+    "never": {
+      "title": "Czego nie robi",
+      "items": {
+        "cookies": "Nie ustawia żadnych ciasteczek.",
+        "analytics": "Nie ma analityki, reklam ani żadnego śledzenia.",
+        "thirdParty": "Nie wysyła zapytań do innych serwisów: skrypty, fonty i obrazy pochodzą z tej strony. Przeglądarka dostaje polecenie, żeby tego pilnować (nagłówek Content-Security-Policy), więc zapytanie do obcego serwisu zostałoby zablokowane.",
+        "forms": "Nie ma formularzy i nie zbiera niczego, co wpiszesz.",
+        "accounts": "Nie ma kont ani logowania."
+      }
+    },
+    "storage": {
+      "title": "Co zapamiętuje Twoja przeglądarka",
+      "text": "Jedną rzecz, i tylko jeśli użyjesz przełącznika jasny/ciemny: wybrany motyw, w pamięci lokalnej przeglądarki pod kluczem <code>{key}</code>. Zostaje na Twoim urządzeniu i nigdzie nie jest wysyłany. Kod tej strony odczytuje go, żeby od razu po otwarciu pokazać wybrany motyw. Żeby go usunąć, wyczyść dane tej strony w przeglądarce. Język jest częścią adresu (<code>/en</code> lub <code>/pl</code>) i nie jest zapisywany."
+    },
+    "hosting": {
+      "title": "Hosting",
+      "text": "Strona działa na Vercelu. Żeby wysłać Ci stronę, serwer przetwarza dane techniczne o zapytaniu: Twój adres IP, tekst identyfikujący przeglądarkę (user agent), żądany adres i czas. Robi to dostawca hostingu, na zasadach z <link>polityki prywatności Vercela</link>. Strona niczego do tego nie dodaje: nie ma w niej żadnej analityki ani narzędzia pomiarowego."
+    },
+    "links": {
+      "title": "Linki do innych serwisów",
+      "text": "Linki do GitHuba i LinkedIna prowadzą poza tę stronę. Gdy z nich skorzystasz, obowiązują zasady tamtego serwisu, a przeglądarka przekazuje mu tylko adres tej strony, bez informacji, z której podstrony trafiasz."
+    }
+  },
+  "app": {
+    "title": "Aplikacja hybrid-rag",
+    "lead": "hybrid-rag to oprogramowanie, które uruchamiasz na własnym komputerze. Ta strona nigdy nie widzi jego danych.",
+    "local": {
+      "title": "Gdzie zostają Twoje dane",
+      "text": "Domyślnie Twoje PDF-y, pytania i odpowiedzi zostają na Twoim komputerze: leżą w lokalnych wolumenach Dockera i lokalnej bazie, modele działają lokalnie w Ollamie, a każdy port jest przypięty do <code>127.0.0.1</code>, więc z innych komputerów nic z tego nie jest dostępne. Nie trzeba konta ani klucza API, a modele pobierają się tylko przy pierwszym uruchomieniu."
+    },
+    "claude": {
+      "title": "Jeśli wybierzesz Claude API",
+      "text": "Przy <code>LLM_PROVIDER=anthropic</code> odpowiedź pisze API Anthropic i trafia do niego: {sent}. To, co Anthropic z tym robi, opisuje <link>polityka prywatności Anthropic</link>. Wyszukiwanie, dokumenty i baza zostają na Twoim komputerze.",
+      "sent": "polecenia dla modelu, pytanie, {historyTurns} ostatnie tury rozmowy, Twój kontekst osobisty z ustawień oraz fragmenty znalezione w dokumentach, razem z nazwami plików i numerami stron"
+    },
+    "access": {
+      "title": "Kto widzi dokumenty",
+      "text": "Aplikacja nie ma jeszcze kont użytkowników. Każdy, kto ma do niej dostęp, widzi te same dokumenty, grupy i rozmowy, więc uruchamiaj ją tylko tam, gdzie to jest w porządku."
+    }
+  },
+  "who": {
+    "title": "Kto za to odpowiada",
+    "text": "Lukasz Malicki, Polska, prowadzi tę stronę i projekt hybrid-rag. Nie ma tu e-maila ani adresu pocztowego, i to celowo: pytania o tę stronę lub projekt kieruj przez <link>GitHub Issues</link>.",
+    "changes": "Gdy ta strona się zmieni, zmieni się też data na górze. Wcześniejsze wersje są w historii repozytorium.",
+    "notLegal": "Ta strona opisuje, co robi witryna. Nie jest poradą prawną i nie twierdzi, że witryna spełnia wymagania jakiegokolwiek konkretnego prawa."
+  }
+}

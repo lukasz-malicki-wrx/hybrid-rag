@@ -1,0 +1,49 @@
+{
+  "skipToContent": "Skip to content",
+  "homeLink": "hybrid-rag, home",
+  "pages": {
+    "home": "Home",
+    "features": "Features",
+    "how-it-works": "How it works",
+    "pricing": "Pricing",
+    "about": "About",
+    "faq": "FAQ",
+    "privacy": "Privacy",
+    "accessibility": "Accessibility"
+  },
+  "languages": {
+    "en": "English",
+    "pl": "Polski"
+  },
+  "header": {
+    "navLabel": "Main",
+    "menu": "Menu",
+    "github": "GitHub",
+    "githubLabel": "GitHub, hybrid-rag source code",
+    "switchToLight": "Switch to light theme",
+    "switchToDark": "Switch to dark theme",
+    "menuNavLabel": "Main menu",
+    "product": "Product"
+  },
+  "footer": {
+    "label": "Footer",
+    "tagline": "Answers from your PDFs, with sources you can check.",
+    "follow": "Follow on GitHub",
+    "productHeading": "Product",
+    "projectHeading": "Project",
+    "legalHeading": "Legal",
+    "github": "Source on GitHub",
+    "issues": "Report an issue",
+    "linkedin": "LinkedIn",
+    "licence": "MIT licence",
+    "copyright": "© {year} {author}. {licence}.",
+    "note": "No cookies, no analytics, no third-party requests."
+  },
+  "cta": {
+    "title": "Try it on your own PDFs",
+    "text": "You need Docker with Compose, about 4 GB of disk space for the models and 8 GB of RAM. The first start downloads two models, about 3 GB.",
+    "command": "docker compose up -d --build",
+    "github": "View on GitHub",
+    "how": "How it works"
+  }
+}

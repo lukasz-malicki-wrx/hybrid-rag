@@ -28,6 +28,21 @@
   --color-mark: var(--mark);
   --color-mark-fg: var(--mark-fg);
   --color-ai: var(--ai-2);
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+  /* Role colours of the chat frame, composed from the palette: no hex values of their own, so a
+     palette cannot forget them. On `chip` only `fg` text is legible (palettes.test.ts). */
+  --color-panel: var(--surface);
+  --color-bubble-user: light-dark(var(--bg), var(--surface-2));
+  --color-bubble-ai: light-dark(var(--surface-2), var(--bg));
+  /* A card on a panel section: lighter than the panel in the light theme, raised in the dark one. */
+  --color-card-raised: light-dark(var(--bg), var(--surface-2));
+  --color-chip: light-dark(var(--border), var(--surface-2));
+  /* The dark band of the landing page (numbers, footer): the text colour as a background, and the
+     page colour as its text, so it is dark in the light theme and a raised dark grey in the dark
+     one. `band-muted` is the quieter text on it (links, captions). */
+  --color-band: light-dark(var(--fg), var(--surface-2));
+  --color-band-fg: light-dark(var(--bg), var(--fg));
+  --color-band-muted: light-dark(var(--border), var(--muted));
+  /* Inter Variable is loaded by the app (globals.css); the rest is the fallback while it loads. */
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
     Arial, sans-serif;
 }

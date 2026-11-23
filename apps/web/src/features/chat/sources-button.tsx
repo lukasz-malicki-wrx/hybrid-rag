@@ -1,6 +1,6 @@
 "use client";
 
-import { memo } from "react";
+import { memo, useCallback } from "react";
 import { Button } from "@hybrid-rag/ui/button";
 import type { Source } from "@/api/types";
 import { useTranslation } from "@/i18n/use-translation";
@@ -17,14 +17,10 @@ export const SourcesButton = memo(function SourcesButton({
   onOpen: OpenSources;
 }) {
   const { tp } = useTranslation();
+  const open = useCallback(() => onOpen(sources, cited, cited[0] ?? 1), [onOpen, sources, cited]);
   if (!sources.length) return null;
   return (
-    <Button
-      variant="link"
-      size="sm"
-      className="mt-1 min-h-0 px-0 font-medium"
-      onClick={() => onOpen(sources, cited, cited[0] ?? 1)}
-    >
+    <Button variant="chip" size="xs" onClick={open}>
       {cited.length ? tp("counts.citedSources", cited.length) : tp("counts.searchedExcerpts", sources.length)}
     </Button>
   );

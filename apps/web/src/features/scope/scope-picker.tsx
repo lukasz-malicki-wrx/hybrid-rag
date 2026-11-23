@@ -46,7 +46,15 @@ export const ScopePicker = memo(function ScopePicker({ selected, attached, group
 
   return (
     <>
-      <Button size="sm" aria-haspopup="dialog" onClick={show} icon={count ? <FileIcon /> : <GroupIcon />} className="max-w-full px-2.5">
+      <Button
+        variant="chip-ghost"
+        size="field"
+        icon={count ? <FileIcon className="shrink-0" /> : <GroupIcon className="shrink-0" />}
+        aria-haspopup="dialog"
+        title={label}
+        onClick={show}
+        className="min-w-0 max-w-44 sm:max-w-64"
+      >
         <span className="truncate">{label}</span>
       </Button>
       <Dialog

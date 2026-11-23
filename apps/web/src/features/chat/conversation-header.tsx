@@ -19,7 +19,7 @@ export const ConversationHeader = memo(function ConversationHeader({
   conversation: ConversationDetail;
   group?: Group;
 }) {
-  const { t } = useTranslation();
+  const { t, tp } = useTranslation();
   const router = useRouter();
   const update = useUpdateConversation();
   const [deleting, setDeleting] = useState(false);
@@ -30,11 +30,14 @@ export const ConversationHeader = memo(function ConversationHeader({
 
   return (
     <BarHeader
+      // Always a subtitle, so the title is at the same height as the one of the sources bar next to it.
       subtitle={
-        group && (
+        group ? (
           <Link href={`/g/${group.id}`} className="inline-flex items-center gap-1 hover:underline">
             <GroupIcon width={14} height={14} /> {group.name}
           </Link>
+        ) : (
+          tp("counts.questions", conversation.messages.length)
         )
       }
       actions={
@@ -42,10 +45,17 @@ export const ConversationHeader = memo(function ConversationHeader({
           <IconButton
             label={t(favorite ? "chat.removeFavourite" : "chat.addFavourite")}
             icon={<StarIcon filled={favorite} />}
+            variant="tile"
             pressed={favorite}
             onClick={toggleFavourite}
           />
-          <IconButton label={t("chat.deleteConversation")} icon={<TrashIcon />} tone="danger" onClick={() => setDeleting(true)} />
+          <IconButton
+            label={t("chat.deleteConversation")}
+            icon={<TrashIcon />}
+            variant="tile"
+            tone="danger"
+            onClick={() => setDeleting(true)}
+          />
           <DeleteConversationDialog
             conversation={deleting ? { id, title } : null}
             onClose={() => setDeleting(false)}
@@ -54,7 +64,7 @@ export const ConversationHeader = memo(function ConversationHeader({
         </>
       }
     >
-      <Heading level={1} size="sm" className="truncate">
+      <Heading level={1} size="bar" className="truncate">
         {title}
       </Heading>
     </BarHeader>

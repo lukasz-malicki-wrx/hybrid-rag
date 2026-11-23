@@ -1,0 +1,121 @@
+{
+  "hero": {
+    "eyebrow": "Open source, na Twoim komputerze",
+    "title": "Zapytaj swoje PDF-y. Sprawdź każdą odpowiedź.",
+    "lead": "hybrid-rag odpowiada na pytania o Twoje PDF-y i podaje stronę, z której pochodzi każda odpowiedź. Domyślnie wszystko działa na Twoim komputerze.",
+    "github": "Zobacz na GitHubie",
+    "how": "Jak to działa"
+  },
+  "builtWith": {
+    "label": "Zbudowane na",
+    "items": {
+      "postgres": "PostgreSQL + pgvector",
+      "ollama": "Ollama",
+      "fastapi": "FastAPI",
+      "next": "Next.js"
+    }
+  },
+  "strengths": {
+    "eyebrow": "Mocne strony",
+    "title": "Co dostajesz",
+    "items": {
+      "checkable": {
+        "title": "Każdą odpowiedź da się sprawdzić",
+        "text": "Cytat otwiera fragment, z którego pochodzi, razem z dokumentem, stroną i linkiem do oryginalnego PDF-a.",
+        "link": "O źródłach"
+      },
+      "honest": {
+        "title": "Mówi, kiedy nie wie",
+        "text": "Pytanie, którego nie dotyczą Twoje dokumenty, jest odrzucane, zanim model zostanie wywołany. Odpowiedź bez cytatu jest oznaczona.",
+        "link": "Jak działa sprawdzanie"
+      },
+      "local": {
+        "title": "Działa u Ciebie",
+        "text": "Docker Compose, bez kont i kluczy API. Claude API jest opcjonalne, a co do niego trafia, opisuje strona prywatności.",
+        "link": "Dokąd trafiają dane"
+      },
+      "twoWays": {
+        "title": "Szuka na dwa sposoby",
+        "text": "Po znaczeniu i po dokładnych słowach, a wyniki łączy w jeden ranking. Parafraza i termin taki jak „ALCOA” znajdują swój fragment.",
+        "link": "Jak działa wyszukiwanie"
+      }
+    }
+  },
+  "about": {
+    "eyebrow": "Po co to jest",
+    "title": "Modelowi, który odpowiada z pamięci, trudno zaufać",
+    "problem": "Zapytaj model językowy o dokument, którego nigdy nie czytał, a i tak odpowie, płynnie i pewnie. Że się mylił, dowiadujesz się dopiero wtedy, gdy ktoś zajrzy do oryginału.",
+    "solution": "hybrid-rag najpierw przeszukuje Twoje PDF-y. Do modelu trafiają tylko znalezione fragmenty, z poleceniem, by się na nie powoływał. Każdy cytowany fragment widzisz obok odpowiedzi, razem z numerem strony oryginalnego PDF-a.",
+    "link": "Zobacz, jak to działa"
+  },
+  "numbers": {
+    "ratio": "{evalOffTopicRefused}/{evalOffTopic}",
+    "items": {
+      "questions": "pytania w teście",
+      "top10": "trafienie w pierwszej dziesiątce",
+      "offTopic": "odrzucone pytania spoza tematu",
+      "passages": "przeszukane fragmenty"
+    },
+    "method": "Zmierzono tylko etap wyszukiwania, na {evalDocuments} publicznych dokumentach regulacyjnych. Pytania, na które dokumenty odpowiadają: {evalAnswerable}. Pytania spoza tematu: {evalOffTopic}. Wynik się liczy, gdy fragment z oczekiwaną frazą jest w pierwszej dziesiątce. Pomiar nie ocenia, jak dobrze napisana jest odpowiedź, a {evalAnswerable} pytań z jednej dziedziny to mała próba.",
+    "link": "Pełna metoda i tabele na GitHubie"
+  },
+  "gallery": {
+    "eyebrow": "Aplikacja",
+    "title": "Zobacz aplikację",
+    "tabsLabel": "Obszary aplikacji",
+    "areas": {
+      "all": "Wszystko",
+      "chat": "Czat",
+      "sources": "Źródła",
+      "documents": "Dokumenty",
+      "quality": "Jakość"
+    },
+    "cards": {
+      "chat": {
+        "title": "Pytasz w polu wiadomości, czytasz odpowiedź",
+        "link": "Więcej o czacie"
+      },
+      "start": {
+        "title": "Wybierasz, co odpowiedź może przeszukać",
+        "link": "Więcej o zakresie"
+      },
+      "sources": {
+        "title": "Kliknij numer, by zobaczyć fragment i jego stronę",
+        "link": "Więcej o źródłach"
+      },
+      "groups": {
+        "title": "Dokumenty i rozmowy w grupach",
+        "link": "Więcej o dokumentach"
+      },
+      "document": {
+        "title": "Zobacz, jak PDF został pocięty na fragmenty",
+        "link": "Więcej o kontroli jakości"
+      },
+      "searchLab": {
+        "title": "Porównaj oba wyszukiwania, bez modelu",
+        "link": "Więcej o laboratorium"
+      }
+    },
+    "cta": "Zobacz wszystkie funkcje"
+  },
+  "examples": {
+    "eyebrow": "Odpowiedzi",
+    "title": "Jak wygląda odpowiedź",
+    "note": "Oba przykłady są napisane ręcznie, żeby pokazać format. To nie są wyniki prawdziwego uruchomienia. Fragment w pierwszym pochodzi z unijnego Aneksu 11 do GMP, publicznego dokumentu, ze strony 3.",
+    "badge": "Przykład napisany ręcznie",
+    "questionLabel": "Pytanie",
+    "cited": {
+      "question": "Czy dane krytyczne wpisywane ręcznie wymagają dodatkowej kontroli?",
+      "answer": "Tak. Aneks 11 przewiduje dodatkową kontrolę poprawności danych krytycznych wpisanych ręcznie. Może jej dokonać druga osoba albo zwalidowane narzędzie elektroniczne <ref>[1]</ref>.",
+      "source": "Źródło 1: eu-gmp-annex11.pdf, strona 3"
+    },
+    "refused": {
+      "question": "Jaki jest dobry przepis na naleśniki?",
+      "answer": "Nie znaleziono w dokumentach. Nic w Twoich dokumentach nie dotyczy tego pytania, więc model nie został zapytany.",
+      "source": "Brak źródła: nic nie znaleziono"
+    }
+  },
+  "jsonLd": {
+    "operatingSystem": "Dowolny system, na którym działa Docker Compose"
+  }
+}

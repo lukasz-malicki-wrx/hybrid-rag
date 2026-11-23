@@ -19,6 +19,11 @@ reviews:
       instructions: >
         Check WCAG 2.1 AA (keyboard access, contrast, semantics, live regions)
         and responsive layout from 320 px.
+    - path: "apps/landing/**"
+      instructions: >
+        Check WCAG 2.2 AA, that every text goes through the translations (src/messages, none in
+        components), that no third-party origin is added to the CSP, and that shared components
+        (Heading, Text, Button) are used instead of raw elements.
     - path: "packages/**"
       instructions: >
         Check that nothing here imports from apps/, that tokens stay plain CSS without React,

@@ -73,3 +73,37 @@ test("a saved theme applies before the app's JavaScript runs (no flash)", async 
   await page.reload({ waitUntil: "domcontentloaded" });
   await expectBackground(page, DARK);
 });
+
+test("the pill in the rail flips between light and dark, and the choice is remembered", async ({ page }) => {
+  await page.emulateMedia({ colorScheme: "light", reducedMotion: "reduce" });
+  await page.goto("/");
+  await expectBackground(page, LIGHT);
+  const toDark = page.getByRole("complementary", { name: "Sidebar" }).getByRole("button", { name: "Switch to dark theme" });
+  await toDark.click();
+  await expectBackground(page, DARK);
+  await expectAccessible(page);
+
+  const toLight = page.getByRole("button", { name: "Switch to light theme" });
+  await expect(toLight).toBeVisible();
+  await expect(page.getByRole("button", { name: "Switch to dark theme" })).toHaveCount(0);
+
+  await page.reload();
+  await expectBackground(page, DARK);
+  await page.getByRole("button", { name: "Switch to light theme" }).click();
+  await expectBackground(page, LIGHT);
+  await expectAccessible(page);
+});
+
+test("with the system theme the pill shows what the device shows, and Settings still offers System default", async ({
+  page,
+}) => {
+  await page.emulateMedia({ colorScheme: "dark", reducedMotion: "reduce" });
+  await page.goto("/");
+  await expect(page.getByRole("button", { name: "Switch to light theme" })).toBeVisible();
+  await page.getByRole("button", { name: "Switch to light theme" }).click();
+  await expectBackground(page, LIGHT);
+
+  await chooseAppearance(page, "System default");
+  await expectBackground(page, DARK);
+  await expect(page.getByRole("button", { name: "Switch to light theme" })).toBeVisible();
+});

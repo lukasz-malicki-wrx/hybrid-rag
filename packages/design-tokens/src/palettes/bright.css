@@ -1,0 +1,28 @@
+/* Bright palette: the vintage hues (terracotta, muted green-grey, warm beige) arranged for a
+   marketing page: white and near-white surfaces, a near-black for text and the dark band, and one
+   saturated accent, the terracotta, for buttons, icons and the call to action. Used by the
+   landing page; the app keeps vintage. Text/background pairs meet WCAG 2.1 AA contrast (4.5:1
+   text, 3:1 UI) in both themes (palettes.test.ts). */
+:root {
+  --bg: light-dark(#ffffff, #171a19);
+  --surface: light-dark(#f6f4f1, #1f2321);
+  --surface-2: light-dark(#ece7e1, #2a2f2d);
+  --fg: light-dark(#1d2220, #f1ede8);
+  --muted: light-dark(#59625e, #a9b0aa);
+  --border: light-dark(#e2dcd4, #3a403d);
+  --accent: light-dark(#a54d3c, #e39a89);
+  --accent-fg: light-dark(#ffffff, #171a19);
+  --danger: light-dark(#9c3a2b, #efa597);
+  --danger-fg: light-dark(#ffffff, #171a19);
+  --warn-bg: light-dark(#f8ebdc, #3b2a1e);
+  --warn-fg: light-dark(#6a3a1c, #f0d3b8);
+  --ok: light-dark(#3a6a4b, #a9cda9);
+  --focus: light-dark(#a54d3c, #e39a89);
+  /* Marked text (search matches): a soft marker colour that stays readable on any palette. */
+  --mark: light-dark(#fbeb9a, #6f5c14);
+  --mark-fg: light-dark(#1a1a1a, #fff6d6);
+  /* Decoration (eyebrow dashes, doodles) and the "AI is working" highlight */
+  --ai-1: light-dark(#6a736f, #8e9a94);
+  --ai-2: light-dark(#b85f4c, #e39a89);
+  --ai-3: light-dark(#d9ab9a, #d9ab9a);
+}

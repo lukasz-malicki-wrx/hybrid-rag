@@ -1,0 +1,172 @@
+{
+  "hero": {
+    "title": "Co robi hybrid‑rag",
+    "lead": "Sześć obszarów, a w każdym to, co działa dziś, i gdzie leżą granice.",
+    "eyebrow": "Produkt"
+  },
+  "groups": {
+    "chat": {
+      "title": "Czat",
+      "lead": "Rozmowy z Twoimi dokumentami. Odpowiedzi spływają na bieżąco, a każda mówi, na czym się opiera.",
+      "more": "Czat w szczegółach"
+    },
+    "sources": {
+      "title": "Źródła",
+      "lead": "Sprawdzenie, dzięki któremu odpowiedź warto czytać: fragment, jego strona i oryginalny plik.",
+      "more": "Źródła w szczegółach"
+    },
+    "documents": {
+      "title": "Dokumenty i grupy",
+      "lead": "Wgraj PDF-y, trzymaj je w porządku i zachowaj każdą wersję.",
+      "more": "Dokumenty w szczegółach"
+    },
+    "scope": {
+      "title": "Zakres",
+      "lead": "Zakres wyszukiwania jest do wyboru, a aplikacja zawsze mówi, co przeszuka.",
+      "more": "Zakres w szczegółach"
+    },
+    "quality": {
+      "title": "Kontrola jakości",
+      "lead": "Gdy odpowiedź jest zła, możesz ustalić, czy zawinęło cięcie tekstu, wyszukiwanie czy model.",
+      "more": "Kontrola jakości w szczegółach"
+    },
+    "access": {
+      "title": "Dostępność i języki",
+      "lead": "Polski i angielski, jasny i ciemny motyw, klawiatura i telefon.",
+      "more": "Dostępność w szczegółach"
+    }
+  },
+  "items": {
+    "streaming": {
+      "title": "Odpowiedzi spływają na bieżąco",
+      "text": "Słowa pojawiają się, gdy model je pisze. Na CPU jest to wolniejsze niż w usłudze w chmurze, a pierwsza odpowiedź po uruchomieniu czeka na załadowanie modeli."
+    },
+    "stop": {
+      "title": "Stop w każdej chwili",
+      "text": "Stop kończy generowanie i zachowuje część odpowiedzi, oznaczoną jako zatrzymaną."
+    },
+    "followUps": {
+      "title": "Pytania uzupełniające",
+      "text": "Model widzi {historyTurns} ostatnie tury, a pytanie uzupełniające jest szukane razem z poprzednim, więc „jak często?” zadziała. Gdy zmienisz temat, może wrócić stary."
+    },
+    "feedback": {
+      "title": "Oceń, skopiuj, wygeneruj ponownie",
+      "text": "Możesz ocenić odpowiedź jako dobrą lub złą, skopiować ją bez znaczników cytatów albo zadać to samo pytanie jeszcze raz jako nową turę."
+    },
+    "labels": {
+      "title": "Uczciwe oznaczenia",
+      "text": "Każda odpowiedź mówi, że wygenerowała ją AI. Odmowa pokazuje się jako „Nie znaleziono w dokumentach”, a odpowiedź bez cytatu jest oznaczona: sprawdź ją, zanim na niej polegasz."
+    },
+    "personal": {
+      "title": "Twoje własne wskazówki",
+      "text": "W ustawieniach jest kontekst osobisty, na przykład „odpowiadaj po polsku, w punktach”. Idzie z każdym nowym pytaniem i nie zmienia tego, że odpowiedzi pochodzą tylko z Twoich dokumentów."
+    },
+    "citations": {
+      "title": "Klikalne cytaty",
+      "text": "Numery w odpowiedzi otwierają panel źródeł."
+    },
+    "panel": {
+      "title": "Fragment i jego strona",
+      "text": "Każde źródło pokazuje fragment, dokument, stronę i wersję. „Otwórz PDF” otwiera oryginał na tej stronie."
+    },
+    "searched": {
+      "title": "Zacytowane i przeszukane",
+      "text": "Panel oddziela fragmenty, na które powołuje się odpowiedź, od tych, które tylko przeszukano."
+    },
+    "record": {
+      "title": "Zapisane razem z odpowiedzią",
+      "text": "Każda odpowiedź jest zapisana razem z fragmentami, wersjami i skrótami dokumentów, modelami, wersją promptu i Twoim kontekstem osobistym. Zapisane pytania i odpowiedzi nigdy się nie zmieniają."
+    },
+    "original": {
+      "title": "Oryginalny PDF bez zmian",
+      "text": "Plik jest przechowywany pod swoim skrótem SHA-256, a przy każdym odczycie skrót jest sprawdzany."
+    },
+    "upload": {
+      "title": "Wrzuć PDF-y do pola wiadomości",
+      "text": "Przyciskiem albo przeciągnięciem. Pliki wgrywają się od razu i pokazują postęp indeksowania na żywo, a wysłanie wiadomości czeka, aż będą zaindeksowane."
+    },
+    "versions": {
+      "title": "Wersje",
+      "text": "Ta sama nazwa z inną zawartością staje się nową wersją, a starsze zostają. Identyczny plik nie jest przetwarzany drugi raz. Przeszukiwane są i stare, i nowe wersje, więc cytaty mogą się powtarzać."
+    },
+    "groups": {
+      "title": "Grupy",
+      "text": "Grupa zbiera dokumenty i rozmowy, na przykład „med” albo „prawo”. Rozmowa w grupie przeszukuje tylko dokumenty tej grupy. Dokument może być w kilku grupach i jest indeksowany raz."
+    },
+    "favourites": {
+      "title": "Do {favouritesLimit} ulubionych",
+      "text": "Oznacz rozmowę gwiazdką, a trafi do zakładki Zapisane. Limit {favouritesLimit} pilnuje baza danych, nie tylko ekran."
+    },
+    "overview": {
+      "title": "Wszystko w panelu bocznym",
+      "text": "Ulubione, grupy, ostatnie rozmowy i dokumenty ze statusem indeksowania. Każda rozmowa pokazuje podgląd ostatniej odpowiedzi."
+    },
+    "softDelete": {
+      "title": "Usuwanie pyta o zgodę",
+      "text": "Usuwając grupę, widzisz, ile rozmów zniknie razem z nią. Z bazy nic nie jest kasowane: dokumenty, grupy i rozmowy są ukrywane, a nie wymazywane."
+    },
+    "chip": {
+      "title": "Zawsze wiadomo, co jest przeszukiwane",
+      "text": "Znacznik obok pola wiadomości mówi, co przeszuka następna odpowiedź: wszystkie dokumenty, grupę albo wybrane pliki."
+    },
+    "pinned": {
+      "title": "Przypięte dokumenty",
+      "text": "Plik dołączony do wiadomości jest przypięty do rozmowy. Znacznik otwiera wybór, w którym wskazujesz dokumenty albo czyścisz zaznaczenie."
+    },
+    "rule": {
+      "title": "Zasada",
+      "text": "Rozmowa z przypiętymi dokumentami przeszukuje tylko je. W przeciwnym razie przeszukuje dokumenty swojej grupy, a bez grupy wszystkie dokumenty."
+    },
+    "inGroup": {
+      "title": "Nowe pliki trafiają do grupy",
+      "text": "W grupie pliki dodane do wiadomości są dodawane do tej grupy."
+    },
+    "gate": {
+      "title": "Bramka trafności",
+      "text": "Najbliższe fragmenty zawsze istnieją, więc „są jakieś wyniki” niczego nie dowodzi. Jeśli najbliższy fragment jest za daleko i żaden nie zawiera wszystkich istotnych słów pytania, model nie jest wywoływany, a odpowiedź mówi, że niczego nie znaleziono."
+    },
+    "documentPage": {
+      "title": "Strona dokumentu",
+      "text": "Fragmenty, na które pocięto PDF, z numerem strony, długością i filtrem tekstu, a do tego statystyki rozmiarów i oznaczenie bardzo krótkich. Złe odpowiedzi często zaczynają się od złego cięcia, więc zacznij tutaj."
+    },
+    "lab": {
+      "title": "Laboratorium wyszukiwania",
+      "text": "Uruchamia tylko etap wyszukiwania, bez modelu. Dla każdego fragmentu pokazuje jego miejsce w wyszukiwaniu wektorowym i pełnotekstowym, odległość i łączny wynik. Pusty wynik wyjaśnia, że bramka odmówiła."
+    },
+    "modes": {
+      "title": "Trzy tryby",
+      "text": "Hybrydowy (taki jak przy odpowiedziach), tylko wektorowy albo tylko pełnotekstowy. Każdy wynik prowadzi do swojego fragmentu na stronie dokumentu."
+    },
+    "evaluation": {
+      "title": "Ewaluacja, którą powtórzysz",
+      "text": "{evalQuestions} pytania i skrypt w repozytorium porównują tryby. Wyniki i ich ograniczenia są opisane."
+    },
+    "languages": {
+      "title": "Polski i angielski",
+      "text": "Interfejs podąża za językiem przeglądarki, a gdy jest inny, wybiera angielski; ustawienia mogą to zmienić. Odpowiedzi powstają w języku pytania."
+    },
+    "keyboard": {
+      "title": "Klawiatura i czytniki ekranu",
+      "text": "Link pomijający nawigację, fokus zatrzymany w oknach dialogowych i menu mobilnym, komunikat po zakończeniu odpowiedzi i szanowanie ograniczonego ruchu."
+    },
+    "axe": {
+      "title": "Sprawdzane automatycznie",
+      "text": "Testy end-to-end uruchamiają axe pod kątem WCAG 2.1 AA w jasnym i ciemnym motywie, w oknach dialogowych i na telefonie o szerokości 320 px. Testy automatyczne nie wykrywają wszystkiego."
+    },
+    "themes": {
+      "title": "Jasny i ciemny motyw",
+      "text": "Motyw podąża za systemem, chyba że w ustawieniach, w sekcji Wygląd, wybierzesz inaczej."
+    },
+    "phone": {
+      "title": "Mieści się na telefonie",
+      "text": "Układ działa od szerokości 320 px, a menu zastępuje panel boczny."
+    }
+  },
+  "more": {
+    "evaluation": "Przeczytaj ewaluację na GitHubie"
+  },
+  "overview": {
+    "eyebrow": "Przegląd",
+    "title": "Sześć obszarów, jedna aplikacja"
+  }
+}

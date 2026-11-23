@@ -1,0 +1,78 @@
+{
+  "hero": {
+    "title": "Najczęstsze pytania",
+    "lead": "Krótkie odpowiedzi o tym, co robi hybrid-rag, dokąd trafiają Twoje dane i czego aplikacja nie potrafi. Odpowiedzi opierają się na repozytorium i jego ewaluacji.",
+    "eyebrow": "Pytania"
+  },
+  "groups": {
+    "basics": "Podstawy",
+    "privacy": "Prywatność i dane",
+    "running": "Uruchamianie",
+    "documents": "Dokumenty",
+    "answers": "Odpowiedzi"
+  },
+  "items": {
+    "whatIs": {
+      "q": "Czym jest hybrid-rag?",
+      "a": "To otwarta aplikacja, która odpowiada na pytania o Twoje własne pliki PDF i pokazuje, skąd pochodzi każda odpowiedź. Szuka według sensu i według dokładnych słów, najlepsze fragmenty podaje modelowi językowemu, a odpowiedź je cytuje. Działa na Twoim komputerze w Docker Compose. Zobacz, <how>jak to działa</how>."
+    },
+    "accounts": {
+      "q": "Czy potrzebuję konta albo klucza API?",
+      "a": "Nie. Aplikacja nie ma kont, a domyślna konfiguracja nie wymaga klucza API. Nie ma też logowania, co ma znaczenie, jeśli ją komuś udostępniasz: zobacz pytania o prywatność poniżej."
+    },
+    "cost": {
+      "q": "Ile to kosztuje?",
+      "a": "Uruchomienie u siebie jest darmowe. Płacisz za własny sprzęt i prąd, a za Claude API tylko wtedy, gdy wybierzesz je przez <code>LLM_PROVIDER=anthropic</code>. Plany na <pricing>stronie cennika</pricing> to podgląd: niczego nie można kupić."
+    },
+    "licence": {
+      "q": "Na jakiej licencji to jest?",
+      "a": "MIT. Możesz używać, kopiować, zmieniać i udostępniać aplikację, także komercyjnie, pod warunkiem zachowania informacji o licencji. Dokładne warunki są w <licence>pliku LICENSE</licence>."
+    },
+    "dataWhere": {
+      "q": "Dokąd trafiają moje dane?",
+      "a": "Domyślnie Twoje PDF-y, pytania i odpowiedzi zostają na Twoim komputerze. Baza danych i oba modele działają w kontenerach na komputerze (modele przez Ollamę), porty nasłuchują tylko na 127.0.0.1, a modele pobierają się tylko przy pierwszym uruchomieniu. Jeśli ustawisz <code>LLM_PROVIDER=anthropic</code>, odpowiedź pisze API Anthropic i trafia do niego: {sent}. Indeksowanie nadal odbywa się lokalnie."
+    },
+    "website": {
+      "q": "Czy ta strona mnie śledzi?",
+      "a": "Nie. Nie ustawia ciasteczek, nie ma analityki i nie wysyła żadnych zapytań do innych serwisów. Zapamiętuje tylko wybrany motyw, w Twojej przeglądarce. Szczegóły są na <privacy>stronie o prywatności</privacy>."
+    },
+    "shared": {
+      "q": "Kto widzi moje dokumenty?",
+      "a": "Każdy, kto ma dostęp do API. Domyślnie masz go tylko Ty, na swoim komputerze. Logowania jeszcze nie ma, więc jeśli udostępnisz aplikację w sieci, wszyscy, którzy do niej dotrą, zobaczą te same dokumenty, grupy i rozmowy. Tekst z PDF trafia do promptu. Ograniczniki i instrukcje zmniejszają ryzyko wstrzyknięcia poleceń, ale go nie wykluczają, więc nie wgrywaj dokumentów, którym nie ufasz."
+    },
+    "hardware": {
+      "q": "Jakiego sprzętu potrzebuję i jak szybko to działa?",
+      "a": "Potrzebny jest Docker z Compose, około {ramGb} GB RAM i {diskGb} GB miejsca na dysku na modele. Karta graficzna nie jest wymagana: całość celowo działa na procesorze, żeby każdy mógł ją uruchomić jedną komendą. Kosztem jest szybkość. Indeksowanie {indexPages}-stronicowego PDF-a trwało około {indexMinutes} minut na procesorze laptopa, odpowiedzi zaczynają się po krótkiej przerwie i powstają w tempie procesora, a pierwsze zapytanie po starcie jest wolniejsze. Dla szybkości GPU uruchom Ollamę natywnie (Metal na procesorach Apple, CUDA na Linuksie) i dodaj nakładkę <code>docker-compose.native-ollama.yml</code>. Docker Desktop na macOS nie przekazuje GPU do kontenera."
+    },
+    "models": {
+      "q": "Jakich modeli używa?",
+      "a": "bge-m3 do embeddingów (około {embeddingGb} GB) i qwen2.5:3b do pisania odpowiedzi (około {chatGb} GB), oba przez Ollamę. Inny model ustawisz w <code>LLM_MODEL</code>, na przykład qwen2.5:7b z kartą graficzną, albo użyjesz Claude przez <code>LLM_PROVIDER=anthropic</code>. Inny model embeddingów wymaga wektorów tej samej długości i ponownego zaindeksowania wszystkiego."
+    },
+    "languages": {
+      "q": "W jakich językach działa?",
+      "a": "Interfejs jest po angielsku i po polsku. Model embeddingów jest wielojęzyczny: w pomiarze wszystkie {evalPolish} pytania po polsku o angielskie dokumenty miały właściwy fragment na pierwszym miejscu. Wyszukiwanie po słowach używa angielskiej listy słów pomijanych, a małe modele lokalne potrafią pisać po polsku niezgrabnie, więc słabsze strony to wyszukiwanie dokładnych słów po polsku i same polskie odpowiedzi."
+    },
+    "fileTypes": {
+      "q": "Jakie pliki mogę wgrać i jak duże?",
+      "a": "Tylko PDF, i to z warstwą tekstu. Skanów bez tekstu aplikacja nie obsługuje: nie ma OCR. Domyślny limit to {uploadMb} MB na plik, zmienisz go w <code>MAX_UPLOAD_MB</code>. Identyczne pliki są zapisywane raz, a ta sama nazwa z inną treścią staje się nową wersją, przy czym starsze wersje zostają."
+    },
+    "groups": {
+      "q": "Czy mogę trzymać dokumenty osobno?",
+      "a": "Tak. Grupy zbierają dokumenty i rozmowy, na przykład „med” i „prawo”. Rozmowa w grupie przeszukuje tylko dokumenty tej grupy, a jeden dokument może należeć do kilku grup. Możesz też przypiąć wybrane dokumenty do rozmowy, żeby szukać tylko w nich."
+    },
+    "citations": {
+      "q": "Jak działają cytaty?",
+      "a": "Model dostaje polecenie cytowania otrzymanych fragmentów jako [1], [2]. Każdy numer otwiera fragment i odsyła do oryginalnego PDF-a na cytowanej stronie. Każda odpowiedź jest zapisana razem z dokładnymi fragmentami, wersjami dokumentów, modelami i wersją promptu, na których się oparła, więc później widać, na czym polegała."
+    },
+    "notFound": {
+      "q": "Co się dzieje, gdy odpowiedzi nie ma w moich dokumentach?",
+      "a": "Najpierw działa bramka trafności. Jeśli żaden fragment nie jest dość bliski pytaniu, model nie jest wywoływany, a aplikacja mówi, że nie znalazła tego w dokumentach. Odpowiedzi bez żadnego cytatu są oznaczane. W pomiarze wyszukiwanie hybrydowe nie zwróciło nic dla wszystkich {evalOffTopic} pytań spoza tematu."
+    },
+    "accuracy": {
+      "q": "Czy odpowiedzi są zawsze poprawne?",
+      "a": "Nie. Małe modele lokalne się mylą, dlatego każda odpowiedź ma etykietę wygenerowanej przez AI i podaje źródła do sprawdzenia. Pomiar dotyczy wyszukiwania, a nie napisanych odpowiedzi: na {evalAnswerable} pytaniach z odpowiedzią w {evalDocuments} publicznych dokumentach regulacyjnych wyszukiwanie hybrydowe zawsze miało właściwy fragment w pierwszej dziesiątce (samo wyszukiwanie wektorowe: {vectorTop10}). To mała próba z jednej dziedziny. Metodę i ograniczenia opisuje <evaluation>pomiar</evaluation>."
+    }
+  },
+  "more": "Nie ma tu Twojego pytania? <issues>Zgłoś je na GitHubie</issues> albo przeczytaj, <how>jak to działa</how>.",
+  "groupsLabel": "Grupy pytań"
+}

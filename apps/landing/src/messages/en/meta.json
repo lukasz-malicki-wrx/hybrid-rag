@@ -1,0 +1,40 @@
+{
+  "home": {
+    "title": "hybrid-rag: ask your PDFs, check every answer",
+    "description": "hybrid-rag answers questions about your own PDFs and shows where each answer comes from."
+  },
+  "features": {
+    "title": "Features",
+    "description": "What hybrid-rag does: cited answers, two ways of searching, groups, and tools to see where a wrong answer came from."
+  },
+  "how-it-works": {
+    "title": "How it works",
+    "description": "From PDF to answer: how hybrid-rag splits, indexes and searches documents, and why it can say it found nothing."
+  },
+  "pricing": {
+    "title": "Pricing",
+    "description": "Free, Basic and Unlimited plans. A preview only: the app has no payments yet."
+  },
+  "about": {
+    "title": "About hybrid-rag and its author",
+    "description": "Who builds hybrid-rag, why it exists and how to help. An open source project by Lukasz Malicki, Poland."
+  },
+  "faq": {
+    "title": "Frequently asked questions",
+    "description": "Answers about what hybrid-rag can and cannot do, where your data goes and how to run it."
+  },
+  "privacy": {
+    "title": "Privacy",
+    "description": "What this website stores and what it does not: no cookies, no analytics, no third-party requests."
+  },
+  "accessibility": {
+    "title": "Accessibility statement",
+    "description": "How this website was built and checked for accessibility, and how to report a problem."
+  },
+  "manifest": {
+    "description": "Ask questions about your PDFs and get answers with citations."
+  },
+  "og": {
+    "alt": "{title}. {description}"
+  }
+}

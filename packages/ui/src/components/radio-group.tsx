@@ -1,5 +1,6 @@
 "use client";
 
+import { FIELD_LABEL } from "./field";
 import { Radio } from "./radio";
 
 export type RadioOption<T extends string> = { value: T; label: string };
@@ -20,7 +21,7 @@ export function RadioGroup<T extends string>({
 }) {
   return (
     <fieldset>
-      <legend className="mb-1 font-medium">{legend}</legend>
+      <legend className={`${FIELD_LABEL} mb-1.5`}>{legend}</legend>
       {options.map((option) => (
         <Radio
           key={option.value}
