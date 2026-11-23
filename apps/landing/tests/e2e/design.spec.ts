@@ -151,7 +151,7 @@ test.describe("home, from the Figma layout", () => {
   });
 });
 
-test.describe("on a phone the pictures run to the edges, right under the header", () => {
+test.describe("on a phone the pictures run to the edges (under the text in a page header, under the site header in a section)", () => {
   for (const [path, selector] of [
     ["/en", "main header"],
     ["/en", "section[aria-labelledby=home-about]"],
@@ -174,14 +174,20 @@ test.describe("on a phone the pictures run to the edges, right under the header"
           radius: getComputedStyle(frame).borderTopLeftRadius,
           top: box.top - el.getBoundingClientRect().top,
           gapToText: heading.getBoundingClientRect().top - box.bottom,
+          gapAfterText: box.top - heading.getBoundingClientRect().bottom,
         };
       });
       expect(geometry.left).toBe(0);
       expect(geometry.right).toBe(0);
       expect(geometry.ratio).toBeCloseTo(375 / 240, 1);
       expect(geometry.radius).toBe("0px");
-      expect(geometry.top).toBe(0);
-      expect(geometry.gapToText).toBeGreaterThanOrEqual(40);
+      if (selector === "main header") {
+        // A page header: the text comes first, the picture follows it.
+        expect(geometry.gapAfterText).toBeGreaterThanOrEqual(40);
+      } else {
+        expect(geometry.top).toBe(0);
+        expect(geometry.gapToText).toBeGreaterThanOrEqual(40);
+      }
       // No sideways scroll from the bleed.
       expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0);
     });
