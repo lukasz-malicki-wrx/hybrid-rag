@@ -351,7 +351,6 @@ packages/design-tokens/      colour palettes and theme variables, plain CSS
 packages/ui/                 React components and icons, one component per file, and base styles
 packages/eslint-config/      shared ESLint configs
 packages/typescript-config/  shared tsconfig bases
-design/figma/                Figma plugin that generates the design file from the code
 eval/                        evaluation questions
 samples/                     public PDFs used as sample data and evaluation corpus
 scripts/                     sample seeding and re-download
@@ -384,11 +383,6 @@ It has three pages:
 
 Every screen exists in a light and a dark version. Colours, spacing and radius are Figma variables
 and text uses text styles, all named after the code.
-
-A Figma plugin in [design/figma](design/figma) builds the file from this repo: it reads the
-tokens, translations, icons and screenshots and draws everything again. After a change in the
-UI, run `npm run figma:build` and run the plugin again in Figma Desktop. The steps are in
-[design/figma/README.md](design/figma/README.md) (in Polish).
 
 ## Monorepo
 

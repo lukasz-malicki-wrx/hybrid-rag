@@ -15,9 +15,7 @@
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
-    "test:e2e": "turbo run test:e2e",
-    "figma:build": "node design/figma/build.mjs",
-    "figma:test": "node design/figma/test/run.mjs"
+    "test:e2e": "turbo run test:e2e"
   },
   "devDependencies": {
     "turbo": "2.11.13"
