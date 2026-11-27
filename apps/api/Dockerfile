@@ -1,5 +1,5 @@
 # Build stage: resolve dependencies from the lockfile into a virtualenv.
-FROM ghcr.io/astral-sh/uv:0.13.9 AS uv
+FROM ghcr.io/astral-sh/uv:0.13.10 AS uv
 
 FROM python:3.15.2-slim-bookworm AS builder
 COPY --from=uv /uv /usr/local/bin/uv
