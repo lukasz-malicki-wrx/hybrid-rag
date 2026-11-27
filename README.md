@@ -1,17 +1,26 @@
 # hybrid-rag
 
-Ask questions about your PDFs and get answers with citations. Retrieval combines vector
-search (pgvector, bge-m3 embeddings) with full-text search, fused with Reciprocal Rank Fusion.
-Every answer is stored with what it was based on: the exact chunks, document versions, models
-and prompt version.
+Ask questions about your PDFs and get answers that cite the page they come from. Search combines
+meaning (vector search with pgvector and bge-m3 embeddings) and exact words (full-text search),
+merged with Reciprocal Rank Fusion. Every answer is stored with what it was based on: the exact
+chunks, document versions, models and prompt version.
 
-Landing page can be found at https://hybrid-rag-rho.vercel.app/en
+Everything runs on your own computer with Docker Compose. No accounts, API keys or hosting needed.
 
-Everything runs locally with Docker Compose. No accounts, API keys or hosting are required.
+**Links:** [Website](https://hybrid-rag-rho.vercel.app/en) ·
+[Figma design](https://www.figma.com/design/PMkNP9EogvXorM5SZ8XWLb/hybrid-rag) ·
+[How it works (Polish)](docs/HOW_IT_WORKS.md) · [Evaluation](docs/EVALUATION.md)
 
-> **Status:** API and web UI are working: upload with live indexing progress, groups,
-> multi-turn conversations with favourites, streamed answers with clickable citations, personal
-> answer preferences and retrieval evaluation.
+> **Status:** the API and web UI work: upload with live indexing progress, groups, conversations
+> with favourites, streamed answers with clickable citations, personal answer preferences and
+> retrieval evaluation.
+
+**Contents:** [Screenshots](#screenshots) · [Quick start](#quick-start) ·
+[Runs on CPU](#runs-on-cpu) · [API](#api-at-a-glance) · [Web UI](#web-ui) ·
+[How it works](#how-it-works) · [Retrieval quality](#retrieval-quality) ·
+[Configuration](#configuration) · [Project layout](#project-layout) · [Website](#website) ·
+[Design](#design) · [Monorepo](#monorepo) · [Limitations](#limitations) ·
+[Development](#development)
 
 ## Screenshots
 
@@ -35,37 +44,6 @@ The website (`apps/landing`, English and Polish):
 
 The pictures are made from demo data: `npm run screenshots` in `apps/web` (app) and in
 `apps/landing` (website) regenerates them.
-
-## Runs on CPU, on purpose
-
-The stack runs in Docker on **CPU only**. This is a deliberate choice: anyone can clone the
-repo and start it with one command, without a GPU, drivers or special Docker runtime.
-
-The trade-off is speed. Embedding and text generation are noticeably slower than on a GPU:
-
-- Indexing a PDF takes seconds to minutes depending on its size (a 29-page document took
-  about 8 minutes on a laptop CPU).
-- Answers start streaming after a short delay and arrive at CPU speed.
-- The first request after startup is slower because the models are loaded into memory.
-
-### Using the GPU
-
-Docker Desktop on macOS cannot pass the GPU to a container, so for GPU speed (Metal on Apple
-silicon, CUDA on Linux) run Ollama natively and let the containers call it. The
-`docker-compose.native-ollama.yml` overlay does that: it leaves out the Ollama container and
-points the API and worker at `host.docker.internal:11434`.
-
-```bash
-brew install --cask ollama          # or see https://ollama.com/download; then start it
-ollama pull bge-m3 && ollama pull qwen2.5:3b
-docker compose stop ollama          # if the container version was running (same port)
-docker compose -f docker-compose.yml -f docker-compose.native-ollama.yml up -d
-```
-
-The models now live on the host, not in the `ollama` volume. The index stays valid because the
-embedding model is the same. While an answer is written, `ollama ps` shows `100% GPU`. With a
-GPU a larger chat model is practical (`LLM_MODEL=qwen2.5:7b`). Alternatively use the Claude API
-for generation (`LLM_PROVIDER=anthropic`); nothing else changes.
 
 ## Quick start
 
@@ -110,6 +88,37 @@ curl -N -X POST http://localhost:8000/answers \
   -d '{"question": "Who is allowed to certify batch release?"}'
 ```
 
+## Runs on CPU
+
+The stack runs in Docker on the CPU only, so anyone can clone the repo and start it with one
+command, without a GPU, drivers or a special Docker runtime.
+
+The trade-off is speed. Embedding and text generation are noticeably slower than on a GPU:
+
+- Indexing a PDF takes seconds to minutes depending on its size (a 29-page document took
+  about 8 minutes on a laptop CPU).
+- Answers start streaming after a short delay and arrive at CPU speed.
+- The first request after startup is slower because the models are loaded into memory.
+
+### Using the GPU
+
+Docker Desktop on macOS cannot pass the GPU to a container, so for GPU speed (Metal on Apple
+silicon, CUDA on Linux) run Ollama natively and let the containers call it. The
+`docker-compose.native-ollama.yml` overlay does that: it leaves out the Ollama container and
+points the API and worker at `host.docker.internal:11434`.
+
+```bash
+brew install --cask ollama          # or see https://ollama.com/download; then start it
+ollama pull bge-m3 && ollama pull qwen2.5:3b
+docker compose stop ollama          # if the container version was running (same port)
+docker compose -f docker-compose.yml -f docker-compose.native-ollama.yml up -d
+```
+
+The models now live on the host, not in the `ollama` volume. The index stays valid because the
+embedding model is the same. While an answer is written, `ollama ps` shows `100% GPU`. With a
+GPU a larger chat model is practical (`LLM_MODEL=qwen2.5:7b`). Alternatively use the Claude API
+for generation (`LLM_PROVIDER=anthropic`); nothing else changes.
+
 ## API at a glance
 
 | Area | Endpoints |
@@ -148,8 +157,6 @@ language and the light/dark switch.
 - A chip next to the message box always says what the next answer will search ("Searching all
   documents", "Searching group “med”", "Searching 2 selected documents"). Attached files are
   pinned to the conversation; the chip opens a picker to choose documents or clear the selection.
-- Server data lives in TanStack Query; shared client state (the streaming answer, the mobile
-  menu, notifications, language, theme) in Zustand, so each token re-renders only the live answer.
 - Answers stream in. Citation numbers open a sources panel with the excerpt and a link to the
   original PDF at the cited page. **Stop** ends generation; the partial answer is kept.
 - Answers are labelled as AI-generated, and flagged when nothing was found or nothing is cited.
@@ -362,6 +369,21 @@ Privacy and Accessibility. It shares the components, tokens and translation code
 checked with axe, HTML validation, a link checker and Lighthouse in CI. It is meant for Vercel;
 setup, commands and the screenshot workflow are in [apps/landing/README.md](apps/landing/README.md).
 
+## Design
+
+The design of the app and the website is in Figma:
+[hybrid-rag design file](https://www.figma.com/design/PMkNP9EogvXorM5SZ8XWLb/hybrid-rag).
+It has three pages:
+
+- **Design System**: colours, type, spacing, radius, shadows, the grid, icons and every component
+  with its variants and states (buttons, form fields, tabs, dialogs, toasts and inline alerts, and
+  the parts of the website and the app).
+- **Landing**: Home, Features, How it works and FAQ, on desktop (1440 px) and phone (375 px).
+- **App**: start, conversation with sources, group, document, search lab and settings.
+
+Every screen exists in a light and a dark version. Colours, spacing and radius are Figma variables
+and text uses text styles, all named after the code.
+
 ## Monorepo
 
 The JavaScript side is an npm workspace (`apps/*` and `packages/*`), and
@@ -446,7 +468,9 @@ the API refuses to start if one of them was edited.
 The API image is multi-stage, runs as a non-root user and has a liveness healthcheck
 (`/health/live`). Base images and tools are pinned to exact versions.
 
-Web UI (Node 22, version in `.nvmrc`). `npm run dev` serves it on <http://localhost:3000>
+Web UI (Node 22, version in `.nvmrc`). Server data lives in TanStack Query; shared client state
+(the streaming answer, the mobile menu, notifications, language, theme) lives in Zustand, so each
+token re-renders only the live answer. `npm run dev` serves it on <http://localhost:3000>
 against the API on port 8000. After changing the API, regenerate the client types with
 `npm run api:types -w @hybrid-rag/web`. Run all commands from the repository root:
 
